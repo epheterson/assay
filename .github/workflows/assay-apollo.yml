@@ -1,0 +1,93 @@
+name: assay — Balackburn/Apollo
+
+# Polls the Balackburn/Apollo repo for new Apollo IPA releases and runs the
+# full assay pipeline on each new release.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: assay-Balackburn-Apollo
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  models: read
+
+jobs:
+  assay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache previous-release binary
+        uses: actions/cache@v4
+        with:
+          path: /tmp/assay-baseline
+          key: assay-baseline-Balackburn-Apollo-v1
+
+      - name: Run assay pipeline
+        id: assay
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASSAY_OWNER: ${{ github.repository_owner }}
+          ASSAY_REPO: ${{ github.event.repository.name }}
+        run: |
+          python3 scripts/poll_and_assay.py \
+            --assay-owner "$ASSAY_OWNER" \
+            --assay-repo  "$ASSAY_REPO" \
+            --tracked-owner Balackburn \
+            --tracked-repo Apollo \
+            --code-owner JeffreyCA \
+            --code-repo Apollo-ImprovedCustomApi \
+            --binary-asset-pattern 'GLASS_Apollo-.*\.ipa$' \
+            --binary-inner-path 'Payload/Apollo.app/Apollo' \
+            --allowlist examples/apollo/allowlist.json
+
+      - name: Persist new verdict to repo
+        if: steps.assay.outputs.new_release == 'true'
+        env:
+          NEW_TAG: ${{ steps.assay.outputs.tag }}
+          VERDICT: ${{ steps.assay.outputs.verdict }}
+        run: |
+          git config user.name "assay-bot"
+          git config user.email "assay-bot@users.noreply.github.com"
+          git add verdicts/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m "verdict: Balackburn/Apollo $NEW_TAG — $VERDICT"
+            git push
+          fi
+
+      - name: Send email
+        if: steps.assay.outputs.new_release == 'true' && env.HAVE_SMTP == 'true'
+        env:
+          HAVE_SMTP: ${{ secrets.GMAIL_APP_PASSWORD != '' && 'true' || 'false' }}
+          EMAIL_SUBJECT: "[assay] Balackburn/Apollo ${{ steps.assay.outputs.tag }} — ${{ steps.assay.outputs.verdict }}"
+          EMAIL_HEADLINE: ${{ steps.assay.outputs.headline }}
+          EMAIL_VERDICT: ${{ steps.assay.outputs.verdict }}
+          EMAIL_SCORE: ${{ steps.assay.outputs.score }}
+          EMAIL_TAG: ${{ steps.assay.outputs.tag }}
+          EMAIL_REASONING: ${{ steps.assay.outputs.reasoning }}
+          EMAIL_ISSUE_URL: ${{ steps.assay.outputs.issue_url }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          from: "assay"
+          to: epheterson@gmail.com
+          subject: ${{ env.EMAIL_SUBJECT }}
+          html_body: |
+            <h2>${{ env.EMAIL_HEADLINE }}</h2>
+            <p><b>Verdict:</b> <code>${{ env.EMAIL_VERDICT }}</code> (score ${{ env.EMAIL_SCORE }}/10)<br/>
+               <b>Tag:</b> <code>${{ env.EMAIL_TAG }}</code></p>
+            <h3>Reasoning</h3>
+            <p>${{ env.EMAIL_REASONING }}</p>
+            <p><a href="${{ env.EMAIL_ISSUE_URL }}">→ Full report on GitHub</a></p>
+            <hr/>
+            <p style="color:#888;font-size:12px">assay · Balackburn/Apollo</p>
