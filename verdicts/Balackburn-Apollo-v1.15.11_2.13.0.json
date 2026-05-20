@@ -14,7 +14,7 @@
     "consistent_with_notes": false,
     "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
     "judge_source": "heuristic-fallback:HTTPError",
-    "judge_error": "HTTP Error 400: Bad Request",
+    "judge_error": "HTTP Error 400: Bad Request :: {\n  \"error\": {\n    \"message\": \"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\",\n    \"type\": \"invalid_request_error\",\n    \"param\": \"messages\",\n    \"code\": null\n  }\n}",
     "hard_flagged_modules": [
       "committer_diff"
     ]
@@ -53,7 +53,7 @@
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmpuov7mhix/new/Apollo",
+      "new_path": "/tmp/tmpbxtgn2gw/new/Apollo",
       "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
