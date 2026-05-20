@@ -168,6 +168,7 @@ def judge(
                 "MODULE_FINDINGS_JSON": json.dumps(findings, indent=2)[:30000],
             },
         )
+        raw = None
         try:
             raw = call_github_models(
                 model=prompt["model"],
@@ -179,15 +180,32 @@ def judge(
             )
             result = extract_json(raw)
             result["judge_source"] = f"github-models:{prompt['model']}"
-        except (
-            urllib.error.HTTPError,
-            urllib.error.URLError,
-            ValueError,
-            KeyError,
-        ) as e:
+        except (urllib.error.HTTPError, urllib.error.URLError) as e:
             result = heuristic_verdict(findings)
             result["judge_source"] = f"heuristic-fallback:{type(e).__name__}"
             result["judge_error"] = str(e)[:300]
+        except (ValueError, KeyError) as e:
+            # LLM returned content we couldn't parse. Don't silently fall back
+            # to clean — treat as a low-confidence review and surface the raw
+            # response so the prompt can be tuned.
+            result = {
+                "verdict": "review",
+                "score": 4,
+                "headline": "Could not parse LLM verdict; manual review",
+                "anomalies": [],
+                "consistent_with_notes": False,
+                "reasoning": (
+                    f"LLM returned a response that couldn't be parsed as the "
+                    f"expected JSON schema ({type(e).__name__}: {e}). Raw "
+                    f"response preserved below in `raw_response` for prompt "
+                    f"tuning. Falling back to 'review' so we don't claim "
+                    f"'clean' on a parse failure."
+                ),
+                "judge_source": f"unparseable:{type(e).__name__}",
+                "judge_error": str(e)[:300],
+            }
+        if raw is not None:
+            result["raw_response"] = raw[:4000]
 
     # Rule-based override: hard_flag => not clean
     hard_flagged = [f.get("module") for f in findings if f.get("hard_flag")]
