@@ -111,8 +111,18 @@ def call_github_models(
         },
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        data = json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        # Surface the response body so we can debug 4xx/5xx
+        try:
+            err_body = e.read().decode("utf-8", errors="replace")[:1000]
+        except Exception:
+            err_body = "(no body)"
+        raise urllib.error.HTTPError(
+            e.url, e.code, f"{e.reason} :: {err_body}", e.headers, None
+        ) from e
     return data["choices"][0]["message"]["content"]
 
 
