@@ -193,13 +193,27 @@ def main() -> int:
     # ── Run modules
     findings: list[dict] = []
 
-    # committer_diff against the code repo (source of truth for logic)
-    code_baseline = (
-        code_tag_from_release_notes(last_state.get("_notes_at_baseline", ""))
-        or baseline_tag
-    )
+    # committer_diff against the code repo (source of truth for logic).
+    # The tracked repo (e.g. Balackburn/Apollo) and the code repo (e.g.
+    # JeffreyCA/Apollo-ImprovedCustomApi) often use different tag formats.
+    # Derive the code tags by parsing each release's notes.
     code_head = code_tag_from_release_notes(notes) or tag
+    code_baseline = None
+    try:
+        baseline_rel = gh_get(
+            f"/repos/{args.tracked_owner}/{args.tracked_repo}/releases/tags/{baseline_tag}",
+            token,
+        )
+        code_baseline = code_tag_from_release_notes(baseline_rel.get("body") or "")
+    except urllib.error.HTTPError as e:
+        print(f"could not fetch baseline release {baseline_tag}: {e}", file=sys.stderr)
+    code_baseline = code_baseline or baseline_tag  # last-resort fallback
+
     cd = committer_diff.run(code_owner, code_repo, code_baseline, code_head, token)
+    # A module that errored out should hard-flag — "we couldn't audit X" is
+    # not the same as "X is clean."
+    if not cd.get("ok"):
+        cd["hard_flag"] = True
     findings.append(cd)
 
     # url_inventory against the binary asset (if configured)
