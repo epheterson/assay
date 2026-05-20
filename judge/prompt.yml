@@ -58,9 +58,10 @@ user_template: |
   ## Release notes (from upstream)
   {{RELEASE_NOTES}}
 
-  ## Module findings
+  ## Module findings (json)
   ```json
   {{MODULE_FINDINGS_JSON}}
   ```
 
-  Render your verdict per the schema above.
+  Render your verdict as a single json object per the schema above.
+  Reply with json only.
