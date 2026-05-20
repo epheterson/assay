@@ -1,25 +1,59 @@
 {
   "verdict": {
-    "verdict": "clean",
-    "score": 8,
-    "headline": "No hard flags from any module",
-    "anomalies": [],
-    "consistent_with_notes": true,
-    "reasoning": "Heuristic judge (no LLM available). No module flagged anomalies.",
+    "verdict": "review",
+    "score": 5,
+    "headline": "Hard flag from module(s); manual review needed",
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "committer_diff",
+        "what": "32 commits by 6 authors. 2 new author(s): ['bajader', 'epheterson']. ",
+        "why_it_matters": "Hard flag indicates a programmatic check tripped."
+      }
+    ],
+    "consistent_with_notes": false,
+    "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
     "judge_source": "heuristic-fallback:HTTPError",
     "judge_error": "HTTP Error 400: Bad Request",
-    "hard_flagged_modules": []
+    "hard_flagged_modules": [
+      "committer_diff"
+    ]
   },
   "findings": [
     {
       "module": "committer_diff",
-      "ok": false,
-      "error": "HTTPError 404 fetching compare v1.15.11_2.11.0...v2.13.0"
+      "ok": true,
+      "owner": "JeffreyCA",
+      "repo": "Apollo-ImprovedCustomApi",
+      "base_ref": "v2.11.0",
+      "head_ref": "v2.13.0",
+      "window_commit_count": 32,
+      "window_authors": {
+        "icpryde": 10,
+        "jordanearle": 1,
+        "JeffreyCA": 18,
+        "DeltAndy123": 1,
+        "bajader": 1,
+        "epheterson": 1
+      },
+      "new_authors": [
+        "bajader",
+        "epheterson"
+      ],
+      "existing_authors": [
+        "DeltAndy123",
+        "JeffreyCA",
+        "icpryde",
+        "jordanearle"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": true,
+      "summary": "32 commits by 6 authors. 2 new author(s): ['bajader', 'epheterson']. "
     },
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmp1je3k26h/new/Apollo",
+      "new_path": "/tmp/tmpuehi1zvu/new/Apollo",
       "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
