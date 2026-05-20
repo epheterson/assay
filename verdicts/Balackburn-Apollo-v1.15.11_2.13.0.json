@@ -1,20 +1,26 @@
 {
   "verdict": {
-    "verdict": "review",
-    "score": 5,
-    "headline": "Hard flag from module(s); manual review needed",
+    "verdict": "blocked",
+    "score": 4,
+    "headline": "New authors introduced with hard flag raised",
     "anomalies": [
       {
-        "severity": "medium",
+        "severity": "high",
         "module": "committer_diff",
-        "what": "32 commits by 6 authors. 2 new author(s): ['bajader', 'epheterson']. ",
-        "why_it_matters": "Hard flag indicates a programmatic check tripped."
+        "what": "Two new authors introduced in the commit history.",
+        "why_it_matters": "New authors can introduce unvetted code, raising supply chain risks."
+      },
+      {
+        "severity": "medium",
+        "module": "url_inventory",
+        "what": "One new host added that is not on the allowlist.",
+        "why_it_matters": "Unallowlisted hosts can potentially lead to data exfiltration or malicious activity."
       }
     ],
     "consistent_with_notes": false,
-    "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
-    "judge_source": "heuristic-fallback:HTTPError",
-    "judge_error": "HTTP Error 400: Bad Request :: {\n  \"error\": {\n    \"message\": \"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\",\n    \"type\": \"invalid_request_error\",\n    \"param\": \"messages\",\n    \"code\": null\n  }\n}",
+    "reasoning": "The release introduces two new authors, which raises a hard flag due to potential risks associated with unvetted contributions. Additionally, a new host, www.apple.com, was added that is not on the allowlist, further compounding the risk. These factors necessitate blocking the release.",
+    "judge_source": "github-models:openai/gpt-4o-mini",
+    "raw_response": "{\n  \"verdict\": \"blocked\",\n  \"score\": 4,\n  \"headline\": \"New authors introduced with hard flag raised\",\n  \"anomalies\": [\n    {\n      \"severity\": \"high\",\n      \"module\": \"committer_diff\",\n      \"what\": \"Two new authors introduced in the commit history.\",\n      \"why_it_matters\": \"New authors can introduce unvetted code, raising supply chain risks.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"module\": \"url_inventory\",\n      \"what\": \"One new host added that is not on the allowlist.\",\n      \"why_it_matters\": \"Unallowlisted hosts can potentially lead to data exfiltration or malicious activity.\"\n    }\n  ],\n  \"consistent_with_notes\": false,\n  \"reasoning\": \"The release introduces two new authors, which raises a hard flag due to potential risks associated with unvetted contributions. Additionally, a new host, www.apple.com, was added that is not on the allowlist, further compounding the risk. These factors necessitate blocking the release.\"\n}",
     "hard_flagged_modules": [
       "committer_diff"
     ]
@@ -53,7 +59,7 @@
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmps79ldhb6/new/Apollo",
+      "new_path": "/tmp/tmphgf_ksnh/new/Apollo",
       "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
