@@ -22,24 +22,51 @@ MODELS_URL = "https://models.github.ai/inference/chat/completions"
 
 
 def load_prompt(path: Path) -> dict:
-    """Tiny YAML loader for our prompt file (avoid PyYAML dep)."""
+    """Load the prompt config from YAML.
+
+    Uses PyYAML if available (default on Ubuntu Actions runners), falls back
+    to a line-based block-scalar parser for environments without PyYAML.
+    The fallback supports blank lines inside block scalars — a real YAML
+    block ends at a less-indented non-blank line, NOT at the first blank.
+    """
     text = path.read_text()
-    # Extract `model:`, `temperature:`, `max_tokens:`, `system:` block, `user_template:` block
+    try:
+        import yaml  # type: ignore
+
+        return yaml.safe_load(text)
+    except ImportError:
+        pass
+
     out: dict[str, object] = {}
-    out["model"] = re.search(r"^model:\s*(\S+)", text, re.M).group(1)
-    out["temperature"] = float(
-        re.search(r"^temperature:\s*([\d.]+)", text, re.M).group(1)
-    )
-    out["max_tokens"] = int(re.search(r"^max_tokens:\s*(\d+)", text, re.M).group(1))
+    # Simple scalars
+    for key, caster in (
+        ("model", str),
+        ("temperature", float),
+        ("max_tokens", int),
+        ("version", int),
+    ):
+        m = re.search(rf"^{key}:\s*(\S+)", text, re.M)
+        if m:
+            out[key] = caster(m.group(1))
+
+    # Block scalars (`key: |` then indented content until the next top-level key)
     for key in ("system", "user_template"):
-        m = re.search(rf"^{key}:\s*\|\s*\n((?:[ \t]+.*\n?)+)", text, re.M)
-        if not m:
+        start = re.search(rf"^{key}:\s*\|\s*\n", text, re.M)
+        if not start:
             raise ValueError(f"missing block {key}")
-        block = m.group(1)
-        # de-indent
-        lines = block.splitlines()
-        indent = min(len(l) - len(l.lstrip()) for l in lines if l.strip())
-        out[key] = "\n".join(l[indent:] for l in lines).rstrip()
+        rest = text[start.end() :]
+        lines = rest.split("\n")
+        block_lines: list[str] = []
+        for line in lines:
+            if line == "" or line.startswith(" ") or line.startswith("\t"):
+                block_lines.append(line)
+            else:
+                break
+        indents = [len(l) - len(l.lstrip()) for l in block_lines if l.strip()]
+        indent = min(indents) if indents else 0
+        out[key] = "\n".join(
+            (l[indent:] if len(l) >= indent else l) for l in block_lines
+        ).rstrip()
     return out
 
 
