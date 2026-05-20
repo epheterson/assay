@@ -53,7 +53,7 @@
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmpbxtgn2gw/new/Apollo",
+      "new_path": "/tmp/tmps79ldhb6/new/Apollo",
       "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
