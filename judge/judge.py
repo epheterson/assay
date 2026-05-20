@@ -18,7 +18,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-MODELS_URL = "https://models.inference.ai.azure.com/chat/completions"
+MODELS_URL = "https://models.github.ai/inference/chat/completions"
 
 
 def load_prompt(path: Path) -> dict:
