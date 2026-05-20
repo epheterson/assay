@@ -92,6 +92,10 @@ def call_github_models(
         "model": model,
         "temperature": temperature,
         "max_tokens": max_tokens,
+        # Force structured JSON output — without this, GPT-4o tends to wrap
+        # the JSON in markdown or precede it with prose despite system-prompt
+        # instructions. OpenAI's json_object mode is a hard constraint.
+        "response_format": {"type": "json_object"},
         "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
