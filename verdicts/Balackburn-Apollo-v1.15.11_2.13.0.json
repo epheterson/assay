@@ -13,8 +13,8 @@
     ],
     "consistent_with_notes": false,
     "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
-    "judge_source": "heuristic-fallback:HTTPError",
-    "judge_error": "HTTP Error 400: Bad Request",
+    "judge_source": "heuristic-fallback:ValueError",
+    "judge_error": "no JSON object found in LLM response",
     "hard_flagged_modules": [
       "committer_diff"
     ]
@@ -53,7 +53,7 @@
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmpuehi1zvu/new/Apollo",
+      "new_path": "/tmp/tmpb6sa8i2a/new/Apollo",
       "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
