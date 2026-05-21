@@ -2,22 +2,37 @@
   "verdict": {
     "verdict": "review",
     "score": 6,
-    "headline": "New author introduced with hard flag raised",
+    "headline": "Three new committers and one unallowlisted host added",
     "anomalies": [
       {
-        "severity": "high",
+        "severity": "medium",
         "module": "committer_diff",
-        "what": "New author 'nickclyde' introduced in the commit history.",
-        "why_it_matters": "The introduction of a new author raises concerns, especially with the hard flag indicating potential issues."
+        "what": "Three new authors: bajader, epheterson, nickclyde",
+        "why_it_matters": "New committers can introduce unexpected changes or vulnerabilities."
+      },
+      {
+        "severity": "medium",
+        "module": "url_inventory",
+        "what": "Added host 'www.apple.com' \u2014 not on allowlist",
+        "why_it_matters": "Unallowlisted hosts can pose a risk if they are not properly vetted."
       }
     ],
+    "decision_inputs": [
+      "Check commits by bajader, epheterson, and nickclyde for any suspicious changes (https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commits)",
+      "Verify the purpose of the added host 'www.apple.com' and its necessity in the context of the release"
+    ],
     "consistent_with_notes": true,
-    "reasoning": "The release notes are consistent with the changes made, and the new features are documented. However, the presence of a new author, 'nickclyde', along with the hard flag raised in the module findings, necessitates a review to ensure the integrity of the contributions.",
+    "reasoning": "The release includes three new committers, which is a notable anomaly that warrants a review. Additionally, the addition of 'www.apple.com' as an unallowlisted host raises concerns about potential unintended behavior. However, the changes align with the stated intent in the release notes, and there are no indications of malicious intent, leading to a 'review' verdict.",
     "judge_source": "github-models:openai/gpt-4o-mini",
-    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 6,\n  \"headline\": \"New author introduced with hard flag raised\",\n  \"anomalies\": [\n    {\n      \"severity\": \"high\",\n      \"module\": \"committer_diff\",\n      \"what\": \"New author 'nickclyde' introduced in the commit history.\",\n      \"why_it_matters\": \"The introduction of a new author raises concerns, especially with the hard flag indicating potential issues.\"\n    }\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release notes are consistent with the changes made, and the new features are documented. However, the presence of a new author, 'nickclyde', along with the hard flag raised in the module findings, necessitates a review to ensure the integrity of the contributions.\"\n}",
+    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 6,\n  \"headline\": \"Three new committers and one unallowlisted host added\",\n  \"anomalies\": [\n    {\n      \"severity\": \"medium\",\n      \"module\": \"committer_diff\",\n      \"what\": \"Three new authors: bajader, epheterson, nickclyde\",\n      \"why_it_matters\": \"New committers can introduce unexpected changes or vulnerabilities.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"module\": \"url_inventory\",\n      \"what\": \"Added host 'www.apple.com' \u2014 not on allowlist\",\n      \"why_it_matters\": \"Unallowlisted hosts can pose a risk if they are not properly vetted.\"\n    }\n  ],\n  \"decision_inputs\": [\n    \"Check commits by bajader, epheterson, and nickclyde for any suspicious changes (https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commits)\",\n    \"Verify the purpose of the added host 'www.apple.com' and its necessity in the context of the release\"\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release includes three new committers, which is a notable anomaly that warrants a review. Additionally, the addition of 'www.apple.com' as an unallowlisted host raises concerns about potential unintended behavior. However, the changes align with the stated intent in the release notes, and there are no indications of malicious intent, leading to a 'review' verdict.\"\n}",
     "hard_flagged_modules": [
       "committer_diff"
-    ]
+    ],
+    "links": {
+      "code_compare_url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/compare/v2.11.0...v2.14.0",
+      "release_compare_url": "https://github.com/Balackburn/Apollo/compare/v1.15.11_2.11.0...v1.15.11_2.14.0",
+      "release_url": "https://github.com/Balackburn/Apollo/releases/tag/v1.15.11_2.14.0"
+    }
   },
   "findings": [
     {
@@ -25,37 +40,121 @@
       "ok": true,
       "owner": "JeffreyCA",
       "repo": "Apollo-ImprovedCustomApi",
-      "base_ref": "v2.13.0",
+      "base_ref": "v2.11.0",
       "head_ref": "v2.14.0",
-      "window_commit_count": 3,
+      "window_commit_count": 35,
       "window_authors": {
-        "nickclyde": 1,
-        "JeffreyCA": 2
+        "icpryde": 10,
+        "jordanearle": 1,
+        "JeffreyCA": 20,
+        "DeltAndy123": 1,
+        "bajader": 1,
+        "epheterson": 1,
+        "nickclyde": 1
       },
       "new_authors": [
+        "bajader",
+        "epheterson",
         "nickclyde"
       ],
       "existing_authors": [
-        "JeffreyCA"
+        "DeltAndy123",
+        "JeffreyCA",
+        "icpryde",
+        "jordanearle"
       ],
       "has_unknown_author_commits": false,
       "hard_flag": true,
-      "summary": "3 commits by 2 authors. 1 new author(s): ['nickclyde']. "
+      "summary": "35 commits by 7 authors. 3 new author(s): ['bajader', 'epheterson', 'nickclyde']. "
     },
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmp0a9f4o60/new/Apollo",
-      "baseline_path": "/tmp/assay-baseline/Balackburn-Apollo-v1.15.11_2.13.0",
+      "new_path": "/tmp/tmpqw7c98_l/new/Apollo",
+      "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
-      "added": [],
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.apple.com",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
       "removed": [],
-      "added_unallowlisted": [],
+      "added_unallowlisted": [
+        "www.apple.com"
+      ],
       "hard_flag": false,
-      "summary": "71 total hosts. 0 added (0 not on allowlist), 0 removed."
+      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
     }
   ],
   "tag": "v1.15.11_2.14.0",
-  "baseline": "v1.15.11_2.13.0"
+  "baseline": "v1.15.11_2.11.0"
 }

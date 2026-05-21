@@ -2,12 +2,13 @@
 
 Every verdict, every release, every target. Newest first. Auto-generated on each verdict.
 
-**Totals:** 1 verdicts · ✅ 0 clean · ⚠️ 0 review · 🚨 1 blocked
+**Totals:** 2 verdicts · ✅ 0 clean · ⚠️ 1 review · 🚨 1 blocked
 
 ## Balackburn/Apollo
 
 | | Tag | Score | Headline | Judge | Baseline |
 |---|---|---|---|---|---|
+| ⚠️ `review` | [`v1.15.11_2.14.0`](https://github.com/Balackburn/Apollo/releases/tag/v1.15.11_2.14.0) | 6 | Three new committers and one unallowlisted host added | `github-models:openai/gpt-4o-mini` | `v1.15.11_2.11.0` |
 | 🚨 `blocked` | `v1.15.11_2.13.0` | 4 | New authors introduced with hard flag raised | `github-models:openai/gpt-4o-mini` | `v1.15.11_2.11.0` |
 
 ---
