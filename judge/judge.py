@@ -77,11 +77,15 @@ def render(template: str, vars: dict[str, str]) -> str:
 
 
 def heuristic_verdict(findings: list[dict]) -> dict:
-    """Offline fallback. Conservative: any hard_flag → review."""
+    """Offline fallback. Conservative: any hard_flag → review (never blocked)."""
     hard = [f for f in findings if f.get("hard_flag")]
     if hard:
         return {
             "verdict": "review",
+            "decision_inputs": [
+                f"Review {f.get('module', '?')} finding: {f.get('summary', '(no summary)')}"
+                for f in hard
+            ],
             "score": 5,
             "headline": "Hard flag from module(s); manual review needed",
             "anomalies": [
@@ -182,6 +186,9 @@ def judge(
     release_notes: str,
     findings: list[dict],
     prompt_path: Path,
+    code_compare_url: str = "",
+    release_compare_url: str = "",
+    release_url: str = "",
 ) -> dict:
     """Render a verdict. Returns a dict with `verdict`, `score`, etc.
 
@@ -189,6 +196,9 @@ def judge(
     otherwise. Always applies the rule-based override: if any module has
     `hard_flag: true`, the verdict cannot be `clean` regardless of what the
     LLM says.
+
+    Compare URLs are passed into the prompt so the LLM can include them in
+    its `decision_inputs` for the human reviewer.
     """
     token = os.environ.get("GITHUB_TOKEN")
     use_fake = os.environ.get("USE_FAKE_JUDGE") == "1"
@@ -207,6 +217,9 @@ def judge(
                 "BASELINE_TAG": baseline_tag,
                 "RELEASE_NOTES": release_notes[:8000],
                 "MODULE_FINDINGS_JSON": json.dumps(findings, indent=2)[:30000],
+                "CODE_COMPARE_URL": code_compare_url or "(not available)",
+                "RELEASE_COMPARE_URL": release_compare_url or "(not available)",
+                "RELEASE_URL": release_url or "(not available)",
             },
         )
         raw = None

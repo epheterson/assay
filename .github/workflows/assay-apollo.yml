@@ -55,7 +55,7 @@ jobs:
         run: |
           git config user.name "assay-bot"
           git config user.email "assay-bot@users.noreply.github.com"
-          git add verdicts/ || true
+          git add verdicts/ LEDGER.md || true
           if ! git diff --cached --quiet; then
             git commit -m "verdict: Balackburn/Apollo $NEW_TAG — $VERDICT"
             git push

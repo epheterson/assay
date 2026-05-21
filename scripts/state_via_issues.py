@@ -149,6 +149,23 @@ def write_verdict_issue(
     if not anomalies_md:
         anomalies_md = "_(none)_"
 
+    decision_inputs_md = ""
+    for d in verdict.get("decision_inputs", []) or []:
+        decision_inputs_md += f"- {d}\n"
+    if not decision_inputs_md:
+        decision_inputs_md = "_(none provided)_"
+
+    links_md = ""
+    extra = verdict.get("links", {}) or {}
+    if extra.get("code_compare_url"):
+        links_md += f"- Code diff: {extra['code_compare_url']}\n"
+    if extra.get("release_compare_url"):
+        links_md += f"- Release diff: {extra['release_compare_url']}\n"
+    if extra.get("release_url"):
+        links_md += f"- Release page: {extra['release_url']}\n"
+    if not links_md:
+        links_md = "_(none)_"
+
     findings_md = "<details><summary>Module findings (JSON)</summary>\n\n```json\n"
     findings_md += json.dumps(findings, indent=2)[:50000]
     findings_md += "\n```\n</details>"
@@ -160,6 +177,8 @@ def write_verdict_issue(
         f"**Baseline:** `{baseline_tag or '(none — first run)'}`\n"
         f"**Judge:** `{verdict.get('judge_source','?')}`\n\n"
         f"### Reasoning\n{verdict.get('reasoning','(none)')}\n\n"
+        f"### What to check before deciding\n{decision_inputs_md}\n"
+        f"### Quick links\n{links_md}\n"
         f"### Anomalies\n{anomalies_md}\n\n"
         f"### Findings\n{findings_md}\n\n"
         f"---\n"

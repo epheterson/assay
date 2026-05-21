@@ -267,6 +267,14 @@ def main() -> int:
                 }
             )
 
+    # ── Compute compare URLs (handed to judge + included in verdict issue)
+    code_compare_url = (
+        f"https://github.com/{code_owner}/{code_repo}/compare/{code_baseline}...{code_head}"
+        if code_baseline and code_head and code_baseline != code_head
+        else ""
+    )
+    release_compare_url = f"https://github.com/{args.tracked_owner}/{args.tracked_repo}/compare/{baseline_tag}...{tag}"
+
     # ── Judge
     verdict = judge_mod.judge(
         trigger_owner=args.tracked_owner,
@@ -276,7 +284,16 @@ def main() -> int:
         release_notes=notes,
         findings=findings,
         prompt_path=ROOT / "judge" / "prompt.yml",
+        code_compare_url=code_compare_url,
+        release_compare_url=release_compare_url,
+        release_url=release_url,
     )
+    # Attach links to the verdict so the issue + ledger can render them
+    verdict["links"] = {
+        "code_compare_url": code_compare_url,
+        "release_compare_url": release_compare_url,
+        "release_url": release_url,
+    }
 
     # ── Write verdict issue
     issue = state_mod.write_verdict_issue(
@@ -309,6 +326,14 @@ def main() -> int:
             indent=2,
         )
     )
+
+    # ── Update LEDGER.md (rebuilt from all verdict files so it stays consistent)
+    try:
+        import update_ledger
+
+        update_ledger.main()
+    except Exception as e:  # noqa: BLE001
+        print(f"warning: failed to update LEDGER.md: {e}", file=sys.stderr)
 
     emit_output("new_release", "true")
     emit_output("verdict", verdict.get("verdict", "unknown"))

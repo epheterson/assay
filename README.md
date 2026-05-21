@@ -6,6 +6,10 @@ Watch a GitHub repo's releases. On each new release, run a battery of checks (UR
 
 Built for the case where you depend on an auto-updating piece of software — sideloaded apps, npm packages, Homebrew formulas, container images — and want a human-in-the-loop gate against silent supply chain attacks.
 
+## History
+
+[**LEDGER.md**](LEDGER.md) — green/red list of every verdict assay has rendered, newest first, with links to each release.
+
 ## The verdict
 
 Every release gets one of:
