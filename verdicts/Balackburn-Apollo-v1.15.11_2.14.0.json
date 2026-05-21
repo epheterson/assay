@@ -1,23 +1,29 @@
 {
   "verdict": {
     "verdict": "review",
-    "decision_inputs": [
-      "Review committer_diff finding: 3 commits by 2 authors. 1 new author(s): ['nickclyde']. "
+    "score": 6,
+    "headline": "New notification backend feature added; verify security of self-hosted backend",
+    "release_summary": "The v1.15.11_2.14.0 release introduces a significant feature: support for a self-hosted notification backend, allowing users to configure their own backend for push notifications (commit 9d583c04 by @nickclyde). This change modifies how notifications are handled and could expose user data to security risks if the backend is not properly secured. Additionally, a new Reddit API Secret field has been added for forwarding credentials to the backend. The release also includes various performance improvements and a project restructure, but no new external hosts or analytics SDKs were introduced.",
+    "top_changes_to_review": [
+      "9d583c04 by @nickclyde: 'Restore push notification functionality from apollo-backend' \u2014 verify the security of the self-hosted backend and how user data is handled.",
+      "b39f6d74 by @JeffreyCA: 'Perf/reliability improvements' \u2014 UI-only fixes, low risk."
     ],
-    "score": 5,
-    "headline": "Hard flag from module(s); manual review needed",
     "anomalies": [
       {
         "severity": "medium",
-        "module": "committer_diff",
-        "what": "3 commits by 2 authors. 1 new author(s): ['nickclyde']. ",
-        "why_it_matters": "Hard flag indicates a programmatic check tripped."
+        "module": "code_review",
+        "what": "Introduction of a self-hosted notification backend",
+        "why_it_matters": "This change could expose user data to security risks if the backend is not properly secured."
       }
     ],
-    "consistent_with_notes": false,
-    "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
-    "judge_source": "heuristic-fallback:HTTPError",
-    "judge_error": "HTTP Error 429: Too Many Requests :: Too many requests. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service).\n",
+    "decision_inputs": [
+      "Check the security measures in place for the self-hosted backend at https://github.com/nickclyde/apollo-backend",
+      "Review the commit 9d583c04 for details on the notification backend implementation"
+    ],
+    "consistent_with_notes": true,
+    "reasoning": "The release notes indicate the addition of a self-hosted notification backend, which aligns with the changes made in the code. The presence of a new committer and the introduction of a potentially risky feature warrant a review, but there are no indications of malicious intent.",
+    "judge_source": "github-models:openai/gpt-4o-mini",
+    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 6,\n  \"headline\": \"New notification backend feature added; verify security of self-hosted backend\",\n  \"release_summary\": \"The v1.15.11_2.14.0 release introduces a significant feature: support for a self-hosted notification backend, allowing users to configure their own backend for push notifications (commit 9d583c04 by @nickclyde). This change modifies how notifications are handled and could expose user data to security risks if the backend is not properly secured. Additionally, a new Reddit API Secret field has been added for forwarding credentials to the backend. The release also includes various performance improvements and a project restructure, but no new external hosts or analytics SDKs were introduced.\",\n  \"top_changes_to_review\": [\n    \"9d583c04 by @nickclyde: 'Restore push notification functionality from apollo-backend' \u2014 verify the security of the self-hosted backend and how user data is handled.\",\n    \"b39f6d74 by @JeffreyCA: 'Perf/reliability improvements' \u2014 UI-only fixes, low risk.\"\n  ],\n  \"anomalies\": [\n    {\n      \"severity\": \"medium\",\n      \"module\": \"code_review\",\n      \"what\": \"Introduction of a self-hosted notification backend\",\n      \"why_it_matters\": \"This change could expose user data to security risks if the backend is not properly secured.\"\n    }\n  ],\n  \"decision_inputs\": [\n    \"Check the security measures in place for the self-hosted backend at https://github.com/nickclyde/apollo-backend\",\n    \"Review the commit 9d583c04 for details on the notification backend implementation\"\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release notes indicate the addition of a self-hosted notification backend, which aligns with the changes made in the code. The presence of a new committer and the introduction of a potentially risky feature warrant a review, but there are no indications of malicious intent.\"\n}",
     "hard_flagged_modules": [
       "committer_diff"
     ],
@@ -84,12 +90,11 @@
           ],
           "summary": "This commit restores push notification functionality by adding support for a self-hosted notification backend. It modifies how requests are routed to legacy hosts and introduces a new module for handling notifications.",
           "security_implications": "The introduction of a custom notification backend could expose the application to security risks if the backend is not properly secured.",
-          "privacy_implications": "User data related to push notifications may be sent to a self-hosted backend, which could have privacy implications depending on the backend's data handling practices.",
-          "safety_implications": "Changes to networking code could introduce crash-prone areas if not properly handled, especially with the new backend integration.",
+          "privacy_implications": "User data may be sent to a self-hosted backend, which could have implications for data privacy depending on the backend's security and data handling practices.",
+          "safety_implications": "(none)",
           "risk_signals": [
             "self-hosted",
-            "notification backend",
-            "push registrations"
+            "notification backend"
           ],
           "severity": "medium",
           "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/9d583c04a217114e9a652c78ebf5564f9965fbee",
@@ -112,14 +117,14 @@
             "contributors.json",
             "control"
           ],
-          "kind": "fix",
+          "kind": "refactor",
           "areas": [
             "ui"
           ],
           "summary": "This commit focuses on performance and reliability improvements across various UI components, enhancing the overall user experience.",
           "security_implications": "(none)",
           "privacy_implications": "(none)",
-          "safety_implications": "Improvements in performance may reduce the likelihood of crashes, but no significant changes to error handling or memory management are noted.",
+          "safety_implications": "(none)",
           "risk_signals": [],
           "severity": "none",
           "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/b39f6d74243e8f35489219029e9c69fdd7124a84",
@@ -185,7 +190,7 @@
           "areas": [
             "build"
           ],
-          "summary": "This commit restructures the project and adds a license file, simplifying the project layout and documentation.",
+          "summary": "This commit restructures the project, adding a LICENSE file and simplifying documentation. It primarily focuses on organization rather than functional changes.",
           "security_implications": "(none)",
           "privacy_implications": "(none)",
           "safety_implications": "(none)",
@@ -199,8 +204,7 @@
         "total_commits": 3,
         "by_kind": {
           "feature": 1,
-          "fix": 1,
-          "refactor": 1
+          "refactor": 2
         },
         "by_severity": {
           "none": 2,
@@ -239,12 +243,11 @@
             ],
             "summary": "This commit restores push notification functionality by adding support for a self-hosted notification backend. It modifies how requests are routed to legacy hosts and introduces a new module for handling notifications.",
             "security_implications": "The introduction of a custom notification backend could expose the application to security risks if the backend is not properly secured.",
-            "privacy_implications": "User data related to push notifications may be sent to a self-hosted backend, which could have privacy implications depending on the backend's data handling practices.",
-            "safety_implications": "Changes to networking code could introduce crash-prone areas if not properly handled, especially with the new backend integration.",
+            "privacy_implications": "User data may be sent to a self-hosted backend, which could have implications for data privacy depending on the backend's security and data handling practices.",
+            "safety_implications": "(none)",
             "risk_signals": [
               "self-hosted",
-              "notification backend",
-              "push registrations"
+              "notification backend"
             ],
             "severity": "medium",
             "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/9d583c04a217114e9a652c78ebf5564f9965fbee",
@@ -258,7 +261,7 @@
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmpo05p1qmt/new/Apollo",
+      "new_path": "/tmp/tmpk2hpgtjx/new/Apollo",
       "baseline_path": "/tmp/assay-baseline/Balackburn-Apollo-v1.15.11_2.13.0",
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,

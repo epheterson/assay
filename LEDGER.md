@@ -8,7 +8,7 @@ Every verdict, every release, every target. Newest first. Auto-generated on each
 
 | | Tag | Score | Headline | Judge | Baseline |
 |---|---|---|---|---|---|
-| ⚠️ `review` | [`v1.15.11_2.14.0`](https://github.com/Balackburn/Apollo/releases/tag/v1.15.11_2.14.0) | 5 | Hard flag from module(s); manual review needed | `heuristic-fallback:HTTPError` | `v1.15.11_2.13.0` |
+| ⚠️ `review` | [`v1.15.11_2.14.0`](https://github.com/Balackburn/Apollo/releases/tag/v1.15.11_2.14.0) | 6 | New notification backend feature added; verify security of self-hosted backend | `github-models:openai/gpt-4o-mini` | `v1.15.11_2.13.0` |
 
 ---
 
