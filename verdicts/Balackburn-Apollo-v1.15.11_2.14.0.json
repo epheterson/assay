@@ -1,36 +1,29 @@
 {
   "verdict": {
     "verdict": "review",
-    "score": 6,
-    "headline": "Three new committers and one unallowlisted host added",
+    "decision_inputs": [
+      "Review committer_diff finding: 3 commits by 2 authors. 1 new author(s): ['nickclyde']. "
+    ],
+    "score": 5,
+    "headline": "Hard flag from module(s); manual review needed",
     "anomalies": [
       {
         "severity": "medium",
         "module": "committer_diff",
-        "what": "Three new authors: bajader, epheterson, nickclyde",
-        "why_it_matters": "New committers can introduce unexpected changes or vulnerabilities."
-      },
-      {
-        "severity": "medium",
-        "module": "url_inventory",
-        "what": "Added host 'www.apple.com' \u2014 not on allowlist",
-        "why_it_matters": "Unallowlisted hosts can pose a risk if they are not properly vetted."
+        "what": "3 commits by 2 authors. 1 new author(s): ['nickclyde']. ",
+        "why_it_matters": "Hard flag indicates a programmatic check tripped."
       }
     ],
-    "decision_inputs": [
-      "Check commits by bajader, epheterson, and nickclyde for any suspicious changes (https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commits)",
-      "Verify the purpose of the added host 'www.apple.com' and its necessity in the context of the release"
-    ],
-    "consistent_with_notes": true,
-    "reasoning": "The release includes three new committers, which is a notable anomaly that warrants a review. Additionally, the addition of 'www.apple.com' as an unallowlisted host raises concerns about potential unintended behavior. However, the changes align with the stated intent in the release notes, and there are no indications of malicious intent, leading to a 'review' verdict.",
-    "judge_source": "github-models:openai/gpt-4o-mini",
-    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 6,\n  \"headline\": \"Three new committers and one unallowlisted host added\",\n  \"anomalies\": [\n    {\n      \"severity\": \"medium\",\n      \"module\": \"committer_diff\",\n      \"what\": \"Three new authors: bajader, epheterson, nickclyde\",\n      \"why_it_matters\": \"New committers can introduce unexpected changes or vulnerabilities.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"module\": \"url_inventory\",\n      \"what\": \"Added host 'www.apple.com' \u2014 not on allowlist\",\n      \"why_it_matters\": \"Unallowlisted hosts can pose a risk if they are not properly vetted.\"\n    }\n  ],\n  \"decision_inputs\": [\n    \"Check commits by bajader, epheterson, and nickclyde for any suspicious changes (https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commits)\",\n    \"Verify the purpose of the added host 'www.apple.com' and its necessity in the context of the release\"\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release includes three new committers, which is a notable anomaly that warrants a review. Additionally, the addition of 'www.apple.com' as an unallowlisted host raises concerns about potential unintended behavior. However, the changes align with the stated intent in the release notes, and there are no indications of malicious intent, leading to a 'review' verdict.\"\n}",
+    "consistent_with_notes": false,
+    "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
+    "judge_source": "heuristic-fallback:HTTPError",
+    "judge_error": "HTTP Error 429: Too Many Requests :: Too many requests. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service).\n",
     "hard_flagged_modules": [
       "committer_diff"
     ],
     "links": {
-      "code_compare_url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/compare/v2.11.0...v2.14.0",
-      "release_compare_url": "https://github.com/Balackburn/Apollo/compare/v1.15.11_2.11.0...v1.15.11_2.14.0",
+      "code_compare_url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/compare/v2.13.0...v2.14.0",
+      "release_compare_url": "https://github.com/Balackburn/Apollo/compare/v1.15.11_2.13.0...v1.15.11_2.14.0",
       "release_url": "https://github.com/Balackburn/Apollo/releases/tag/v1.15.11_2.14.0"
     }
   },
@@ -40,121 +33,242 @@
       "ok": true,
       "owner": "JeffreyCA",
       "repo": "Apollo-ImprovedCustomApi",
-      "base_ref": "v2.11.0",
+      "base_ref": "v2.13.0",
       "head_ref": "v2.14.0",
-      "window_commit_count": 35,
+      "window_commit_count": 3,
       "window_authors": {
-        "icpryde": 10,
-        "jordanearle": 1,
-        "JeffreyCA": 20,
-        "DeltAndy123": 1,
-        "bajader": 1,
-        "epheterson": 1,
-        "nickclyde": 1
+        "nickclyde": 1,
+        "JeffreyCA": 2
       },
       "new_authors": [
-        "bajader",
-        "epheterson",
         "nickclyde"
       ],
       "existing_authors": [
-        "DeltAndy123",
-        "JeffreyCA",
-        "icpryde",
-        "jordanearle"
+        "JeffreyCA"
       ],
       "has_unknown_author_commits": false,
       "hard_flag": true,
-      "summary": "35 commits by 7 authors. 3 new author(s): ['bajader', 'epheterson', 'nickclyde']. "
+      "summary": "3 commits by 2 authors. 1 new author(s): ['nickclyde']. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "JeffreyCA",
+      "code_repo": "Apollo-ImprovedCustomApi",
+      "base_ref": "v2.13.0",
+      "head_ref": "v2.14.0",
+      "llm_used": true,
+      "capped": false,
+      "reviews": [
+        {
+          "sha": "9d583c04a217114e9a652c78ebf5564f9965fbee",
+          "title": "Restore push notification functionality from apollo-backend",
+          "author": "nickclyde",
+          "files_touched": [
+            "ApolloNotificationBackend.h",
+            "ApolloNotificationBackend.m",
+            "ApolloState.h",
+            "ApolloState.m",
+            "CHANGELOG.md",
+            "CustomAPIViewController.m",
+            "Makefile",
+            "README.md",
+            "Tweak.xm",
+            "UserDefaultConstants.h",
+            "build-ipa.sh"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "This commit restores push notification functionality by adding support for a self-hosted notification backend. It modifies how requests are routed to legacy hosts and introduces a new module for handling notifications.",
+          "security_implications": "The introduction of a custom notification backend could expose the application to security risks if the backend is not properly secured.",
+          "privacy_implications": "User data related to push notifications may be sent to a self-hosted backend, which could have privacy implications depending on the backend's data handling practices.",
+          "safety_implications": "Changes to networking code could introduce crash-prone areas if not properly handled, especially with the new backend integration.",
+          "risk_signals": [
+            "self-hosted",
+            "notification backend",
+            "push registrations"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/9d583c04a217114e9a652c78ebf5564f9965fbee",
+          "short_sha": "9d583c04"
+        },
+        {
+          "sha": "b39f6d74243e8f35489219029e9c69fdd7124a84",
+          "title": "Perf/reliability improvements",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "ApolloAutoHideTabBar.xm",
+            "ApolloInlineLinkPreviewURLHiding.xm",
+            "ApolloInlineLinkPreviews.xm",
+            "ApolloPhotoPostComposerScrollFix.xm",
+            "ApolloSubredditIndexPolish.xm",
+            "ApolloUserAvatars.xm",
+            "CHANGELOG.md",
+            "CustomAPIViewController.m",
+            "README.md",
+            "contributors.json",
+            "control"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit focuses on performance and reliability improvements across various UI components, enhancing the overall user experience.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improvements in performance may reduce the likelihood of crashes, but no significant changes to error handling or memory management are noted.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/b39f6d74243e8f35489219029e9c69fdd7124a84",
+          "short_sha": "b39f6d74"
+        },
+        {
+          "sha": "1c70085d0d823a5627835dca2e68462e7b567193",
+          "title": "Restructure project",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".gitmodules",
+            "AGENTS.md",
+            "LICENSE",
+            "Makefile",
+            "liquid-glass/README.md",
+            "modules/FLEXing",
+            "modules/ZipArchive",
+            "modules/ffmpeg-kit",
+            "src/ApolloAutoHideTabBar.xm",
+            "src/ApolloCommentsCollapse.xm",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloCreatedAtAlert.xm",
+            "src/ApolloImageUploadHost.h",
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloInlineLinkPreviewURLHiding.xm",
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloLinkPreviewCache.h",
+            "src/ApolloLinkPreviewCache.m",
+            "src/ApolloLinkPreviewFetcher.h",
+            "src/ApolloLinkPreviewFetcher.m",
+            "src/ApolloLinkPreviewModel.h",
+            "src/ApolloLinkPreviewModel.m",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloLiquidGlassIconPicker.xm",
+            "src/ApolloMedia.xm",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloNativeActionMetadata.h",
+            "src/ApolloNotificationBackend.h",
+            "src/ApolloNotificationBackend.m",
+            "src/ApolloPhotoPostComposerScrollFix.xm",
+            "src/ApolloRecentlyRead.xm",
+            "src/ApolloRedditMediaUpload.h",
+            "src/ApolloRedditMediaUpload.m",
+            "src/ApolloSavedCategories.xm",
+            "src/ApolloSettings.xm",
+            "src/ApolloShareLinks.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/ApolloTagFilters.xm",
+            "src/ApolloTranslation.xm",
+            "src/ApolloTweetBuddy.xm",
+            "src/ApolloUserAvatars.xm",
+            "src/ApolloUserProfileCache.h",
+            "src/ApolloUserProfileCache.m",
+            "src/ApolloVideoSwipeFix.xm",
+            "src/ApolloVideoUnmute.xm",
+            "src/B64ImageEncodings.h"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit restructures the project and adds a license file, simplifying the project layout and documentation.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/1c70085d0d823a5627835dca2e68462e7b567193",
+          "short_sha": "1c70085d"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 3,
+        "by_kind": {
+          "feature": 1,
+          "fix": 1,
+          "refactor": 1
+        },
+        "by_severity": {
+          "none": 2,
+          "low": 0,
+          "medium": 1,
+          "high": 0
+        },
+        "areas_touched": [
+          "auth",
+          "build",
+          "networking",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "9d583c04a217114e9a652c78ebf5564f9965fbee",
+            "title": "Restore push notification functionality from apollo-backend",
+            "author": "nickclyde",
+            "files_touched": [
+              "ApolloNotificationBackend.h",
+              "ApolloNotificationBackend.m",
+              "ApolloState.h",
+              "ApolloState.m",
+              "CHANGELOG.md",
+              "CustomAPIViewController.m",
+              "Makefile",
+              "README.md",
+              "Tweak.xm",
+              "UserDefaultConstants.h",
+              "build-ipa.sh"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "This commit restores push notification functionality by adding support for a self-hosted notification backend. It modifies how requests are routed to legacy hosts and introduces a new module for handling notifications.",
+            "security_implications": "The introduction of a custom notification backend could expose the application to security risks if the backend is not properly secured.",
+            "privacy_implications": "User data related to push notifications may be sent to a self-hosted backend, which could have privacy implications depending on the backend's data handling practices.",
+            "safety_implications": "Changes to networking code could introduce crash-prone areas if not properly handled, especially with the new backend integration.",
+            "risk_signals": [
+              "self-hosted",
+              "notification backend",
+              "push registrations"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/JeffreyCA/Apollo-ImprovedCustomApi/commit/9d583c04a217114e9a652c78ebf5564f9965fbee",
+            "short_sha": "9d583c04"
+          }
+        ]
+      },
+      "hard_flag": false,
+      "summary": "3 commits reviewed. severity: 0H 1M 0L 2none. areas: auth, build, networking, ui"
     },
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmpqw7c98_l/new/Apollo",
-      "baseline_path": null,
+      "new_path": "/tmp/tmpo05p1qmt/new/Apollo",
+      "baseline_path": "/tmp/assay-baseline/Balackburn-Apollo-v1.15.11_2.13.0",
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
-      "added": [
-        "api.gfycat.com",
-        "api.mixpanel.com",
-        "api.redgifs.com",
-        "api.streamable.com",
-        "apolloapp.io",
-        "apollogur.download",
-        "apollonotifications.com",
-        "apollopushserver.xyz",
-        "apolloreq.com",
-        "apps.apple.com",
-        "aspca.org",
-        "bcrfcure.org",
-        "beta.apollonotifications.com",
-        "buy.itunes.apple.com",
-        "cancer.org",
-        "care.org",
-        "cff.org",
-        "chromium.googlesource.com",
-        "cocoapods.org",
-        "cottonbureau.com",
-        "developer.twitter.com",
-        "doctorswithoutborders.org",
-        "eff.org",
-        "giphy.com",
-        "gist.github.com",
-        "github.com",
-        "humanesociety.org",
-        "i.imgflip.com",
-        "i.imgur.com",
-        "i.vimeocdn.com",
-        "imgur-apiv3.p.rapidapi.com",
-        "imgur.com",
-        "itunes.apple.com",
-        "iwkfoundation.org",
-        "jimmyfund.org",
-        "m.reddit.com",
-        "mastodon.social",
-        "mod.reddit.com",
-        "notify.bugsnag.com",
-        "null.org",
-        "oauth.reddit.com",
-        "old.reddit.com",
-        "pcf.org",
-        "plannedparenthood.org",
-        "player.vimeo.com",
-        "redcross.org",
-        "redcrossblood.org",
-        "reddit.com",
-        "sandbox.itunes.apple.com",
-        "sessions.bugsnag.com",
-        "shinerama.ca",
-        "spcans.ca",
-        "ssl.gstatic.com",
-        "ssl.reddit.com",
-        "statsigapi.net",
-        "stjude.org",
-        "terryfox.org",
-        "translate.google.com",
-        "twitter.com",
-        "unicef.org",
-        "v.redd.it",
-        "vimeo.com",
-        "water.org",
-        "weather-data.apple.com",
-        "wikimedia.org",
-        "www.apple.com",
-        "www.googleapis.com",
-        "www.reddit.com",
-        "www.reddithelp.com",
-        "www.youtube.com",
-        "xkcd.com"
-      ],
+      "added": [],
       "removed": [],
-      "added_unallowlisted": [
-        "www.apple.com"
-      ],
+      "added_unallowlisted": [],
       "hard_flag": false,
-      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
+      "summary": "71 total hosts. 0 added (0 not on allowlist), 0 removed."
     }
   ],
   "tag": "v1.15.11_2.14.0",
-  "baseline": "v1.15.11_2.11.0"
+  "baseline": "v1.15.11_2.13.0"
 }
