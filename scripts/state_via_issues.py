@@ -170,12 +170,76 @@ def write_verdict_issue(
     findings_md += json.dumps(findings, indent=2)[:50000]
     findings_md += "\n```\n</details>"
 
+    # Release summary (LLM narrative) + top changes to review
+    release_summary_md = verdict.get("release_summary", "").strip() or "_(none)_"
+    top_changes_md = ""
+    for t in verdict.get("top_changes_to_review", []) or []:
+        top_changes_md += f"- {t}\n"
+    if not top_changes_md:
+        top_changes_md = "_(none provided)_"
+
+    # Per-commit code review (from the code_review module finding)
+    SEV_EMOJI = {"high": "🟥", "medium": "🟧", "low": "🟨", "none": "⬜"}
+    commit_reviews_md = ""
+    for f in findings or []:
+        if f.get("module") != "code_review" or not f.get("ok"):
+            continue
+        reviews = f.get("reviews") or []
+        if not reviews:
+            commit_reviews_md = "_(no commits in window)_"
+            break
+        for r in reviews:
+            sev = r.get("severity", "none")
+            sev_e = SEV_EMOJI.get(sev, "⬜")
+            sha = r.get("short_sha") or (r.get("sha") or "")[:8]
+            url = r.get("url") or ""
+            sha_link = f"[`{sha}`]({url})" if url else f"`{sha}`"
+            author = r.get("author") or "(unknown)"
+            title = (r.get("title") or "").replace("\n", " ").strip()[:140]
+            kind = r.get("kind", "?")
+            areas = ", ".join(r.get("areas") or [])
+            summary = r.get("summary", "").strip()
+            sec = (r.get("security_implications") or "").strip()
+            priv = (r.get("privacy_implications") or "").strip()
+            safe = (r.get("safety_implications") or "").strip()
+            commit_reviews_md += (
+                f"#### {sev_e} `{sev}` {sha_link} — @{author} — {title}\n" f"`{kind}`"
+            )
+            if areas:
+                commit_reviews_md += f" · areas: `{areas}`"
+            commit_reviews_md += "\n\n"
+            if summary:
+                commit_reviews_md += f"{summary}\n\n"
+            # Only render the three-angle block for non-trivial commits
+            if sev in ("low", "medium", "high"):
+                if sec and sec != "(none)":
+                    commit_reviews_md += f"- 🔒 **Security:** {sec}\n"
+                if priv and priv != "(none)":
+                    commit_reviews_md += f"- 👁 **Privacy:** {priv}\n"
+                if safe and safe != "(none)":
+                    commit_reviews_md += f"- 🛡 **Safety:** {safe}\n"
+                if (
+                    (not sec or sec == "(none)")
+                    and (not priv or priv == "(none)")
+                    and (not safe or safe == "(none)")
+                ):
+                    commit_reviews_md += (
+                        "_no security/privacy/safety implications noted._\n"
+                    )
+                commit_reviews_md += "\n"
+        break  # only one code_review module per verdict
+    if not commit_reviews_md:
+        commit_reviews_md = "_(code_review module did not run for this release)_"
+
     body = (
         f"## {emoji} {headline}\n\n"
         f"**Verdict:** `{v_class}` (score {score}/10)\n"
         f"**Tag:** [`{tag}`]({release_url})\n"
         f"**Baseline:** `{baseline_tag or '(none — first run)'}`\n"
         f"**Judge:** `{verdict.get('judge_source','?')}`\n\n"
+        f"### What's in this release\n{release_summary_md}\n\n"
+        f"### Top changes to review\n{top_changes_md}\n"
+        f"### Per-commit security/privacy/safety review\n{commit_reviews_md}\n"
         f"### Reasoning\n{verdict.get('reasoning','(none)')}\n\n"
         f"### What to check before deciding\n{decision_inputs_md}\n"
         f"### Quick links\n{links_md}\n"

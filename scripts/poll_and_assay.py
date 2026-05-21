@@ -46,6 +46,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import committer_diff  # noqa: E402
 import url_inventory  # noqa: E402
+import code_review  # noqa: E402
 import judge as judge_mod  # noqa: E402
 import state_via_issues as state_mod  # noqa: E402
 
@@ -215,6 +216,12 @@ def main() -> int:
     if not cd.get("ok"):
         cd["hard_flag"] = True
     findings.append(cd)
+
+    # code_review — per-commit LLM-assisted security/privacy/safety review
+    cr = code_review.run(code_owner, code_repo, code_baseline, code_head, token)
+    if not cr.get("ok"):
+        cr["hard_flag"] = True
+    findings.append(cr)
 
     # url_inventory against the binary asset (if configured)
     if args.binary_asset_pattern and args.binary_inner_path:
