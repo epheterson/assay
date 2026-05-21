@@ -195,7 +195,7 @@ def write_verdict_issue(
             url = r.get("url") or ""
             sha_link = f"[`{sha}`]({url})" if url else f"`{sha}`"
             author = r.get("author") or "(unknown)"
-            title = (r.get("title") or "").replace("\n", " ").strip()[:140]
+            commit_title = (r.get("title") or "").replace("\n", " ").strip()[:140]
             kind = r.get("kind", "?")
             areas = ", ".join(r.get("areas") or [])
             summary = r.get("summary", "").strip()
@@ -203,7 +203,8 @@ def write_verdict_issue(
             priv = (r.get("privacy_implications") or "").strip()
             safe = (r.get("safety_implications") or "").strip()
             commit_reviews_md += (
-                f"#### {sev_e} `{sev}` {sha_link} — @{author} — {title}\n" f"`{kind}`"
+                f"#### {sev_e} `{sev}` {sha_link} — @{author} — {commit_title}\n"
+                f"`{kind}`"
             )
             if areas:
                 commit_reviews_md += f" · areas: `{areas}`"
