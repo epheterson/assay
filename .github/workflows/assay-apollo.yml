@@ -41,8 +41,8 @@ jobs:
             --assay-repo  "$ASSAY_REPO" \
             --tracked-owner Balackburn \
             --tracked-repo Apollo \
-            --code-owner JeffreyCA \
-            --code-repo Apollo-ImprovedCustomApi \
+            --code-owner Apollo-Reborn \
+            --code-repo Apollo-Reborn \
             --binary-asset-pattern 'GLASS_Apollo-.*\.ipa$' \
             --binary-inner-path 'Payload/Apollo.app/Apollo' \
             --allowlist examples/apollo/allowlist.json
