@@ -53,12 +53,46 @@ import state_via_issues as state_mod  # noqa: E402
 GH_API = "https://api.github.com"
 
 
-def gh_get(path: str, token: str) -> dict | list:
-    req = urllib.request.Request(f"{GH_API}{path}")
-    req.add_header("Accept", "application/vnd.github+json")
-    req.add_header("Authorization", f"Bearer {token}")
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return json.loads(r.read())
+def gh_get(
+    path: str, token: str, *, retries: int = 3, backoff: float = 5.0
+) -> dict | list:
+    """GET a JSON endpoint on the GitHub API with retry on transient failures.
+
+    Retries on 401/429/5xx, which we've observed as transient GitHub Actions
+    infra hiccups (e.g. the workflow's built-in GITHUB_TOKEN occasionally
+    returns 401 on the first request of a run before reconciling).
+    """
+    import time
+
+    last_exc: Exception | None = None
+    for attempt in range(retries + 1):
+        req = urllib.request.Request(f"{GH_API}{path}")
+        req.add_header("Accept", "application/vnd.github+json")
+        req.add_header("Authorization", f"Bearer {token}")
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            last_exc = e
+            if attempt == retries or e.code not in (401, 429, 500, 502, 503, 504):
+                raise
+            wait = backoff * (2**attempt)
+            print(
+                f"gh_get {path} got HTTP {e.code}; retry {attempt+1}/{retries} in {wait:.0f}s",
+                file=sys.stderr,
+            )
+            time.sleep(wait)
+        except urllib.error.URLError as e:
+            last_exc = e
+            if attempt == retries:
+                raise
+            wait = backoff * (2**attempt)
+            print(
+                f"gh_get {path} URLError {e.reason}; retry {attempt+1}/{retries} in {wait:.0f}s",
+                file=sys.stderr,
+            )
+            time.sleep(wait)
+    raise last_exc if last_exc else RuntimeError("gh_get exhausted retries")
 
 
 def latest_release(owner: str, repo: str, token: str) -> dict:
