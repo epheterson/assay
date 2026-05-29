@@ -1,0 +1,144 @@
+{
+  "verdict": {
+    "verdict": "review",
+    "score": 5,
+    "headline": "Transition to community-maintained Apollo-Reborn; verify new API key handling",
+    "release_summary": "The release v1.15.11 marks a significant transition as Apollo moves from a solo-maintained project to a community-driven initiative under the Apollo-Reborn organization. This version introduces several new features, including GIF posting in comments via a Giphy integration, which requires users to input a Giphy API key. The handling of this API key and the associated settings could pose privacy concerns if not properly managed. Additionally, the release includes various UI enhancements and fixes, but the transition to a community model raises questions about the oversight of contributions. Notably, the code review module flagged issues with commit visibility, indicating potential anomalies in the commit history that warrant further examination.",
+    "top_changes_to_review": [
+      "276b3c0 by @icpryde: 'Add GIF posting in comments with Giphy integration' \u2014 verify the API key handling and ensure it is securely stored.",
+      "255f1a2 by @nunoo: 'Add editable user flair text support' \u2014 check for any potential security implications in user input handling.",
+      "294a1b3 by @icpryde: 'Mask API keys in Custom API settings' \u2014 confirm that API keys are properly masked and not exposed."
+    ],
+    "anomalies": [
+      {
+        "severity": "high",
+        "module": "committer_diff",
+        "what": "HTTPError 404 fetching compare v2.14.0...v1.15.11",
+        "why_it_matters": "The inability to fetch commit history raises concerns about the transparency of changes made in this release."
+      },
+      {
+        "severity": "high",
+        "module": "code_review",
+        "what": "HTTPError 404 listing commits v2.14.0...v1.15.11",
+        "why_it_matters": "Similar to the committer diff, this error indicates a lack of visibility into the changes, which is critical for assessing security."
+      }
+    ],
+    "decision_inputs": [
+      "Check the handling of the Giphy API key in Settings > Custom API > API Keys",
+      "Review the commit history for v1.15.11 at https://github.com/Balackburn/Apollo/commits/v1.15.11"
+    ],
+    "consistent_with_notes": false,
+    "reasoning": "While the release notes indicate a transition to community maintenance and new features, the errors in fetching commit history and the flagged issues raise significant concerns. The need for a human review is underscored by the high-severity anomalies related to commit visibility, which could indicate a lack of oversight in the changes made.",
+    "judge_source": "github-models:openai/gpt-4o-mini",
+    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 5,\n  \"headline\": \"Transition to community-maintained Apollo-Reborn; verify new API key handling\",\n  \"release_summary\": \"The release v1.15.11 marks a significant transition as Apollo moves from a solo-maintained project to a community-driven initiative under the Apollo-Reborn organization. This version introduces several new features, including GIF posting in comments via a Giphy integration, which requires users to input a Giphy API key. The handling of this API key and the associated settings could pose privacy concerns if not properly managed. Additionally, the release includes various UI enhancements and fixes, but the transition to a community model raises questions about the oversight of contributions. Notably, the code review module flagged issues with commit visibility, indicating potential anomalies in the commit history that warrant further examination.\",\n  \"top_changes_to_review\": [\n    \"276b3c0 by @icpryde: 'Add GIF posting in comments with Giphy integration' \u2014 verify the API key handling and ensure it is securely stored.\",\n    \"255f1a2 by @nunoo: 'Add editable user flair text support' \u2014 check for any potential security implications in user input handling.\",\n    \"294a1b3 by @icpryde: 'Mask API keys in Custom API settings' \u2014 confirm that API keys are properly masked and not exposed.\"\n  ],\n  \"anomalies\": [\n    {\n      \"severity\": \"high\",\n      \"module\": \"committer_diff\",\n      \"what\": \"HTTPError 404 fetching compare v2.14.0...v1.15.11\",\n      \"why_it_matters\": \"The inability to fetch commit history raises concerns about the transparency of changes made in this release.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"module\": \"code_review\",\n      \"what\": \"HTTPError 404 listing commits v2.14.0...v1.15.11\",\n      \"why_it_matters\": \"Similar to the committer diff, this error indicates a lack of visibility into the changes, which is critical for assessing security.\"\n    }\n  ],\n  \"decision_inputs\": [\n    \"Check the handling of the Giphy API key in Settings > Custom API > API Keys\",\n    \"Review the commit history for v1.15.11 at https://github.com/Balackburn/Apollo/commits/v1.15.11\"\n  ],\n  \"consistent_with_notes\": false,\n  \"reasoning\": \"While the release notes indicate a transition to community maintenance and new features, the errors in fetching commit history and the flagged issues raise significant concerns. The need for a human review is underscored by the high-severity anomalies related to commit visibility, which could indicate a lack of oversight in the changes made.\"\n}",
+    "hard_flagged_modules": [
+      "committer_diff",
+      "code_review"
+    ],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v2.14.0...v1.15.11",
+      "release_compare_url": "https://github.com/Balackburn/Apollo/compare/v1.15.11_2.14.0...v1.15.11_1.15.11_3.0.0",
+      "release_url": "https://github.com/Balackburn/Apollo/releases/tag/v1.15.11_1.15.11_3.0.0"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": false,
+      "error": "HTTPError 404 fetching compare v2.14.0...v1.15.11",
+      "hard_flag": true
+    },
+    {
+      "module": "code_review",
+      "ok": false,
+      "error": "HTTPError 404 listing commits v2.14.0...v1.15.11",
+      "hard_flag": true
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmpe2xuwou1/new/Apollo",
+      "baseline_path": null,
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 70,
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
+      "removed": [],
+      "added_unallowlisted": [],
+      "hard_flag": false,
+      "summary": "70 total hosts. 70 added (0 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_1.15.11_3.0.0",
+  "baseline": "v1.15.11_2.14.0"
+}
