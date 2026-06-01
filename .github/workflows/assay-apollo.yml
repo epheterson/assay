@@ -1,7 +1,9 @@
-name: assay — Balackburn/Apollo
+name: assay — Apollo-Reborn
 
-# Polls the Balackburn/Apollo repo for new Apollo IPA releases and runs the
-# full assay pipeline on each new release.
+# Polls Apollo-Reborn for new Apollo IPA releases and runs the full assay
+# pipeline on each new release. Apollo-Reborn took over from JeffreyCA +
+# Balackburn in May 2026 — they publish both code AND IPAs AND the AltStore
+# source, all in one place.
 
 on:
   schedule:
@@ -11,7 +13,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: assay-Balackburn-Apollo
+  group: assay-Apollo-Reborn
   cancel-in-progress: false
 
 permissions:
@@ -29,7 +31,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/assay-baseline
-          key: assay-baseline-Balackburn-Apollo-v1
+          key: assay-baseline-Apollo-Reborn-v1
 
       - name: Run assay pipeline
         id: assay
@@ -41,11 +43,11 @@ jobs:
           python3 scripts/poll_and_assay.py \
             --assay-owner "$ASSAY_OWNER" \
             --assay-repo  "$ASSAY_REPO" \
-            --tracked-owner Balackburn \
-            --tracked-repo Apollo \
+            --tracked-owner Apollo-Reborn \
+            --tracked-repo Apollo-Reborn \
             --code-owner Apollo-Reborn \
             --code-repo Apollo-Reborn \
-            --binary-asset-pattern 'GLASS_Apollo-.*\.ipa$' \
+            --binary-asset-pattern 'Apollo-Reborn-.*-GLASS\.ipa$' \
             --binary-inner-path 'Payload/Apollo.app/Apollo' \
             --allowlist examples/apollo/allowlist.json
 
@@ -59,7 +61,7 @@ jobs:
           git config user.email "assay-bot@users.noreply.github.com"
           git add verdicts/ LEDGER.md || true
           if ! git diff --cached --quiet; then
-            git commit -m "verdict: Balackburn/Apollo $NEW_TAG — $VERDICT"
+            git commit -m "verdict: Apollo-Reborn $NEW_TAG — $VERDICT"
             git push
           fi
 
@@ -67,7 +69,7 @@ jobs:
         if: steps.assay.outputs.new_release == 'true' && env.HAVE_SMTP == 'true'
         env:
           HAVE_SMTP: ${{ secrets.GMAIL_APP_PASSWORD != '' && 'true' || 'false' }}
-          EMAIL_SUBJECT: "[assay] Balackburn/Apollo ${{ steps.assay.outputs.tag }} — ${{ steps.assay.outputs.verdict }}"
+          EMAIL_SUBJECT: "[assay] Apollo-Reborn ${{ steps.assay.outputs.tag }} — ${{ steps.assay.outputs.verdict }}"
           EMAIL_HEADLINE: ${{ steps.assay.outputs.headline }}
           EMAIL_VERDICT: ${{ steps.assay.outputs.verdict }}
           EMAIL_SCORE: ${{ steps.assay.outputs.score }}
@@ -92,4 +94,4 @@ jobs:
             <p>${{ env.EMAIL_REASONING }}</p>
             <p><a href="${{ env.EMAIL_ISSUE_URL }}">→ Full report on GitHub</a></p>
             <hr/>
-            <p style="color:#888;font-size:12px">assay · Balackburn/Apollo</p>
+            <p style="color:#888;font-size:12px">assay · Apollo-Reborn</p>
