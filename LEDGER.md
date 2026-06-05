@@ -2,7 +2,13 @@
 
 Every verdict, every release, every target. Newest first. Auto-generated on each verdict.
 
-**Totals:** 2 verdicts · ✅ 0 clean · ⚠️ 2 review · 🚨 0 blocked
+**Totals:** 3 verdicts · ✅ 0 clean · ⚠️ 3 review · 🚨 0 blocked
+
+## Apollo/Reborn
+
+| | Tag | Score | Headline | Judge | Baseline |
+|---|---|---|---|---|---|
+| ⚠️ `review` | [`v1.15.11_3.1.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.1.0) | 5 | Hard flag from module(s); manual review needed | `heuristic-fallback:HTTPError` | `v1.15.11_3.0.0` |
 
 ## Balackburn/Apollo
 
