@@ -1,0 +1,338 @@
+{
+  "verdict": {
+    "verdict": "clean",
+    "score": 9,
+    "headline": "Stability improvements and UI fixes in v1.15.11_3.1.1",
+    "release_summary": "The v1.15.11_3.1.1 release focuses on stability and user experience enhancements. Key fixes include resolving a crash when sharing posts to Messages or Mail (commit f3aef07e by @nickclyde), improving Reddit login for iOS 15 users, and addressing various UI issues such as video controls and flair alignment. The changes enhance the overall functionality without introducing new security or privacy risks, and no new external hosts or unknown committers were added.",
+    "top_changes_to_review": [
+      "f3aef07e by @nickclyde: 'Fix crash sharing a post to Messages/Mail' \u2014 verify stability improvements in sharing functionality.",
+      "3bb28823 by @DeltAndy123: 'Add Old Reddit fallback for iOS 15' \u2014 check the implementation of the fallback option.",
+      "f57cd0e3 by @JeffreyCA: 'Fix AirPlay button and video overlay rendering' \u2014 ensure UI components are functioning correctly."
+    ],
+    "anomalies": [],
+    "decision_inputs": [
+      "Review commit f3aef07e for crash fixes in sharing functionality",
+      "Check the implementation of the Old Reddit fallback in commit 3bb28823",
+      "Verify UI changes in commit f57cd0e3 for AirPlay and video overlay"
+    ],
+    "consistent_with_notes": true,
+    "reasoning": "The release notes align with the changes made in the code, focusing on stability and user experience improvements. No new authors or external hosts were introduced, and the changes do not raise any significant security or privacy concerns. The overall assessment is that the release is clean.",
+    "judge_source": "github-models:openai/gpt-4o-mini",
+    "raw_response": "{\n  \"verdict\": \"clean\",\n  \"score\": 9,\n  \"headline\": \"Stability improvements and UI fixes in v1.15.11_3.1.1\",\n  \"release_summary\": \"The v1.15.11_3.1.1 release focuses on stability and user experience enhancements. Key fixes include resolving a crash when sharing posts to Messages or Mail (commit f3aef07e by @nickclyde), improving Reddit login for iOS 15 users, and addressing various UI issues such as video controls and flair alignment. The changes enhance the overall functionality without introducing new security or privacy risks, and no new external hosts or unknown committers were added.\",\n  \"top_changes_to_review\": [\n    \"f3aef07e by @nickclyde: 'Fix crash sharing a post to Messages/Mail' \u2014 verify stability improvements in sharing functionality.\",\n    \"3bb28823 by @DeltAndy123: 'Add Old Reddit fallback for iOS 15' \u2014 check the implementation of the fallback option.\",\n    \"f57cd0e3 by @JeffreyCA: 'Fix AirPlay button and video overlay rendering' \u2014 ensure UI components are functioning correctly.\"\n  ],\n  \"anomalies\": [],\n  \"decision_inputs\": [\n    \"Review commit f3aef07e for crash fixes in sharing functionality\",\n    \"Check the implementation of the Old Reddit fallback in commit 3bb28823\",\n    \"Verify UI changes in commit f57cd0e3 for AirPlay and video overlay\"\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release notes align with the changes made in the code, focusing on stability and user experience improvements. No new authors or external hosts were introduced, and the changes do not raise any significant security or privacy concerns. The overall assessment is that the release is clean.\"\n}",
+    "hard_flagged_modules": [],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.1.0...v1.15.11_3.1.1",
+      "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.1.0...v1.15.11_3.1.1",
+      "release_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.1.1"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": true,
+      "owner": "Apollo-Reborn",
+      "repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.1.0",
+      "head_ref": "v1.15.11_3.1.1",
+      "window_commit_count": 9,
+      "window_authors": {
+        "github-actions[bot]": 1,
+        "nickclyde": 1,
+        "DeltAndy123": 2,
+        "JeffreyCA": 4,
+        "icpryde": 1
+      },
+      "new_authors": [],
+      "existing_authors": [
+        "DeltAndy123",
+        "JeffreyCA",
+        "github-actions[bot]",
+        "icpryde",
+        "nickclyde"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": false,
+      "summary": "9 commits by 5 authors. 0 new author(s): none. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "Apollo-Reborn",
+      "code_repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.1.0",
+      "head_ref": "v1.15.11_3.1.1",
+      "llm_used": true,
+      "capped": false,
+      "reviews": [
+        {
+          "sha": "0bfaef0fa8a7603b0a1ab2b8a744695b1315113b",
+          "title": "Update distribution sources",
+          "author": "github-actions[bot]",
+          "files_touched": [
+            "apps.json",
+            "apps_glass.json",
+            "apps_glass_icons.json",
+            "apps_noext.json",
+            "apps_noext_glass.json",
+            "apps_noext_glass_icons.json",
+            "release-manifest.json"
+          ],
+          "kind": "other",
+          "areas": [],
+          "summary": "This commit updates various distribution source files.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0bfaef0fa8a7603b0a1ab2b8a744695b1315113b",
+          "short_sha": "0bfaef0f"
+        },
+        {
+          "sha": "f3aef07e75d67d99392956a434546afb9e399f32",
+          "title": "Fix crash sharing a post to Messages/Mail (#366) (#378)",
+          "author": "nickclyde",
+          "files_touched": [
+            "CHANGELOG.md",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloMarkdownToolbarGif.xm",
+            "src/ApolloPhotoPostComposerScrollFix.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "This commit addresses a crash issue when sharing a post to Messages or Mail.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "This change improves stability by fixing a crash-prone area.",
+          "risk_signals": [
+            "crash",
+            "fix"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f3aef07e75d67d99392956a434546afb9e399f32",
+          "short_sha": "f3aef07e"
+        },
+        {
+          "sha": "451aaafb771725481c83a136961e55c7bbc037b6",
+          "title": "Add API key workaround guide in README.md (#373)",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "README.md"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "This commit adds a guide for an API key workaround to the README.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/451aaafb771725481c83a136961e55c7bbc037b6",
+          "short_sha": "451aaafb"
+        },
+        {
+          "sha": "1ef6f2c160046ae24daab6f5933de60ac364e562",
+          "title": "Publish release dSYMs for crash symbolication",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            ".github/workflows/release-ipa-variants.yml",
+            "AGENTS.md",
+            "scripts/collect-debug-symbols.sh"
+          ],
+          "kind": "feature",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit publishes debug symbols as part of the release process for better crash symbolication.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "debug symbols",
+            "crash symbolication"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1ef6f2c160046ae24daab6f5933de60ac364e562",
+          "short_sha": "1ef6f2c1"
+        },
+        {
+          "sha": "43fae6e8e091ca7cd93a2c906f750d1257512869",
+          "title": "Fix flair alignment (#389)",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "src/ApolloFlairColors.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes the alignment of flair elements in the UI.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/43fae6e8e091ca7cd93a2c906f750d1257512869",
+          "short_sha": "43fae6e8"
+        },
+        {
+          "sha": "f57cd0e3679bb8857d9f8989927489ed3631ba69",
+          "title": "Fix AirPlay button and video overlay rendering",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "src/ApolloMedia.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes the rendering issues with the AirPlay button and video overlay. It involves changes to the UI components responsible for these features.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f57cd0e3679bb8857d9f8989927489ed3631ba69",
+          "short_sha": "f57cd0e3"
+        },
+        {
+          "sha": "3bb28823e068beef22d75ae3fa19d7bb2eeb5f0e",
+          "title": "Add Old Reddit fallback for iOS 15 and Old Reddit button in auth",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "src/ApolloWebAuthViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "auth",
+            "ui"
+          ],
+          "summary": "This commit adds a fallback option for Old Reddit on iOS 15 and introduces a button for Old Reddit in the authentication process. It enhances user experience for those using older versions.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3bb28823e068beef22d75ae3fa19d7bb2eeb5f0e",
+          "short_sha": "3bb28823"
+        },
+        {
+          "sha": "00b1427f9e634c028ffb36bcb788369fc048dd8e",
+          "title": "Fix colored flairs reverting to grey after app returns from background",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloFlairColors.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit addresses an issue where colored flairs revert to grey when the app is sent to the background and then reopened. It ensures that the correct colors are retained across app lifecycle events.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/00b1427f9e634c028ffb36bcb788369fc048dd8e",
+          "short_sha": "00b1427f"
+        },
+        {
+          "sha": "f472e9ae2f8e78ed0a8309b9b91fc5f2ef549c81",
+          "title": "Update changelog for v3.1.1 and fix version entry merging in source JSON generation",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "CHANGELOG.md",
+            "control",
+            "distribution/config.json",
+            "scripts/update_source_json.py"
+          ],
+          "kind": "docs",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit updates the changelog for the new version and fixes issues with merging version entries in the source JSON generation process.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f472e9ae2f8e78ed0a8309b9b91fc5f2ef549c81",
+          "short_sha": "f472e9ae"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 9,
+        "by_kind": {
+          "other": 1,
+          "fix": 4,
+          "docs": 2,
+          "feature": 2
+        },
+        "by_severity": {
+          "none": 7,
+          "low": 1,
+          "medium": 1,
+          "high": 0
+        },
+        "areas_touched": [
+          "auth",
+          "build",
+          "threading",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "f3aef07e75d67d99392956a434546afb9e399f32",
+            "title": "Fix crash sharing a post to Messages/Mail (#366) (#378)",
+            "author": "nickclyde",
+            "files_touched": [
+              "CHANGELOG.md",
+              "src/ApolloCommon.h",
+              "src/ApolloCommon.m",
+              "src/ApolloMarkdownToolbarGif.xm",
+              "src/ApolloPhotoPostComposerScrollFix.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "ui",
+              "threading"
+            ],
+            "summary": "This commit addresses a crash issue when sharing a post to Messages or Mail.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "This change improves stability by fixing a crash-prone area.",
+            "risk_signals": [
+              "crash",
+              "fix"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f3aef07e75d67d99392956a434546afb9e399f32",
+            "short_sha": "f3aef07e"
+          }
+        ]
+      },
+      "hard_flag": false,
+      "summary": "9 commits reviewed. severity: 0H 1M 1L 7none. areas: auth, build, threading, ui"
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmp4s3vv6yr/new/Apollo",
+      "baseline_path": "/tmp/assay-baseline/Apollo-Reborn-Apollo-Reborn-v1.15.11_3.1.0",
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 71,
+      "added": [],
+      "removed": [],
+      "added_unallowlisted": [],
+      "hard_flag": false,
+      "summary": "71 total hosts. 0 added (0 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_3.1.1",
+  "baseline": "v1.15.11_3.1.0"
+}
