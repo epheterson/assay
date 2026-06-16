@@ -1,0 +1,1026 @@
+{
+  "verdict": {
+    "verdict": "review",
+    "decision_inputs": [
+      "Review committer_diff finding: 27 commits by 8 authors. 1 new author(s): ['Alstruit']. "
+    ],
+    "score": 5,
+    "headline": "Hard flag from module(s); manual review needed",
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "committer_diff",
+        "what": "27 commits by 8 authors. 1 new author(s): ['Alstruit']. ",
+        "why_it_matters": "Hard flag indicates a programmatic check tripped."
+      }
+    ],
+    "consistent_with_notes": false,
+    "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
+    "judge_source": "heuristic-fallback:HTTPError",
+    "judge_error": "HTTP Error 413: Payload Too Large :: {\"error\":{\"code\":\"tokens_limit_reached\",\"message\":\"Request body too large for gpt-4o-mini model. Max size: 8000 tokens.\",\"details\":\"Request body too large for gpt-4o-mini model. Max size: 8000 tokens.\"}}",
+    "hard_flagged_modules": [
+      "committer_diff"
+    ],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.1.1...v1.15.11_3.2.0",
+      "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.1.1...v1.15.11_3.2.0",
+      "release_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.2.0"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": true,
+      "owner": "Apollo-Reborn",
+      "repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.1.1",
+      "head_ref": "v1.15.11_3.2.0",
+      "window_commit_count": 27,
+      "window_authors": {
+        "github-actions[bot]": 1,
+        "JeffreyCA": 11,
+        "Alstruit": 2,
+        "nickclyde": 4,
+        "DeltAndy123": 2,
+        "iCrazeiOS": 1,
+        "jordanearle": 1,
+        "icpryde": 5
+      },
+      "new_authors": [
+        "Alstruit"
+      ],
+      "existing_authors": [
+        "DeltAndy123",
+        "JeffreyCA",
+        "github-actions[bot]",
+        "iCrazeiOS",
+        "icpryde",
+        "jordanearle",
+        "nickclyde"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": true,
+      "summary": "27 commits by 8 authors. 1 new author(s): ['Alstruit']. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "Apollo-Reborn",
+      "code_repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.1.1",
+      "head_ref": "v1.15.11_3.2.0",
+      "llm_used": true,
+      "capped": false,
+      "reviews": [
+        {
+          "sha": "fa6aec19ed934074ad623ce566f10165632190fa",
+          "title": "Update distribution sources for v1.15.11_3.1.1",
+          "author": "github-actions[bot]",
+          "files_touched": [
+            "apps.json",
+            "apps_glass.json",
+            "apps_glass_icons.json",
+            "apps_noext.json",
+            "apps_noext_glass.json",
+            "apps_noext_glass_icons.json",
+            "release-manifest.json"
+          ],
+          "kind": "other",
+          "areas": [],
+          "summary": "This commit updates the distribution sources for the application.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fa6aec19ed934074ad623ce566f10165632190fa",
+          "short_sha": "fa6aec19"
+        },
+        {
+          "sha": "0d4334a591cdfe4bbc7e454dfc4ae4fe5689063b",
+          "title": "Fix comment scroll lockup on failed link previews (#395)",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "src/ApolloLinkPreviewFetcher.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes a UI issue where comments would lock up when link previews fail to load.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "This change may improve user experience by preventing UI freezes.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0d4334a591cdfe4bbc7e454dfc4ae4fe5689063b",
+          "short_sha": "0d4334a5"
+        },
+        {
+          "sha": "45cc7f382dc65fb9037d0ea297040a7551d689fe",
+          "title": "Trim newlines and `&#x200B;` from posts/comments (#405)",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloMarkdownBodyCleanup.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds functionality to trim unnecessary newlines and invisible characters from posts and comments.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/45cc7f382dc65fb9037d0ea297040a7551d689fe",
+          "short_sha": "45cc7f38"
+        },
+        {
+          "sha": "c65e6966ac46f148a405d4e67373a0e7cb6885ef",
+          "title": "Fix gallery GIFs stuck loading (#404)",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "src/ApolloMediaMetadata.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit resolves an issue where GIFs in the gallery would get stuck loading.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "This change may enhance the stability of the media loading process.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/c65e6966ac46f148a405d4e67373a0e7cb6885ef",
+          "short_sha": "c65e6966"
+        },
+        {
+          "sha": "7ca36afe97b613360d47c23f7b04eefcbb8e954d",
+          "title": "Fix installation conflict on older versions (#401)",
+          "author": "Alstruit",
+          "files_touched": [
+            "control"
+          ],
+          "kind": "fix",
+          "areas": [
+            "permissions"
+          ],
+          "summary": "This commit addresses installation conflicts that occur when upgrading from older versions of the application.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/7ca36afe97b613360d47c23f7b04eefcbb8e954d",
+          "short_sha": "7ca36afe"
+        },
+        {
+          "sha": "3f9bdf6d3e927f16b5445339bdf65eb06643e58e",
+          "title": "Send registration token on /v1/live_activities",
+          "author": "nickclyde",
+          "files_touched": [
+            "src/ApolloNotificationBackend.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "This commit adds functionality to send a registration token with the Live Activities endpoint. It modifies the existing hook to include the token in the request.",
+          "security_implications": "This change involves sending a registration token, which could expose sensitive information if not handled properly.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "X-Registration-Token"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3f9bdf6d3e927f16b5445339bdf65eb06643e58e",
+          "short_sha": "3f9bdf6d"
+        },
+        {
+          "sha": "1ff5e6e20072b10a195c540c566242f943809ac8",
+          "title": "Support for dismissing banned profile overlays and suppressing media preview errors",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloBannedProfile.h",
+            "src/ApolloBannedProfile.xm",
+            "src/ApolloMediaPreviewErrorFix.xm",
+            "src/ApolloUserProfileCache.m",
+            "src/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "This commit introduces support for dismissing banned profile overlays and handling media preview errors. It also consolidates cache clearing buttons.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Changes in cache handling could affect data persistence and error handling.",
+          "risk_signals": [
+            "cache clearing"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1ff5e6e20072b10a195c540c566242f943809ac8",
+          "short_sha": "1ff5e6e2"
+        },
+        {
+          "sha": "96ceeb3ec81524778fa1ebb0279c822a341286da",
+          "title": "Add iOS Simulator dev loop (scripts/run-in-sim.sh)",
+          "author": "nickclyde",
+          "files_touched": [
+            ".gitignore",
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "Makefile",
+            "scripts/run-in-sim.sh",
+            "src/ApolloMedia.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit adds a development loop for the iOS Simulator, facilitating easier testing and development.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "dev loop"
+          ],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/96ceeb3ec81524778fa1ebb0279c822a341286da",
+          "short_sha": "96ceeb3e"
+        },
+        {
+          "sha": "9a49905b6bd8fb089afcc20944c6b5f1a43feb96",
+          "title": "Add README guide on avoiding API key revocations",
+          "author": "nickclyde",
+          "files_touched": [
+            "README.md"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "This commit updates the README to include guidance on avoiding API key revocations.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9a49905b6bd8fb089afcc20944c6b5f1a43feb96",
+          "short_sha": "9a49905b"
+        },
+        {
+          "sha": "a844ff3d4b645fbb38fb5bdad245f993419e153e",
+          "title": "Add support for rendering moderator reports as native inline menu sections",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "src/ApolloNativeActionMenus.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds functionality to render moderator reports as inline menu sections, enhancing the user interface.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a844ff3d4b645fbb38fb5bdad245f993419e153e",
+          "short_sha": "a844ff3d"
+        },
+        {
+          "sha": "3b64cbb18b8a4788b2095110043688af502cae55",
+          "title": "Add automation that builds and shares IPAs for testing on PRs",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".github/workflows/pr-build-ipa.yml"
+          ],
+          "kind": "build",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit adds a GitHub Actions workflow for building and sharing IPA variants for testing on pull requests. It also reduces retention to 7 days.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3b64cbb18b8a4788b2095110043688af502cae55",
+          "short_sha": "3b64cbb1"
+        },
+        {
+          "sha": "436b31ff14cea333dad603d05e4fca84bc88dd27",
+          "title": "Support fork PRs via workflow_run with code-owner comment gate",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".github/workflows/pr-build-ipa-comment.yml",
+            ".github/workflows/pr-build-ipa.yml"
+          ],
+          "kind": "build",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit modifies the existing GitHub Actions workflow to support fork pull requests with a code-owner comment gate. It adds a new workflow file and updates the existing one.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/436b31ff14cea333dad603d05e4fca84bc88dd27",
+          "short_sha": "436b31ff"
+        },
+        {
+          "sha": "98ac6e0bcc301e8608194d3a1475de0170413801",
+          "title": "Restore signed-in account in the simulator via keychain capture/replay",
+          "author": "nickclyde",
+          "files_touched": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "scripts/run-in-sim.sh",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit implements functionality to restore a signed-in account in the simulator using keychain capture and replay. It modifies several files to support this feature.",
+          "security_implications": "This change involves handling user authentication data, which could pose security risks if not managed properly.",
+          "privacy_implications": "The use of keychain capture may involve storing sensitive user data, raising privacy concerns.",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "keychain capture",
+            "signed-in account"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/98ac6e0bcc301e8608194d3a1475de0170413801",
+          "short_sha": "98ac6e0b"
+        },
+        {
+          "sha": "a6036ff95d5e3c43a47ccecce8c282113befa0b5",
+          "title": "Add manual sign in fallback using an external browser and userscript",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloManualSignInViewController.h",
+            "src/ApolloManualSignInViewController.m",
+            "src/ApolloWebAuthViewController.m",
+            "userscript/apollo-oauth-helper.user.js"
+          ],
+          "kind": "feature",
+          "areas": [
+            "auth",
+            "ui"
+          ],
+          "summary": "This commit adds a manual sign-in fallback using an external browser and a userscript. It also includes fixes for UI and crash issues.",
+          "security_implications": "The introduction of an external browser for sign-in may expose users to phishing risks if not properly secured.",
+          "privacy_implications": "The userscript may collect user data, which raises privacy concerns depending on its implementation.",
+          "safety_implications": "Fixes a crash issue related to iOS 14, improving overall safety.",
+          "risk_signals": [
+            "manual sign in",
+            "external browser",
+            "userscript"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a6036ff95d5e3c43a47ccecce8c282113befa0b5",
+          "short_sha": "a6036ff9"
+        },
+        {
+          "sha": "399c0d29899337498fbf223247c43f83f2ef8aa9",
+          "title": "Add GitHub issue templates",
+          "author": "DeltAndy123",
+          "files_touched": [
+            ".github/ISSUE_TEMPLATE/bug_report.yml",
+            ".github/ISSUE_TEMPLATE/config.yml",
+            ".github/ISSUE_TEMPLATE/feature_request.yml",
+            ".github/ISSUE_TEMPLATE/login_api_help.yml",
+            ".github/ISSUE_TEMPLATE/question.yml"
+          ],
+          "kind": "docs",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds and improves GitHub issue templates for better issue tracking and reporting.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/399c0d29899337498fbf223247c43f83f2ef8aa9",
+          "short_sha": "399c0d29"
+        },
+        {
+          "sha": "1c9b72aa7dcffa1f572fa263187ad82c0e157e0d",
+          "title": "Move libflex into bundle for rootless deb builds",
+          "author": "iCrazeiOS",
+          "files_touched": [
+            "Makefile",
+            "src/Tweak.xm"
+          ],
+          "kind": "other",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit moves the libflex library into the bundle for rootless deb builds.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1c9b72aa7dcffa1f572fa263187ad82c0e157e0d",
+          "short_sha": "1c9b72aa"
+        },
+        {
+          "sha": "519e124e77cafe5f54309df2a517249133815a41",
+          "title": "Convert Assets.car to non-LFS",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".gitattributes",
+            "liquid-glass/prebuilt/Assets.car"
+          ],
+          "kind": "other",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit removes the Git LFS requirement for the Assets.car file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/519e124e77cafe5f54309df2a517249133815a41",
+          "short_sha": "519e124e"
+        },
+        {
+          "sha": "f2a85d7941b0df9413142f250a7cccdb5f2aeb88",
+          "title": "Remove Git LFS requirement from workflows and update documentation for Liquid Glass assets",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            ".github/workflows/pr-build-ipa.yml",
+            ".github/workflows/release-ipa-variants.yml",
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "README.md",
+            "patch.sh"
+          ],
+          "kind": "docs",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit updates workflows to remove Git LFS requirements and modifies documentation accordingly.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f2a85d7941b0df9413142f250a7cccdb5f2aeb88",
+          "short_sha": "f2a85d79"
+        },
+        {
+          "sha": "f95e44f0d88106134a336322bdc407181dbf910d",
+          "title": "Reborn widgets",
+          "author": "jordanearle",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            ".github/workflows/pr-build-ipa.yml",
+            ".github/workflows/release-ipa-variants.yml",
+            ".gitignore",
+            "Makefile",
+            "distribution/config.json",
+            "scripts/build-test-ipa.sh",
+            "scripts/build_release_variants.sh",
+            "scripts/generate_release_notes.py",
+            "scripts/inject-widgets.sh",
+            "scripts/validate_release_variants.sh",
+            "src/ApolloQuickActions.xm",
+            "src/CustomAPIViewController.m",
+            "widgets/Sources/ApolloRebornWidgetBundle.swift",
+            "widgets/Sources/Assets.xcassets/ApolloAvatar.imageset/Contents.json",
+            "widgets/Sources/Assets.xcassets/ApolloAvatar.imageset/apollo-avatar@2x.png",
+            "widgets/Sources/Assets.xcassets/ApolloAvatar.imageset/apollo-avatar@3x.png",
+            "widgets/Sources/Assets.xcassets/Contents.json",
+            "widgets/Sources/CalendarProvider.swift",
+            "widgets/Sources/CalendarView.swift",
+            "widgets/Sources/Headline.swift",
+            "widgets/Sources/ImageLoader.swift",
+            "widgets/Sources/MediaProviders.swift",
+            "widgets/Sources/MediaViews.swift",
+            "widgets/Sources/RebornWidgets.intentdefinition",
+            "widgets/Sources/RedditAppOnlyClient.swift",
+            "widgets/Sources/RedditModels.swift",
+            "widgets/Sources/RefreshIntents.swift",
+            "widgets/Sources/SetupCode.swift",
+            "widgets/Sources/ShortcutsProvider.swift",
+            "widgets/Sources/ShortcutsView.swift",
+            "widgets/Sources/ShowerthoughtsProvider.swift",
+            "widgets/Sources/ShowerthoughtsViews.swift",
+            "widgets/Sources/WidgetShared.swift",
+            "widgets/Sources/WidgetViews.swift",
+            "widgets/WIDGETS.md",
+            "widgets/project.yml"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit introduces a new set of widgets and related functionality.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f95e44f0d88106134a336322bdc407181dbf910d",
+          "short_sha": "f95e44f0"
+        },
+        {
+          "sha": "9eed15d27ad787f221c35968298a86dca342df50",
+          "title": "Enable compiler warning for older versions",
+          "author": "Alstruit",
+          "files_touched": [
+            "Makefile"
+          ],
+          "kind": "other",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit enables a compiler warning for potential runtime errors on older iOS versions.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9eed15d27ad787f221c35968298a86dca342df50",
+          "short_sha": "9eed15d2"
+        },
+        {
+          "sha": "0c3bb5806e37a65fc863669f5f9fe30ba7bbe3bf",
+          "title": "docs: add thumbnails/inline previews troubleshooting tip to README",
+          "author": "icpryde",
+          "files_touched": [
+            "README.md"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "This commit adds a troubleshooting tip related to thumbnails and inline previews to the README file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0c3bb5806e37a65fc863669f5f9fe30ba7bbe3bf",
+          "short_sha": "0c3bb580"
+        },
+        {
+          "sha": "de1c01b85b87299ab1167a4e7fd83cbaa33ef3a5",
+          "title": "Include author avatar and subreddit icon in Share as Image post renders",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloUserAvatars.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit enhances the Share as Image feature by including the author avatar and subreddit icon in the rendered posts.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/de1c01b85b87299ab1167a4e7fd83cbaa33ef3a5",
+          "short_sha": "de1c01b8"
+        },
+        {
+          "sha": "14af85d72b67fc6f460edaa43c8379dbc0902c8d",
+          "title": "Fix feed link-card glitches: stale row heights, flattened Bluesky text, and dead clip-host thumbnails",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloLinkPreviewFetcher.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes several glitches in the feed link cards, including stale row heights and issues with Bluesky text rendering.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improvements in row height handling may reduce the risk of UI crashes.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/14af85d72b67fc6f460edaa43c8379dbc0902c8d",
+          "short_sha": "14af85d7"
+        },
+        {
+          "sha": "bb31778c628d311779cb1f6440076c6ccd30038a",
+          "title": "Make text post thumbnails consistent: toggle, badge, and tap-to-open",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloCommon.h",
+            "src/ApolloFeedTextPostThumbnails.xm",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit standardizes the behavior of text post thumbnails, including a toggle for visibility and consistent tap actions.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/bb31778c628d311779cb1f6440076c6ccd30038a",
+          "short_sha": "bb31778c"
+        },
+        {
+          "sha": "d1d1f2f9c649be14bb6ca22cf0d36268b64f9cfe",
+          "title": "Add Hide Mod Subreddits: hide dead moderated subreddits from the Subreddits list",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloHideModSubreddits.xm",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "This commit introduces a feature to hide dead moderated subreddits from the list, with a toggle for visibility in edit mode.",
+          "security_implications": "The hidden subreddits are stored locally and not sent to Reddit, reducing exposure of user data.",
+          "privacy_implications": "No new data is collected or sent externally; the feature only affects local storage.",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "hidden subreddits",
+            "NSUserDefaults"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d1d1f2f9c649be14bb6ca22cf0d36268b64f9cfe",
+          "short_sha": "d1d1f2f9"
+        },
+        {
+          "sha": "3909634f24484958d7f99297581b964461005ab3",
+          "title": "Publish IPAs with custom URL schemes and add toggle to restore original sign-in behaviour",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            "scripts/build_release_variants.sh",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "This commit introduces custom URL schemes for IPAs and a toggle for sign-in behavior. It modifies the build process and the user interface for authentication.",
+          "security_implications": "The introduction of custom URL schemes may expose the app to URL hijacking if not properly validated.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Changes in the authentication flow could lead to unexpected crashes if not handled correctly.",
+          "risk_signals": [
+            "custom URL schemes",
+            "sign-in behaviour"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3909634f24484958d7f99297581b964461005ab3",
+          "short_sha": "3909634f"
+        },
+        {
+          "sha": "2a73f52b3ef85ae14802a6a5f050b4953d815f28",
+          "title": "Prepare v3.2.0 release",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "CHANGELOG.md",
+            "README.md",
+            "contributors.json",
+            "control",
+            "distribution/config.json"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "This commit prepares the repository for the v3.2.0 release by updating documentation and configuration files.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2a73f52b3ef85ae14802a6a5f050b4953d815f28",
+          "short_sha": "2a73f52b"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 27,
+        "by_kind": {
+          "other": 4,
+          "fix": 4,
+          "feature": 12,
+          "docs": 5,
+          "build": 2
+        },
+        "by_severity": {
+          "none": 17,
+          "low": 3,
+          "medium": 7,
+          "high": 0
+        },
+        "areas_touched": [
+          "auth",
+          "build",
+          "networking",
+          "permissions",
+          "storage",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "7ca36afe97b613360d47c23f7b04eefcbb8e954d",
+            "title": "Fix installation conflict on older versions (#401)",
+            "author": "Alstruit",
+            "files_touched": [
+              "control"
+            ],
+            "kind": "fix",
+            "areas": [
+              "permissions"
+            ],
+            "summary": "This commit addresses installation conflicts that occur when upgrading from older versions of the application.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/7ca36afe97b613360d47c23f7b04eefcbb8e954d",
+            "short_sha": "7ca36afe"
+          },
+          {
+            "sha": "3f9bdf6d3e927f16b5445339bdf65eb06643e58e",
+            "title": "Send registration token on /v1/live_activities",
+            "author": "nickclyde",
+            "files_touched": [
+              "src/ApolloNotificationBackend.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "This commit adds functionality to send a registration token with the Live Activities endpoint. It modifies the existing hook to include the token in the request.",
+            "security_implications": "This change involves sending a registration token, which could expose sensitive information if not handled properly.",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "X-Registration-Token"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3f9bdf6d3e927f16b5445339bdf65eb06643e58e",
+            "short_sha": "3f9bdf6d"
+          },
+          {
+            "sha": "1ff5e6e20072b10a195c540c566242f943809ac8",
+            "title": "Support for dismissing banned profile overlays and suppressing media preview errors",
+            "author": "JeffreyCA",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloBannedProfile.h",
+              "src/ApolloBannedProfile.xm",
+              "src/ApolloMediaPreviewErrorFix.xm",
+              "src/ApolloUserProfileCache.m",
+              "src/CustomAPIViewController.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "ui",
+              "storage"
+            ],
+            "summary": "This commit introduces support for dismissing banned profile overlays and handling media preview errors. It also consolidates cache clearing buttons.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "Changes in cache handling could affect data persistence and error handling.",
+            "risk_signals": [
+              "cache clearing"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1ff5e6e20072b10a195c540c566242f943809ac8",
+            "short_sha": "1ff5e6e2"
+          },
+          {
+            "sha": "98ac6e0bcc301e8608194d3a1475de0170413801",
+            "title": "Restore signed-in account in the simulator via keychain capture/replay",
+            "author": "nickclyde",
+            "files_touched": [
+              "AGENTS.md",
+              "CONTRIBUTING.md",
+              "scripts/run-in-sim.sh",
+              "src/CustomAPIViewController.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "feature",
+            "areas": [
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit implements functionality to restore a signed-in account in the simulator using keychain capture and replay. It modifies several files to support this feature.",
+            "security_implications": "This change involves handling user authentication data, which could pose security risks if not managed properly.",
+            "privacy_implications": "The use of keychain capture may involve storing sensitive user data, raising privacy concerns.",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "keychain capture",
+              "signed-in account"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/98ac6e0bcc301e8608194d3a1475de0170413801",
+            "short_sha": "98ac6e0b"
+          },
+          {
+            "sha": "a6036ff95d5e3c43a47ccecce8c282113befa0b5",
+            "title": "Add manual sign in fallback using an external browser and userscript",
+            "author": "DeltAndy123",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloManualSignInViewController.h",
+              "src/ApolloManualSignInViewController.m",
+              "src/ApolloWebAuthViewController.m",
+              "userscript/apollo-oauth-helper.user.js"
+            ],
+            "kind": "feature",
+            "areas": [
+              "auth",
+              "ui"
+            ],
+            "summary": "This commit adds a manual sign-in fallback using an external browser and a userscript. It also includes fixes for UI and crash issues.",
+            "security_implications": "The introduction of an external browser for sign-in may expose users to phishing risks if not properly secured.",
+            "privacy_implications": "The userscript may collect user data, which raises privacy concerns depending on its implementation.",
+            "safety_implications": "Fixes a crash issue related to iOS 14, improving overall safety.",
+            "risk_signals": [
+              "manual sign in",
+              "external browser",
+              "userscript"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a6036ff95d5e3c43a47ccecce8c282113befa0b5",
+            "short_sha": "a6036ff9"
+          },
+          {
+            "sha": "d1d1f2f9c649be14bb6ca22cf0d36268b64f9cfe",
+            "title": "Add Hide Mod Subreddits: hide dead moderated subreddits from the Subreddits list",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloHideModSubreddits.xm",
+              "src/UserDefaultConstants.h"
+            ],
+            "kind": "feature",
+            "areas": [
+              "ui",
+              "storage"
+            ],
+            "summary": "This commit introduces a feature to hide dead moderated subreddits from the list, with a toggle for visibility in edit mode.",
+            "security_implications": "The hidden subreddits are stored locally and not sent to Reddit, reducing exposure of user data.",
+            "privacy_implications": "No new data is collected or sent externally; the feature only affects local storage.",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "hidden subreddits",
+              "NSUserDefaults"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d1d1f2f9c649be14bb6ca22cf0d36268b64f9cfe",
+            "short_sha": "d1d1f2f9"
+          },
+          {
+            "sha": "3909634f24484958d7f99297581b964461005ab3",
+            "title": "Publish IPAs with custom URL schemes and add toggle to restore original sign-in behaviour",
+            "author": "JeffreyCA",
+            "files_touched": [
+              ".github/workflows/build-ipa.yml",
+              "scripts/build_release_variants.sh",
+              "src/CustomAPIViewController.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "This commit introduces custom URL schemes for IPAs and a toggle for sign-in behavior. It modifies the build process and the user interface for authentication.",
+            "security_implications": "The introduction of custom URL schemes may expose the app to URL hijacking if not properly validated.",
+            "privacy_implications": "(none)",
+            "safety_implications": "Changes in the authentication flow could lead to unexpected crashes if not handled correctly.",
+            "risk_signals": [
+              "custom URL schemes",
+              "sign-in behaviour"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3909634f24484958d7f99297581b964461005ab3",
+            "short_sha": "3909634f"
+          }
+        ]
+      },
+      "hard_flag": false,
+      "summary": "27 commits reviewed. severity: 0H 7M 3L 17none. areas: auth, build, networking, permissions, storage, ui"
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmpzwq65kr7/new/Apollo",
+      "baseline_path": null,
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 71,
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.apple.com",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
+      "removed": [],
+      "added_unallowlisted": [
+        "www.apple.com"
+      ],
+      "hard_flag": false,
+      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_3.2.0",
+  "baseline": "v1.15.11_3.1.1"
+}
