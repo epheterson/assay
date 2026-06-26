@@ -31,12 +31,15 @@ import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
 GH_API = "https://api.github.com"
 STATE_RE = re.compile(r"<!--\s*ASSAY-STATE\s*(\{.*?\})\s*ASSAY-STATE\s*-->", re.S)
+# GitHub rejects issue bodies longer than this with HTTP 422. Stay just under.
+MAX_ISSUE_BODY = 65000
 
 
 def gh(
@@ -51,9 +54,22 @@ def gh(
         req.add_header("Content-Type", "application/json")
     if token:
         req.add_header("Authorization", f"Bearer {token}")
-    with urllib.request.urlopen(req, timeout=20) as r:
-        resp_bytes = r.read()
-        return json.loads(resp_bytes) if resp_bytes else {}
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            resp_bytes = r.read()
+            return json.loads(resp_bytes) if resp_bytes else {}
+    except urllib.error.HTTPError as e:
+        # The bare HTTPError ("HTTP Error 422: Unprocessable Entity") hides
+        # GitHub's actual reason. Fold the response body into the message so
+        # logs show e.g. "body is too long (maximum is 65536 characters)".
+        # e.code is preserved, so callers like ensure_labels still branch on it.
+        try:
+            detail = e.read().decode("utf-8", "replace").strip()
+        except Exception:  # noqa: BLE001
+            detail = ""
+        if detail:
+            e.msg = f"{e.msg} — {detail}"
+        raise
 
 
 def label_for(tracked_owner: str, tracked_repo: str) -> str:
@@ -166,9 +182,19 @@ def write_verdict_issue(
     if not links_md:
         links_md = "_(none)_"
 
-    findings_md = "<details><summary>Module findings (JSON)</summary>\n\n```json\n"
-    findings_md += json.dumps(findings, indent=2)[:50000]
-    findings_md += "\n```\n</details>"
+    # Full module findings are archived verbatim to verdicts/*.json in the same
+    # run, so we link there instead of inlining a large (previously ~40 KB) raw
+    # JSON dump that duplicated the per-commit reviews rendered below and ate
+    # most of GitHub's 65 536-char issue budget.
+    safe_tag = re.sub(r"[^A-Za-z0-9._-]", "_", tag)
+    verdict_path = f"verdicts/{tracked_owner}-{tracked_repo}-{safe_tag}.json"
+    verdict_file_url = (
+        f"https://github.com/{assay_owner}/{assay_repo}/blob/master/{verdict_path}"
+    )
+    findings_md = (
+        f"Full machine-readable findings for every module are archived at "
+        f"[`{verdict_path}`]({verdict_file_url})."
+    )
 
     # Release summary (LLM narrative) + top changes to review
     release_summary_md = verdict.get("release_summary", "").strip() or "_(none)_"
@@ -178,17 +204,26 @@ def write_verdict_issue(
     if not top_changes_md:
         top_changes_md = "_(none provided)_"
 
-    # Per-commit code review (from the code_review module finding)
+    # Per-commit code review (from the code_review module finding).
+    #
+    # This section scales with commit count — the unbounded term in the issue
+    # body. To keep security signal visible no matter how big a release is, we
+    # render security-relevant commits (high/medium) in full, and collapse the
+    # routine ones (low/none — docs, UI, build) into a single one-line-each
+    # <details> block. That way a 200-commit release stays compact AND the
+    # commits a human actually needs to look at are never the ones truncated.
     SEV_EMOJI = {"high": "🟥", "medium": "🟧", "low": "🟨", "none": "⬜"}
-    commit_reviews_md = ""
+    notable_md = ""  # high/medium — full three-angle detail
+    routine_lines: list[str] = []  # low/none — compact one-liners
+    saw_code_review = False
+    saw_commits = False
     for f in findings or []:
         if f.get("module") != "code_review" or not f.get("ok"):
             continue
+        saw_code_review = True
         reviews = f.get("reviews") or []
-        if not reviews:
-            commit_reviews_md = "_(no commits in window)_"
-            break
         for r in reviews:
+            saw_commits = True
             sev = r.get("severity", "none")
             sev_e = SEV_EMOJI.get(sev, "⬜")
             sha = r.get("short_sha") or (r.get("sha") or "")[:8]
@@ -197,42 +232,59 @@ def write_verdict_issue(
             author = r.get("author") or "(unknown)"
             commit_title = (r.get("title") or "").replace("\n", " ").strip()[:140]
             kind = r.get("kind", "?")
+
+            if sev not in ("high", "medium"):
+                routine_lines.append(
+                    f"- {sev_e} `{sev}` {sha_link} — @{author} — {commit_title} `{kind}`"
+                )
+                continue
+
             areas = ", ".join(r.get("areas") or [])
             summary = r.get("summary", "").strip()
             sec = (r.get("security_implications") or "").strip()
             priv = (r.get("privacy_implications") or "").strip()
             safe = (r.get("safety_implications") or "").strip()
-            commit_reviews_md += (
+            notable_md += (
                 f"#### {sev_e} `{sev}` {sha_link} — @{author} — {commit_title}\n"
                 f"`{kind}`"
             )
             if areas:
-                commit_reviews_md += f" · areas: `{areas}`"
-            commit_reviews_md += "\n\n"
+                notable_md += f" · areas: `{areas}`"
+            notable_md += "\n\n"
             if summary:
-                commit_reviews_md += f"{summary}\n\n"
-            # Only render the three-angle block for non-trivial commits
-            if sev in ("low", "medium", "high"):
-                if sec and sec != "(none)":
-                    commit_reviews_md += f"- 🔒 **Security:** {sec}\n"
-                if priv and priv != "(none)":
-                    commit_reviews_md += f"- 👁 **Privacy:** {priv}\n"
-                if safe and safe != "(none)":
-                    commit_reviews_md += f"- 🛡 **Safety:** {safe}\n"
-                if (
-                    (not sec or sec == "(none)")
-                    and (not priv or priv == "(none)")
-                    and (not safe or safe == "(none)")
-                ):
-                    commit_reviews_md += (
-                        "_no security/privacy/safety implications noted._\n"
-                    )
-                commit_reviews_md += "\n"
+                notable_md += f"{summary}\n\n"
+            if sec and sec != "(none)":
+                notable_md += f"- 🔒 **Security:** {sec}\n"
+            if priv and priv != "(none)":
+                notable_md += f"- 👁 **Privacy:** {priv}\n"
+            if safe and safe != "(none)":
+                notable_md += f"- 🛡 **Safety:** {safe}\n"
+            if (
+                (not sec or sec == "(none)")
+                and (not priv or priv == "(none)")
+                and (not safe or safe == "(none)")
+            ):
+                notable_md += "_no security/privacy/safety implications noted._\n"
+            notable_md += "\n"
         break  # only one code_review module per verdict
-    if not commit_reviews_md:
-        commit_reviews_md = "_(code_review module did not run for this release)_"
 
-    body = (
+    if not saw_code_review:
+        commit_reviews_md = "_(code_review module did not run for this release)_"
+    elif not saw_commits:
+        commit_reviews_md = "_(no commits in window)_"
+    else:
+        commit_reviews_md = notable_md or (
+            "_No high/medium-severity commits in this release._\n\n"
+        )
+        if routine_lines:
+            commit_reviews_md += (
+                f"<details><summary>Routine commits ({len(routine_lines)}) — "
+                f"low / no security relevance</summary>\n\n"
+                + "\n".join(routine_lines)
+                + "\n</details>\n"
+            )
+
+    main_body = (
         f"## {emoji} {headline}\n\n"
         f"**Verdict:** `{v_class}` (score {score}/10)\n"
         f"**Tag:** [`{tag}`]({release_url})\n"
@@ -246,9 +298,22 @@ def write_verdict_issue(
         f"### Quick links\n{links_md}\n"
         f"### Anomalies\n{anomalies_md}\n\n"
         f"### Findings\n{findings_md}\n\n"
-        f"---\n"
-        f"<!-- ASSAY-STATE\n{json.dumps(state)}\nASSAY-STATE -->\n"
     )
+
+    # The state footer is parsed by get_last_state() to recover current state,
+    # so it MUST survive truncation. GitHub rejects issue bodies over 65536
+    # chars with HTTP 422; cap the (large, variable) main body and always
+    # append the footer intact. Full data is preserved in the committed
+    # verdicts/ JSON, so truncating this human-facing view loses nothing.
+    state_footer = f"---\n<!-- ASSAY-STATE\n{json.dumps(state)}\nASSAY-STATE -->\n"
+    if len(main_body) + len(state_footer) > MAX_ISSUE_BODY:
+        notice = (
+            "\n\n> ⚠️ _Report truncated to fit GitHub's 65 536-char issue limit. "
+            f"Full verdict JSON is committed to `verdicts/` in the assay repo._\n\n"
+        )
+        keep = MAX_ISSUE_BODY - len(state_footer) - len(notice)
+        main_body = main_body[:keep] + notice
+    body = main_body + state_footer
 
     labels = [label_for(tracked_owner, tracked_repo), f"verdict:{v_class}"]
 
