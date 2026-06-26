@@ -76,6 +76,84 @@ def render(template: str, vars: dict[str, str]) -> str:
     return template
 
 
+def compact_findings_for_judge(findings: list[dict], char_budget: int) -> list[dict]:
+    """Project findings into a small, judge-ready shape that fits a token budget.
+
+    GitHub Models caps gpt-4o-mini requests at 8000 tokens. The code_review
+    module's per-commit reviews dominate request size on large releases and
+    will 413 the request, forcing a heuristic fallback. Keep security-relevant
+    commits (high/medium) in full and roll routine ones (low/none) into compact
+    one-liners, then trim to `char_budget` — dropping routine detail first, then
+    lowest-severity notable detail — recording how much was omitted so the judge
+    knows its view is partial. Other (small) modules pass through unchanged.
+    """
+    SEV_RANK = {"high": 3, "medium": 2, "low": 1, "none": 0}
+    out: list[dict] = []
+    cr_block: dict | None = None
+    for f in findings:
+        if f.get("module") != "code_review":
+            out.append(f)
+            continue
+        reviews = f.get("reviews") or []
+        notable: list[dict] = []
+        routine: list[dict] = []
+        for r in sorted(
+            reviews, key=lambda x: -SEV_RANK.get(x.get("severity", "none"), 0)
+        ):
+            sev = r.get("severity", "none")
+            sha = r.get("short_sha") or (r.get("sha") or "")[:8]
+            title = (r.get("title") or "").replace("\n", " ").strip()[:120]
+            if sev in ("high", "medium"):
+                notable.append(
+                    {
+                        "sha": sha,
+                        "author": r.get("author"),
+                        "severity": sev,
+                        "kind": r.get("kind"),
+                        "areas": r.get("areas"),
+                        "title": title,
+                        "summary": (r.get("summary") or "").strip()[:400],
+                        "security": (r.get("security_implications") or "").strip()[
+                            :300
+                        ],
+                        "privacy": (r.get("privacy_implications") or "").strip()[:300],
+                        "safety": (r.get("safety_implications") or "").strip()[:300],
+                    }
+                )
+            else:
+                routine.append({"sha": sha, "severity": sev, "title": title})
+        cr_block = {
+            "module": "code_review",
+            "ok": f.get("ok"),
+            "hard_flag": f.get("hard_flag"),
+            "summary": f.get("summary"),
+            "commit_count": len(reviews),
+            "notable_commits": notable,
+            "routine_commits": routine,
+        }
+        out.append(cr_block)
+
+    if cr_block is not None:
+        # Measure with the SAME serialization the request uses (indent=2 adds
+        # ~25% over compact json) so the budget reflects real payload size.
+        size = lambda: len(json.dumps(out, indent=2))  # noqa: E731
+        omitted_routine = 0
+        while size() > char_budget and cr_block["routine_commits"]:
+            cr_block["routine_commits"].pop()
+            omitted_routine += 1
+        if omitted_routine:
+            cr_block["routine_commits_omitted"] = omitted_routine
+        omitted_notable = 0
+        # notable is severity-sorted high→low, so popping the tail sheds the
+        # least-important commits first.
+        while size() > char_budget and cr_block["notable_commits"]:
+            cr_block["notable_commits"].pop()
+            omitted_notable += 1
+        if omitted_notable:
+            cr_block["notable_commits_omitted"] = omitted_notable
+    return out
+
+
 def heuristic_verdict(findings: list[dict]) -> dict:
     """Offline fallback. Conservative: any hard_flag → review (never blocked)."""
     hard = [f for f in findings if f.get("hard_flag")]
@@ -208,6 +286,22 @@ def judge(
         result["judge_source"] = "heuristic"
     else:
         prompt = load_prompt(prompt_path)
+        # GitHub Models caps gpt-4o-mini requests at 8000 tokens. Size the
+        # findings payload to what's left after the system prompt + notes,
+        # rather than a fixed char cap that 413s on large releases (and that
+        # truncated JSON mid-structure). ~4 chars/token, with a safety margin.
+        CHARS_PER_TOKEN = 4
+        REQUEST_TOKEN_LIMIT = 8000
+        SAFETY_TOKENS = 700
+        notes = release_notes[:3000]
+        overhead_tokens = (
+            len(prompt["system"]) + len(prompt["user_template"]) + len(notes)
+        ) // CHARS_PER_TOKEN
+        findings_budget_chars = max(
+            2000,
+            (REQUEST_TOKEN_LIMIT - overhead_tokens - SAFETY_TOKENS) * CHARS_PER_TOKEN,
+        )
+        compact = compact_findings_for_judge(findings, findings_budget_chars)
         user = render(
             prompt["user_template"],
             {
@@ -215,8 +309,8 @@ def judge(
                 "TRIGGER_REPO": trigger_repo,
                 "NEW_TAG": new_tag,
                 "BASELINE_TAG": baseline_tag,
-                "RELEASE_NOTES": release_notes[:8000],
-                "MODULE_FINDINGS_JSON": json.dumps(findings, indent=2)[:30000],
+                "RELEASE_NOTES": notes,
+                "MODULE_FINDINGS_JSON": json.dumps(compact, indent=2),
                 "CODE_COMPARE_URL": code_compare_url or "(not available)",
                 "RELEASE_COMPARE_URL": release_compare_url or "(not available)",
                 "RELEASE_URL": release_url or "(not available)",
@@ -238,6 +332,15 @@ def judge(
             result = heuristic_verdict(findings)
             result["judge_source"] = f"heuristic-fallback:{type(e).__name__}"
             result["judge_error"] = str(e)[:300]
+            # Don't leave the misleading "no LLM available" text from
+            # heuristic_verdict() — the LLM *was* reachable, the call failed.
+            # Name the real cause so a degraded verdict is self-explanatory.
+            result["reasoning"] = (
+                "⚠️ The LLM judge did not run — the GitHub Models request "
+                f"failed ({str(e)[:200]}). Fell back to a conservative "
+                "heuristic: any module hard_flag forces 'review'. Treat this "
+                "as 'unjudged — a human should look', not a real LLM verdict."
+            )
         except (ValueError, KeyError) as e:
             # LLM returned content we couldn't parse. Don't silently fall back
             # to clean — treat as a low-confidence review and surface the raw
