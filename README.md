@@ -25,7 +25,7 @@ State lives in the assay repo's own GitHub Issues. Each verdict opens an issue l
 ## How it works
 
 ```
-                  every 30 min cron
+                  hourly cron
                           │
                           ▼
               ┌─────────────────────────┐

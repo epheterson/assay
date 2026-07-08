@@ -7,9 +7,11 @@ name: assay — Apollo-Reborn
 
 on:
   schedule:
-    # Every 6 hours. Apollo releases land days apart; this is plenty
-    # frequent and 8× fewer cron runs than the original */30 schedule.
-    - cron: "0 */6 * * *"
+    # Hourly. GitHub delivers cron best-effort (observed +hours of drift on
+    # the previous 6h schedule — v1.15.11_3.4.0 sat unjudged for most of a
+    # day, 2026-07-08). Hourly keeps worst-case verdict latency ~1-2h; the
+    # no-new-release path exits in ~10s, and public-repo minutes are free.
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 concurrency:
