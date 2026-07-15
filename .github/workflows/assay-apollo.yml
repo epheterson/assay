@@ -86,7 +86,7 @@ jobs:
           username: ${{ secrets.GMAIL_USERNAME }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           from: "assay"
-          to: epheterson@gmail.com
+          to: ${{ secrets.NOTIFY_EMAIL }}
           subject: ${{ env.EMAIL_SUBJECT }}
           html_body: |
             <h2>${{ env.EMAIL_HEADLINE }}</h2>
