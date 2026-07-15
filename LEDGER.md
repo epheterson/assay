@@ -2,12 +2,13 @@
 
 Every verdict, every release, every target. Newest first. Auto-generated on each verdict.
 
-**Totals:** 7 verdicts · ✅ 1 clean · ⚠️ 6 review · 🚨 0 blocked
+**Totals:** 8 verdicts · ✅ 1 clean · ⚠️ 7 review · 🚨 0 blocked
 
 ## Apollo/Reborn
 
 | | Tag | Score | Headline | Judge | Baseline |
 |---|---|---|---|---|---|
+| ⚠️ `review` | [`v1.15.11_3.4.1`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.4.1) | 6 | New features and fixes; verify new OAuth interactions and account recovery funct | `github-models:openai/gpt-4o-mini` | `v1.15.11_3.4.0` |
 | ⚠️ `review` | [`v1.15.11_3.4.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.4.0) | 5 | Hard flag from module(s); manual review needed | `heuristic-fallback:HTTPError` | `v1.15.11_3.3.0` |
 | ⚠️ `review` | [`v1.15.11_3.3.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.3.0) | 5 | Hard flag from module(s); manual review needed | `heuristic-fallback:HTTPError` | `v1.15.11_3.2.0` |
 | ⚠️ `review` | [`v1.15.11_3.2.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.2.0) | 5 | Hard flag from module(s); manual review needed | `heuristic-fallback:HTTPError` | `v1.15.11_3.1.1` |
