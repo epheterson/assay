@@ -1,0 +1,650 @@
+{
+  "verdict": {
+    "verdict": "review",
+    "score": 6,
+    "headline": "Keychain fixes and new app icon; verify keychain handling",
+    "release_summary": "v1.15.11_3.4.2 introduces a new Synthwave Liquid Glass app icon and addresses several keychain-related issues that could affect user authentication persistence. Notably, commits by @jordanearle and @DeltAndy123 fix problems with login credentials not persisting due to incorrect keychain protection classes. These changes enhance the security of user credentials but require careful verification to ensure that keychain access is handled correctly. Other changes include minor UI fixes and performance improvements, with no new analytics SDKs or expanded permissions noted.",
+    "top_changes_to_review": [
+      "43449aa5 by @jordanearle: 'Fix login not persisting on sideloads: recover scoped keychain reads' \u2014 verify the handling of keychain access and persistence.",
+      "6ca7bf00 by @DeltAndy123: 'Fix API-key-free sign-in creating an unreadable account keychain item' \u2014 check the protection class for keychain items.",
+      "d175aa0d by @DeltAndy123: 'Heal the protection-class mismatch behind the scoped-read miss' \u2014 ensure that logging and healing of keychain items is secure.",
+      "05c97654 by @jordanearle: 'Login persistence: dedupe enumeration + trim diagnostics to a lean signal' \u2014 confirm that sensitive data is not logged."
+    ],
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "Multiple keychain-related fixes addressing potential credential loss",
+        "why_it_matters": "Keychain access is sensitive; improper handling can lead to credential exposure or loss."
+      },
+      {
+        "severity": "low",
+        "module": "url_inventory",
+        "what": "One new host added (www.apple.com) not on the allowlist",
+        "why_it_matters": "Unallowlisted hosts can pose a risk if they are not properly vetted."
+      }
+    ],
+    "decision_inputs": [
+      "Review the keychain handling in commit 43449aa5 and related commits for security implications",
+      "Check the allowlist status of www.apple.com in the url inventory",
+      "Verify the protection class settings in the keychain-related commits"
+    ],
+    "consistent_with_notes": true,
+    "reasoning": "The release notes align with the changes made, particularly the focus on keychain fixes. While there are medium-severity anomalies regarding keychain handling, there is no evidence of malicious intent. The addition of a new unallowlisted host warrants a review, but overall, the release appears to be safe with some areas needing human verification.",
+    "judge_source": "github-models:openai/gpt-4o-mini",
+    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 6,\n  \"headline\": \"Keychain fixes and new app icon; verify keychain handling\",\n  \"release_summary\": \"v1.15.11_3.4.2 introduces a new Synthwave Liquid Glass app icon and addresses several keychain-related issues that could affect user authentication persistence. Notably, commits by @jordanearle and @DeltAndy123 fix problems with login credentials not persisting due to incorrect keychain protection classes. These changes enhance the security of user credentials but require careful verification to ensure that keychain access is handled correctly. Other changes include minor UI fixes and performance improvements, with no new analytics SDKs or expanded permissions noted.\",\n  \"top_changes_to_review\": [\n    \"43449aa5 by @jordanearle: 'Fix login not persisting on sideloads: recover scoped keychain reads' \u2014 verify the handling of keychain access and persistence.\",\n    \"6ca7bf00 by @DeltAndy123: 'Fix API-key-free sign-in creating an unreadable account keychain item' \u2014 check the protection class for keychain items.\",\n    \"d175aa0d by @DeltAndy123: 'Heal the protection-class mismatch behind the scoped-read miss' \u2014 ensure that logging and healing of keychain items is secure.\",\n    \"05c97654 by @jordanearle: 'Login persistence: dedupe enumeration + trim diagnostics to a lean signal' \u2014 confirm that sensitive data is not logged.\"\n  ],\n  \"anomalies\": [\n    {\n      \"severity\": \"medium\",\n      \"module\": \"code_review\",\n      \"what\": \"Multiple keychain-related fixes addressing potential credential loss\",\n      \"why_it_matters\": \"Keychain access is sensitive; improper handling can lead to credential exposure or loss.\"\n    },\n    {\n      \"severity\": \"low\",\n      \"module\": \"url_inventory\",\n      \"what\": \"One new host added (www.apple.com) not on the allowlist\",\n      \"why_it_matters\": \"Unallowlisted hosts can pose a risk if they are not properly vetted.\"\n    }\n  ],\n  \"decision_inputs\": [\n    \"Review the keychain handling in commit 43449aa5 and related commits for security implications\",\n    \"Check the allowlist status of www.apple.com in the url inventory\",\n    \"Verify the protection class settings in the keychain-related commits\"\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release notes align with the changes made, particularly the focus on keychain fixes. While there are medium-severity anomalies regarding keychain handling, there is no evidence of malicious intent. The addition of a new unallowlisted host warrants a review, but overall, the release appears to be safe with some areas needing human verification.\"\n}",
+    "hard_flagged_modules": [],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.4.1...v1.15.11_3.4.2",
+      "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.4.1...v1.15.11_3.4.2",
+      "release_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.4.2"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": true,
+      "owner": "Apollo-Reborn",
+      "repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.4.1",
+      "head_ref": "v1.15.11_3.4.2",
+      "window_commit_count": 14,
+      "window_authors": {
+        "github-actions[bot]": 1,
+        "icpryde": 4,
+        "IllIIllIllIllII": 2,
+        "JeffreyCA": 2,
+        "jordanearle": 3,
+        "DeltAndy123": 2
+      },
+      "new_authors": [],
+      "existing_authors": [
+        "DeltAndy123",
+        "IllIIllIllIllII",
+        "JeffreyCA",
+        "github-actions[bot]",
+        "icpryde",
+        "jordanearle"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": false,
+      "summary": "14 commits by 6 authors. 0 new author(s): none. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "Apollo-Reborn",
+      "code_repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.4.1",
+      "head_ref": "v1.15.11_3.4.2",
+      "llm_used": true,
+      "capped": false,
+      "reviews": [
+        {
+          "sha": "4881cfe106936f7ffad4cdc34bfc7fbbf3370189",
+          "title": "Update distribution sources for v1.15.11_3.4.1",
+          "author": "github-actions[bot]",
+          "files_touched": [
+            "apps.json",
+            "apps_glass.json",
+            "apps_glass_icons.json",
+            "apps_noext.json",
+            "apps_noext_glass.json",
+            "apps_noext_glass_icons.json",
+            "release-manifest.json"
+          ],
+          "kind": "other",
+          "areas": [],
+          "summary": "This commit updates the distribution sources for the application.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/4881cfe106936f7ffad4cdc34bfc7fbbf3370189",
+          "short_sha": "4881cfe1"
+        },
+        {
+          "sha": "37ea80a907823b759834ae557715c356381cc4ae",
+          "title": "Sports clips: recognize streama.in + streamff.link, follow moved dubz/streamff CDNs",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloSportsClipResolver.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking"
+          ],
+          "summary": "This commit enhances the sports clip resolver to recognize new domains and handle CDN changes for better clip resolution.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/37ea80a907823b759834ae557715c356381cc4ae",
+          "short_sha": "37ea80a9"
+        },
+        {
+          "sha": "8da15dea1848f55b3a9f0dd19298079dcdc1cf5c",
+          "title": "Fix Apollo Classic icon assets",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/Antenna Apollo Cropped.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/AntennaApollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/Body Apollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/BodyApollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/Eyes Apollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/EyesApollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/Face Apollo Cropped.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/FaceApollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/Helmet Apollo Cropped.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/Assets/HelmetApollo.svg",
+            "liquid-glass/icons/apollo-classic/apollo-classic.icon/icon.json",
+            "liquid-glass/icons/apollo-classic/clear-dark.png",
+            "liquid-glass/icons/apollo-classic/clear-light.png",
+            "liquid-glass/icons/apollo-classic/dark.png",
+            "liquid-glass/icons/apollo-classic/default.png",
+            "liquid-glass/prebuilt/Assets.car"
+          ],
+          "kind": "other",
+          "areas": [],
+          "summary": "This commit fixes the icon assets for Apollo Classic by updating and removing outdated files.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/8da15dea1848f55b3a9f0dd19298079dcdc1cf5c",
+          "short_sha": "8da15dea"
+        },
+        {
+          "sha": "221869d66f5b3f06aa8227057d6655362ab1c687",
+          "title": "Add Synthwave Liquid Glass icon",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "liquid-glass/generated/LiquidGlassIconPreviews.gen.h",
+            "liquid-glass/icons.json",
+            "liquid-glass/icons/synthwave/clear-dark.png",
+            "liquid-glass/icons/synthwave/clear-light.png",
+            "liquid-glass/icons/synthwave/dark.png",
+            "liquid-glass/icons/synthwave/default.png",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/Apollo Antenna Ball 2.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/Apollo Antenna.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/Eyes.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/Helmet.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/reflection.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/retrowave_grid_cropped_more_angled.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/stars.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/icon.json",
+            "liquid-glass/prebuilt/Assets.car"
+          ],
+          "kind": "other",
+          "areas": [],
+          "summary": "This commit adds a new Synthwave Liquid Glass icon along with its assets.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/221869d66f5b3f06aa8227057d6655362ab1c687",
+          "short_sha": "221869d6"
+        },
+        {
+          "sha": "889478a4e53ec86e2c1f4c5277a03ac5c45c8bed",
+          "title": "Update issue template and add missing changelog entries",
+          "author": "JeffreyCA",
+          "files_touched": [
+            ".github/ISSUE_TEMPLATE/config.yml",
+            ".github/ISSUE_TEMPLATE/feature_request.yml",
+            "CHANGELOG.md"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "This commit updates the issue template and adds missing entries to the changelog.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/889478a4e53ec86e2c1f4c5277a03ac5c45c8bed",
+          "short_sha": "889478a4"
+        },
+        {
+          "sha": "80bb3a5d04c7db254eb85f704ce93b3dba7d7759",
+          "title": "Fix Mod Queue filter menu anchoring on Liquid Glass",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "src/ApolloNativeActionMenus.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes the anchoring of the Mod Queue filter menu in the Liquid Glass interface.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/80bb3a5d04c7db254eb85f704ce93b3dba7d7759",
+          "short_sha": "80bb3a5d"
+        },
+        {
+          "sha": "d2a6816ffbecbe5b6c4e3d4c0b077cb78175e46b",
+          "title": "Speed up full Community Highlights loading",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloState.h",
+            "src/ApolloSubredditHighlights.xm",
+            "src/CustomAPIViewController.m",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit improves the loading speed of Community Highlights and consolidates related settings.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d2a6816ffbecbe5b6c4e3d4c0b077cb78175e46b",
+          "short_sha": "d2a6816f"
+        },
+        {
+          "sha": "a1585ec50c1d6910e4dfd62a695924451d8f354b",
+          "title": "Fix hold-for-speed getting stuck after scrubbing the video",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloVideoHoldSpeed.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit resolves an issue where the video playback speed would get stuck after scrubbing.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "This change improves the handling of video playback state, reducing the risk of crashes.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a1585ec50c1d6910e4dfd62a695924451d8f354b",
+          "short_sha": "a1585ec5"
+        },
+        {
+          "sha": "43449aa5f3797dca10014dc1e536ba1cdd84c51d",
+          "title": "Fix login not persisting on sideloads: recover scoped keychain reads",
+          "author": "jordanearle",
+          "files_touched": [
+            "src/ApolloAccountCredentials.h",
+            "src/ApolloAccountCredentials.m",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit fixes an issue where login credentials were not persisting due to scoped keychain read failures.",
+          "security_implications": "This change involves keychain access, which is sensitive and requires careful handling of credentials.",
+          "privacy_implications": "(none)",
+          "safety_implications": "The fix includes a fallback mechanism to ensure that user credentials are not lost, enhancing data persistence.",
+          "risk_signals": [
+            "keychain",
+            "credentials",
+            "persisting"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/43449aa5f3797dca10014dc1e536ba1cdd84c51d",
+          "short_sha": "43449aa5"
+        },
+        {
+          "sha": "e87787ac2f333a3e5fc64c2f2e27437a8e7284eb",
+          "title": "Fix Search tab suggestions padding and Random Subreddit icon weight",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloSearchTabFixes.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit addresses padding issues in the Search tab suggestions and adjusts the weight of the Random Subreddit icon.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/e87787ac2f333a3e5fc64c2f2e27437a8e7284eb",
+          "short_sha": "e87787ac"
+        },
+        {
+          "sha": "6ca7bf009bdf54bce7c6f0aace3490bfa82d7b9a",
+          "title": "Fix API-key-free sign-in creating an unreadable account keychain item",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "src/ApolloWebJSONIdentity.xm",
+            "src/CustomAPIViewController.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit fixes an issue with creating a corrupted keychain item during API-key-free sign-in. It specifies the protection class to ensure the keychain item is readable.",
+          "security_implications": "Improves the handling of keychain items, which is critical for secure storage of authentication tokens.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "corrupted keychain",
+            "protection class"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6ca7bf009bdf54bce7c6f0aace3490bfa82d7b9a",
+          "short_sha": "6ca7bf00"
+        },
+        {
+          "sha": "d175aa0d1bf2a65907e5b18b61411fd6c93de8c8",
+          "title": "Heal the protection-class mismatch behind the scoped-read miss",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "src/ApolloCommon.h",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit addresses a protection-class mismatch that caused scoped-read misses in keychain items. It logs additional attributes for better debugging and heals invalid keychain items.",
+          "security_implications": "Enhances the robustness of keychain access, which is vital for maintaining secure authentication.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "protection-class mismatch",
+            "scoped-read miss"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d175aa0d1bf2a65907e5b18b61411fd6c93de8c8",
+          "short_sha": "d175aa0d"
+        },
+        {
+          "sha": "05c976549d26f01fe43811ae61b95a427e57b854",
+          "title": "Login persistence: dedupe enumeration + trim diagnostics to a lean signal",
+          "author": "jordanearle",
+          "files_touched": [
+            "src/ApolloCommon.h",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit consolidates and trims login persistence diagnostics to reduce noise and improve clarity. It removes redundant code and ensures sensitive data is not logged unnecessarily.",
+          "security_implications": "Reduces the risk of sensitive data exposure by limiting diagnostic logging.",
+          "privacy_implications": "Addresses potential privacy concerns by preventing usernames from being logged.",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "sensitive data exposure",
+            "diagnostic logging"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/05c976549d26f01fe43811ae61b95a427e57b854",
+          "short_sha": "05c97654"
+        },
+        {
+          "sha": "ffa27b365504d65c33b2afe5ba8b03e0b9307288",
+          "title": "Prepare v3.4.2 release and changelog",
+          "author": "jordanearle",
+          "files_touched": [
+            "CHANGELOG.md",
+            "control",
+            "distribution/config.json"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "This commit updates the version number and changelog for the upcoming release.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ffa27b365504d65c33b2afe5ba8b03e0b9307288",
+          "short_sha": "ffa27b36"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 14,
+        "by_kind": {
+          "other": 3,
+          "feature": 2,
+          "docs": 2,
+          "fix": 6,
+          "refactor": 1
+        },
+        "by_severity": {
+          "none": 8,
+          "low": 2,
+          "medium": 4,
+          "high": 0
+        },
+        "areas_touched": [
+          "auth",
+          "networking",
+          "storage",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "43449aa5f3797dca10014dc1e536ba1cdd84c51d",
+            "title": "Fix login not persisting on sideloads: recover scoped keychain reads",
+            "author": "jordanearle",
+            "files_touched": [
+              "src/ApolloAccountCredentials.h",
+              "src/ApolloAccountCredentials.m",
+              "src/ApolloCommon.h",
+              "src/ApolloCommon.m",
+              "src/CustomAPIViewController.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit fixes an issue where login credentials were not persisting due to scoped keychain read failures.",
+            "security_implications": "This change involves keychain access, which is sensitive and requires careful handling of credentials.",
+            "privacy_implications": "(none)",
+            "safety_implications": "The fix includes a fallback mechanism to ensure that user credentials are not lost, enhancing data persistence.",
+            "risk_signals": [
+              "keychain",
+              "credentials",
+              "persisting"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/43449aa5f3797dca10014dc1e536ba1cdd84c51d",
+            "short_sha": "43449aa5"
+          },
+          {
+            "sha": "6ca7bf009bdf54bce7c6f0aace3490bfa82d7b9a",
+            "title": "Fix API-key-free sign-in creating an unreadable account keychain item",
+            "author": "DeltAndy123",
+            "files_touched": [
+              "src/ApolloWebJSONIdentity.xm",
+              "src/CustomAPIViewController.m"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit fixes an issue with creating a corrupted keychain item during API-key-free sign-in. It specifies the protection class to ensure the keychain item is readable.",
+            "security_implications": "Improves the handling of keychain items, which is critical for secure storage of authentication tokens.",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "corrupted keychain",
+              "protection class"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6ca7bf009bdf54bce7c6f0aace3490bfa82d7b9a",
+            "short_sha": "6ca7bf00"
+          },
+          {
+            "sha": "d175aa0d1bf2a65907e5b18b61411fd6c93de8c8",
+            "title": "Heal the protection-class mismatch behind the scoped-read miss",
+            "author": "DeltAndy123",
+            "files_touched": [
+              "src/ApolloCommon.h",
+              "src/CustomAPIViewController.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit addresses a protection-class mismatch that caused scoped-read misses in keychain items. It logs additional attributes for better debugging and heals invalid keychain items.",
+            "security_implications": "Enhances the robustness of keychain access, which is vital for maintaining secure authentication.",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "protection-class mismatch",
+              "scoped-read miss"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d175aa0d1bf2a65907e5b18b61411fd6c93de8c8",
+            "short_sha": "d175aa0d"
+          },
+          {
+            "sha": "05c976549d26f01fe43811ae61b95a427e57b854",
+            "title": "Login persistence: dedupe enumeration + trim diagnostics to a lean signal",
+            "author": "jordanearle",
+            "files_touched": [
+              "src/ApolloCommon.h",
+              "src/CustomAPIViewController.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "refactor",
+            "areas": [
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit consolidates and trims login persistence diagnostics to reduce noise and improve clarity. It removes redundant code and ensures sensitive data is not logged unnecessarily.",
+            "security_implications": "Reduces the risk of sensitive data exposure by limiting diagnostic logging.",
+            "privacy_implications": "Addresses potential privacy concerns by preventing usernames from being logged.",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "sensitive data exposure",
+              "diagnostic logging"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/05c976549d26f01fe43811ae61b95a427e57b854",
+            "short_sha": "05c97654"
+          }
+        ]
+      },
+      "hard_flag": false,
+      "summary": "14 commits reviewed. severity: 0H 4M 2L 8none. areas: auth, networking, storage, ui"
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmpnhvi8vyu/new/Apollo",
+      "baseline_path": null,
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 71,
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.apple.com",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
+      "removed": [],
+      "added_unallowlisted": [
+        "www.apple.com"
+      ],
+      "hard_flag": false,
+      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_3.4.2",
+  "baseline": "v1.15.11_3.4.1"
+}
