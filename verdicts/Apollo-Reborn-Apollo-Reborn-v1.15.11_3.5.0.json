@@ -1,0 +1,1934 @@
+{
+  "verdict": {
+    "verdict": "review",
+    "score": 6,
+    "headline": "New features added including Gallery View and AI Summaries; verify API key handling",
+    "release_summary": "The v1.15.11_3.5.0 release introduces several new features, including a Gallery View for media browsing, a revamped settings interface, and enhanced AI Summaries with support for cloud-hosted models. Notably, the AI Summaries feature allows users to supply their own API keys, raising potential security concerns regarding key management. Additionally, the introduction of native poll voting and creation features utilizes web session cookies, which may expose user accounts if not handled securely. Overall, while the new features enhance user experience, the handling of sensitive data warrants a closer look.",
+    "top_changes_to_review": [
+      "60704409 by @nickclyde: 'AI Summaries: cloud-hosted model support (OpenRouter / Gemini / custom)' \u2014 verify API key handling and storage in standardUserDefaults.",
+      "aa665fa4 by @jordanearle: 'Add native poll voting and creation' \u2014 check the security of web session cookie usage for authentication.",
+      "6c147b3b by @icpryde: 'Add selectable modern Reddit Chat and Modmail' \u2014 review token_v2 handling for secure authentication."
+    ],
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "Introduction of API key handling for AI Summaries feature",
+        "why_it_matters": "Improper management of API keys can lead to exposure of sensitive user data."
+      },
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "Use of web session cookies for native poll voting and creation",
+        "why_it_matters": "Exposing user accounts through insecure handling of session data poses a significant risk."
+      }
+    ],
+    "decision_inputs": [
+      "Review the diff for commit 60704409 regarding API key handling in AI Summaries",
+      "Check the implementation of web session cookies in commit aa665fa4 for poll features",
+      "Examine token_v2 usage in commit 6c147b3b for secure authentication practices"
+    ],
+    "consistent_with_notes": true,
+    "reasoning": "The release notes align with the changes made, particularly the introduction of new features and enhancements. However, the presence of hard_flag in the code review indicates potential security concerns that merit a human review, particularly around API key and session management.",
+    "judge_source": "github-models:openai/gpt-4o-mini",
+    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 6,\n  \"headline\": \"New features added including Gallery View and AI Summaries; verify API key handling\",\n  \"release_summary\": \"The v1.15.11_3.5.0 release introduces several new features, including a Gallery View for media browsing, a revamped settings interface, and enhanced AI Summaries with support for cloud-hosted models. Notably, the AI Summaries feature allows users to supply their own API keys, raising potential security concerns regarding key management. Additionally, the introduction of native poll voting and creation features utilizes web session cookies, which may expose user accounts if not handled securely. Overall, while the new features enhance user experience, the handling of sensitive data warrants a closer look.\",\n  \"top_changes_to_review\": [\n    \"60704409 by @nickclyde: 'AI Summaries: cloud-hosted model support (OpenRouter / Gemini / custom)' \u2014 verify API key handling and storage in standardUserDefaults.\",\n    \"aa665fa4 by @jordanearle: 'Add native poll voting and creation' \u2014 check the security of web session cookie usage for authentication.\",\n    \"6c147b3b by @icpryde: 'Add selectable modern Reddit Chat and Modmail' \u2014 review token_v2 handling for secure authentication.\"\n  ],\n  \"anomalies\": [\n    {\n      \"severity\": \"medium\",\n      \"module\": \"code_review\",\n      \"what\": \"Introduction of API key handling for AI Summaries feature\",\n      \"why_it_matters\": \"Improper management of API keys can lead to exposure of sensitive user data.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"module\": \"code_review\",\n      \"what\": \"Use of web session cookies for native poll voting and creation\",\n      \"why_it_matters\": \"Exposing user accounts through insecure handling of session data poses a significant risk.\"\n    }\n  ],\n  \"decision_inputs\": [\n    \"Review the diff for commit 60704409 regarding API key handling in AI Summaries\",\n    \"Check the implementation of web session cookies in commit aa665fa4 for poll features\",\n    \"Examine token_v2 usage in commit 6c147b3b for secure authentication practices\"\n  ],\n  \"consistent_with_notes\": true,\n  \"reasoning\": \"The release notes align with the changes made, particularly the introduction of new features and enhancements. However, the presence of hard_flag in the code review indicates potential security concerns that merit a human review, particularly around API key and session management.\"\n}",
+    "hard_flagged_modules": [
+      "code_review"
+    ],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.4.2...v1.15.11_3.5.0",
+      "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.4.2...v1.15.11_3.5.0",
+      "release_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.5.0"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": true,
+      "owner": "Apollo-Reborn",
+      "repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.4.2",
+      "head_ref": "v1.15.11_3.5.0",
+      "window_commit_count": 42,
+      "window_authors": {
+        "github-actions[bot]": 1,
+        "jordanearle": 13,
+        "icpryde": 23,
+        "nickclyde": 1,
+        "DeltAndy123": 3,
+        "IllIIllIllIllII": 1
+      },
+      "new_authors": [],
+      "existing_authors": [
+        "DeltAndy123",
+        "IllIIllIllIllII",
+        "github-actions[bot]",
+        "icpryde",
+        "jordanearle",
+        "nickclyde"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": false,
+      "summary": "42 commits by 6 authors. 0 new author(s): none. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "Apollo-Reborn",
+      "code_repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.4.2",
+      "head_ref": "v1.15.11_3.5.0",
+      "llm_used": true,
+      "capped": false,
+      "reviews": [
+        {
+          "sha": "3090fd0b4434e3a1aa5447e9413e3839063fd2b3",
+          "title": "Update distribution sources for v1.15.11_3.4.2",
+          "author": "github-actions[bot]",
+          "files_touched": [
+            "apps.json",
+            "apps_glass.json",
+            "apps_glass_icons.json",
+            "apps_noext.json",
+            "apps_noext_glass.json",
+            "apps_noext_glass_icons.json",
+            "release-manifest.json"
+          ],
+          "kind": "build",
+          "areas": [
+            "build"
+          ],
+          "summary": "This commit updates the distribution sources for the application.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3090fd0b4434e3a1aa5447e9413e3839063fd2b3",
+          "short_sha": "3090fd0b"
+        },
+        {
+          "sha": "aa665fa4ba1351cf8e94142efad07156fb6dfee2",
+          "title": "Add native poll voting and creation (#643)",
+          "author": "jordanearle",
+          "files_touched": [
+            "Makefile",
+            "Resources/ApolloPollSymbols.bundle/Assets.car",
+            "Resources/ApolloPollSymbols.bundle/Info.plist",
+            "src/ApolloCommon.h",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloPollCompose.xm",
+            "src/ApolloPollSettingsViewController.h",
+            "src/ApolloPollSettingsViewController.m",
+            "src/ApolloPollVoting.xm",
+            "src/ApolloSimDebugTap.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloWebAuthViewController.m",
+            "src/ApolloWebSessionLoginViewController.h",
+            "src/ApolloWebSessionLoginViewController.m",
+            "src/ApolloWebSessionStore.h",
+            "src/ApolloWebSessionStore.m",
+            "src/CustomAPIViewController.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "feature",
+          "areas": [
+            "auth",
+            "networking",
+            "storage"
+          ],
+          "summary": "This commit introduces native poll voting and creation features, allowing users to vote on and create polls using their web session cookies.",
+          "security_implications": "The use of web session cookies for authentication may expose user accounts if not handled securely.",
+          "privacy_implications": "User web session data is utilized for voting and creating polls, which may raise privacy concerns.",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "web session",
+            "cookies",
+            "OAuth"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/aa665fa4ba1351cf8e94142efad07156fb6dfee2",
+          "short_sha": "aa665fa4"
+        },
+        {
+          "sha": "a803990b2260713a6ab20d2ce7bc908d1413fb09",
+          "title": "Revamp settings architecture, IA, search, and support flows (#637)",
+          "author": "jordanearle",
+          "files_touched": [
+            "AGENTS.md",
+            "Makefile",
+            "Resources/apollo-reborn-options-icon.png",
+            "contributors.json",
+            "docs/crawl/settings-native-dump.ndjson",
+            "scripts/gen-settings-search-index.py",
+            "src/ApolloAISettingsViewController.h",
+            "src/ApolloAISettingsViewController.m",
+            "src/ApolloChatComposer.xm",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloDeletedCommentsSettingsViewController.m",
+            "src/ApolloFiltersBlocksInject.xm",
+            "src/ApolloHideNativeOpenInAppRows.xm",
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloImgChestUpload.m",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloLiquidGlassIconPicker.xm",
+            "src/ApolloMarkdownToolbarGif.xm",
+            "src/ApolloOpenInAppViewController.h",
+            "src/ApolloOpenInAppViewController.m",
+            "src/ApolloPerPostCommentSort.xm",
+            "src/ApolloPictureInPicture.xm",
+            "src/ApolloQuickActions.xm",
+            "src/ApolloRecentlyRead.xm",
+            "src/ApolloSettings.xm",
+            "src/ApolloShareLinks.xm",
+            "src/ApolloSimOpenRoute.m",
+            "src/ApolloSubredditFilterDetailViewController.h",
+            "src/ApolloThemeGalleryViewController.h",
+            "src/ApolloThemeManagerIntegration.xm",
+            "src/ApolloThemeManagerViewController.h",
+            "src/ApolloToast.h",
+            "src/ApolloToast.m",
+            "src/ApolloTranslation.xm",
+            "src/CustomAPIViewController.h",
+            "src/CustomAPIViewController.m",
+            "src/GiphyPickerViewController.m",
+            "src/InfoRowSettingsViewController.h",
+            "src/InfoRowSettingsViewController.m",
+            "src/PictureInPictureViewController.h",
+            "src/TagFiltersViewController.h",
+            "src/TagFiltersViewController.m",
+            "src/TranslationSettingsViewController.h",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloAISettingsViewController.h",
+            "src/settings/ApolloAISettingsViewController.m",
+            "src/settings/ApolloBackupRestore.h"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "ui",
+            "auth"
+          ],
+          "summary": "This commit revamps the settings architecture and user interface, improving the organization and search functionality.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a803990b2260713a6ab20d2ce7bc908d1413fb09",
+          "short_sha": "a803990b"
+        },
+        {
+          "sha": "fe0b3564f5adeb220cd9927202d3e99862878dff",
+          "title": "Move Open Links/YouTube into Open in App, Hide Username into Profiles + native scroll-away search bar (#695)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloTabBarTitles.xm",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloOpenInAppViewController.h",
+            "src/settings/ApolloOpenInAppViewController.m",
+            "src/settings/ApolloSettings.xm",
+            "src/settings/ApolloSettingsGeneralTable.h",
+            "src/settings/ApolloSettingsGeneralTable.xm",
+            "src/settings/ApolloSettingsNativeInjections.xm",
+            "src/settings/ApolloSettingsSearch.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit reorganizes settings related to opening links and YouTube, and improves the search bar behavior.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fe0b3564f5adeb220cd9927202d3e99862878dff",
+          "short_sha": "fe0b3564"
+        },
+        {
+          "sha": "e141e57caacf7def07f8a39b9a3f895094b5aac6",
+          "title": "Fix lopsided trailing button pill padding on Liquid Glass (#671)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloTranslation.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes the padding issue for trailing buttons in the Liquid Glass interface.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/e141e57caacf7def07f8a39b9a3f895094b5aac6",
+          "short_sha": "e141e57c"
+        },
+        {
+          "sha": "80488011045dd06937e44c89cbf967457b09c52d",
+          "title": "Fix inline comment images shrinking after collapse/expand + vote-time reload flicker loop",
+          "author": "icpryde",
+          "files_touched": [
+            "CHANGELOG.md",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloInlineLinkPreviews.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes the rendering of inline comment images that shrink after collapsing and expanding comments, as well as a flicker issue when voting on comments with inline images. It ensures that images maintain their correct size during layout changes.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/80488011045dd06937e44c89cbf967457b09c52d",
+          "short_sha": "80488011"
+        },
+        {
+          "sha": "d0e88e083502f8044f92c4b1244010008888ad6c",
+          "title": "FIXED top/bottom edge fades going transparent during swipe-back on Liquid Glass",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloScrollEdgePopFix.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit addresses the issue of edge fades becoming transparent during swipe-back gestures in the Liquid Glass interface. It ensures that the visual effects remain visible throughout the interaction.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d0e88e083502f8044f92c4b1244010008888ad6c",
+          "short_sha": "d0e88e08"
+        },
+        {
+          "sha": "02329ec16c493e10010c63b1512e516190c18e00",
+          "title": "Add configurable AI summary preferences",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloAISummary.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloAISettingsViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit introduces configurable preferences for AI summaries, allowing users to customize their experience. It includes changes to the settings interface and the underlying data handling for these preferences.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/02329ec16c493e10010c63b1512e516190c18e00",
+          "short_sha": "02329ec1"
+        },
+        {
+          "sha": "a4461bc7d94bd27304e18e2e8f7130a2dc76172d",
+          "title": "Fix translated-comment vote flicker and vote-time row shifts",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloCommentVoteFlicker.xm",
+            "src/ApolloTranslation.h",
+            "src/ApolloTranslation.xm",
+            "src/ApolloUserAvatars.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit resolves issues with flickering and shifting of rows when voting on translated comments. It ensures that the UI behaves consistently and correctly reflects the state of comments.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a4461bc7d94bd27304e18e2e8f7130a2dc76172d",
+          "short_sha": "a4461bc7"
+        },
+        {
+          "sha": "5137cb7952204891451af8fa4ad16e7ed95db3cb",
+          "title": "Add Hide Feed Descriptions toggle for the subreddit list",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds a toggle to hide feed descriptions in the subreddit list, enhancing user customization options. It modifies the settings interface and the behavior of the subreddit list display.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/5137cb7952204891451af8fa4ad16e7ed95db3cb",
+          "short_sha": "5137cb79"
+        },
+        {
+          "sha": "3f125cf1eec451cc8371422ed91129c4da07b63a",
+          "title": "User flair fixes: real per-sub emoji limits + over-limit warning on API-key-free accounts, and your own flair on a just-posted comment (#670)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloFlairColors.xm",
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloOwnCommentFlair.h",
+            "src/ApolloOwnCommentFlair.xm",
+            "src/ApolloUserFlair.h",
+            "src/ApolloUserFlair.xm",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/ApolloWebJSONIdentity.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit fixes user flair functionality by ensuring proper emoji limits and providing warnings for API-key-free accounts. It also improves the handling of user flair on newly posted comments.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "The changes improve error handling related to user flair limits and session management.",
+          "risk_signals": [],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3f125cf1eec451cc8371422ed91129c4da07b63a",
+          "short_sha": "3f125cf1"
+        },
+        {
+          "sha": "11ba481b14f8fab38e95e86363f55a1dc603ca98",
+          "title": "Fix crash: inline preview resize stack overflow during row layout (#686)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloInlineLinkPreviews.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "threading"
+          ],
+          "summary": "This commit addresses a crash caused by stack overflow during the layout of inline previews. It introduces a stack-guard sentinel to prevent main-thread stack exhaustion.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "The changes enhance safety by preventing stack overflow crashes and improving error handling in layout processes.",
+          "risk_signals": [],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/11ba481b14f8fab38e95e86363f55a1dc603ca98",
+          "short_sha": "11ba481b"
+        },
+        {
+          "sha": "7c76ad0d7ed3b7370a81626c094c436079f3ceaf",
+          "title": "Social links: resolve profiles in under a second (was 7-8s+) (#722)",
+          "author": "jordanearle",
+          "files_touched": [
+            "src/ApolloProfileSocialLinks.h",
+            "src/ApolloProfileSocialLinks.m",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking"
+          ],
+          "summary": "This commit optimizes the resolution of social links, significantly reducing the time taken to resolve profiles. It modifies how requests are handled to improve performance.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/7c76ad0d7ed3b7370a81626c094c436079f3ceaf",
+          "short_sha": "7c76ad0d"
+        },
+        {
+          "sha": "60704409d8095df461ac0d4991ea9bc49885d374",
+          "title": "AI Summaries: cloud-hosted model support (OpenRouter / Gemini / custom) (#674)",
+          "author": "nickclyde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloAICloudBridge.h",
+            "src/ApolloAICloudBridge.m",
+            "src/ApolloAISummary.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloAISettingsViewController.m",
+            "src/settings/ApolloBackupRestore.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "This commit adds support for cloud-hosted AI models, allowing users to select a provider and supply their own API key. It enhances the AI Summaries feature with new backend options.",
+          "security_implications": "The introduction of API key handling raises potential security concerns regarding key management and exposure.",
+          "privacy_implications": "User API keys are stored in standardUserDefaults, which may have privacy implications if not handled securely.",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "API key",
+            "cloud-hosted model"
+          ],
+          "severity": "high",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/60704409d8095df461ac0d4991ea9bc49885d374",
+          "short_sha": "60704409"
+        },
+        {
+          "sha": "8b9d558569c6606883c69ae8ea1cba261bdbc714",
+          "title": "Redesign Liquid Glass icon picker with featured icons (#668)",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "docs/theme-builder-RE.md",
+            "liquid-glass/README.md",
+            "liquid-glass/generated/LiquidGlassIconPreviews.gen.h",
+            "liquid-glass/icons.json",
+            "liquid-glass/icons/helios-legacy/clear-dark.png",
+            "liquid-glass/icons/helios-legacy/clear-light.png",
+            "liquid-glass/icons/helios-legacy/dark.png",
+            "liquid-glass/icons/helios-legacy/default.png",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/Assets/Apollo Antenna Ball copy.svg",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/Assets/Apollo Antenna Icon 2.svg",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/Assets/Apollo Helmet Space.svg",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/Assets/Apollo Helmet.svg",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/Assets/Apollo Ring Large.svg",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/Assets/Closed Eye.svg",
+            "liquid-glass/icons/helios-legacy/helios-legacy.icon/icon.json",
+            "liquid-glass/icons/helios-tribute/clear-dark.png",
+            "liquid-glass/icons/helios-tribute/clear-light.png",
+            "liquid-glass/icons/helios-tribute/dark.png",
+            "liquid-glass/icons/helios-tribute/default.png",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/Assets/Apollo Antenna Ball copy.svg",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/Assets/Apollo Antenna Icon 2.svg",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/Assets/Apollo Eyes Icon.svg",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/Assets/Apollo Helmet Space.svg",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/Assets/Apollo Helmet.svg",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/Assets/Apollo Ring Large.svg",
+            "liquid-glass/icons/helios-tribute/helios-tribute.icon/icon.json",
+            "liquid-glass/prebuilt/Assets.car",
+            "liquid-glass/scripts/generate_previews_header.py",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloLiquidGlassIconPicker.xm",
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit redesigns the Liquid Glass icon picker, enhancing the user interface with featured icons and improved layout.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/8b9d558569c6606883c69ae8ea1cba261bdbc714",
+          "short_sha": "8b9d5585"
+        },
+        {
+          "sha": "89727b29f9e9f86bb4a37bbeee33bdab7ec172a1",
+          "title": "Fix Post Flair opening nothing in the composer on API-key-free accounts",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/ApolloWebJSONIdentity.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "networking",
+            "storage"
+          ],
+          "summary": "This commit fixes an issue where the flair composer would not display any options for API-key-free accounts. It retrieves the correct flair list using OAuth tokens and improves error handling for session management.",
+          "security_implications": "The change involves handling OAuth tokens, which could expose sensitive data if not managed properly.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improvements in error handling and session management reduce the risk of crashes related to stale tokens.",
+          "risk_signals": [
+            "OAuth bearer",
+            "token management",
+            "session handling"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/89727b29f9e9f86bb4a37bbeee33bdab7ec172a1",
+          "short_sha": "89727b29"
+        },
+        {
+          "sha": "9438a0a39cbba48d8e668d86413e39f1694bc71e",
+          "title": "Add a JSON-driven \"What's New\" splash, shown once per version",
+          "author": "jordanearle",
+          "files_touched": [
+            ".agents/skills/prepare-release/SKILL.md",
+            ".agents/skills/update-contributors/SKILL.md",
+            ".agents/skills/update-contributors/generate-readme-contributors.py",
+            ".claude/skills/prepare-release",
+            ".claude/skills/update-contributors",
+            ".github/skills/prepare-release/SKILL.md",
+            ".gitignore",
+            "Makefile",
+            "README.md",
+            "src/ApolloWhatsNew.h",
+            "src/ApolloWhatsNew.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m",
+            "whats-new/generated/ApolloWhatsNewCatalog.gen.h",
+            "whats-new/generated/ApolloWhatsNewCatalog.gen.m",
+            "whats-new/preview.png",
+            "whats-new/releases/3.5.0.json",
+            "whats-new/scripts/generate_catalog.py"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit introduces a new splash screen that displays what's new in the app, driven by JSON data. It ensures that users see relevant updates upon upgrading.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "JSON-driven",
+            "splash screen"
+          ],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9438a0a39cbba48d8e668d86413e39f1694bc71e",
+          "short_sha": "9438a0a3"
+        },
+        {
+          "sha": "1f0751b06271f6d2ef77cc0cf43d3f4117105bed",
+          "title": "Update Synthwave Liquid Glass icon",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "liquid-glass/icons/synthwave/clear-dark.png",
+            "liquid-glass/icons/synthwave/clear-light.png",
+            "liquid-glass/icons/synthwave/dark.png",
+            "liquid-glass/icons/synthwave/default.png",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/retrowaveblue.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/Assets/retrowavepink.svg",
+            "liquid-glass/icons/synthwave/synthwave.icon/icon.json",
+            "liquid-glass/prebuilt/Assets.car"
+          ],
+          "kind": "asset",
+          "areas": [],
+          "summary": "This commit updates the icons for the Synthwave Liquid Glass theme, enhancing the visual appearance of the app.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1f0751b06271f6d2ef77cc0cf43d3f4117105bed",
+          "short_sha": "1f0751b0"
+        },
+        {
+          "sha": "d3b4155cd80577b0d3813b6f4e611df50fa97ce1",
+          "title": "Immersive subreddit header: redesign, settings, and stability fixes",
+          "author": "jordanearle",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloAccountCredentials.h",
+            "src/ApolloAccountCredentials.m",
+            "src/ApolloAutoHideTabBar.xm",
+            "src/ApolloIdentityHeaderLayout.h",
+            "src/ApolloIdentityHeaderLayout.m",
+            "src/ApolloImmersiveHeaderBackground.h",
+            "src/ApolloImmersiveHeaderBackground.m",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloScrollEdgeEffect.xm",
+            "src/ApolloSearchInPlace.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloSubredditHeaders.xm",
+            "src/ApolloSubredditInfoCache.h",
+            "src/ApolloSubredditInfoCache.m",
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm",
+            "src/ApolloTranslation.xm",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloSettingsRouter.m",
+            "src/settings/ApolloSubredditLayoutViewController.h",
+            "src/settings/ApolloSubredditLayoutViewController.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "auth",
+            "threading"
+          ],
+          "summary": "This commit redesigns the subreddit header with new immersive features and stability improvements. It includes better handling of asynchronous tasks to enhance performance.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improvements in threading and stability reduce the risk of crashes related to UI rendering.",
+          "risk_signals": [
+            "asynchronous",
+            "stability fixes"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d3b4155cd80577b0d3813b6f4e611df50fa97ce1",
+          "short_sha": "d3b4155c"
+        },
+        {
+          "sha": "17460d019da720e9c61444b044370d2c95a8375d",
+          "title": "Immersive profile header: redesign, settings, and Trophy Case removal",
+          "author": "jordanearle",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloProfileSocialLinks.m",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloUserAvatars.xm",
+            "src/ApolloUserProfileCache.h",
+            "src/ApolloUserProfileCache.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloProfileLayoutViewController.h",
+            "src/settings/ApolloProfileLayoutViewController.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "auth"
+          ],
+          "summary": "This commit introduces a redesigned immersive profile header with new customization options and removes the Trophy Case feature. It enhances user experience and interface.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "redesign",
+            "customization options"
+          ],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/17460d019da720e9c61444b044370d2c95a8375d",
+          "short_sha": "17460d01"
+        },
+        {
+          "sha": "6c147b3b4f0ffc2eb3813228ac408d20d96c6046",
+          "title": "Completed: Add selectable modern Reddit Chat and Modmail (#658)",
+          "author": "icpryde",
+          "files_touched": [
+            ".github/pr-assets/lg-inbox-switcher-chat.png",
+            ".github/pr-assets/lg-inbox-switcher-notifications.png",
+            ".github/pr-assets/modern-modmail-sanitized.png",
+            ".github/pr-assets/modern-reddit-chat-sanitized.png",
+            "Makefile",
+            "src/ApolloBarkNotifications.h",
+            "src/ApolloBarkNotifications.m",
+            "src/ApolloChatUnreadPoller.h",
+            "src/ApolloChatUnreadPoller.m",
+            "src/ApolloChatsFilter.xm",
+            "src/ApolloCommon.m",
+            "src/ApolloDirectChatWeb.h",
+            "src/ApolloDirectChatWeb.xm",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloQuickActions.xm",
+            "src/ApolloWebAuthViewController.m",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/ApolloWebSessionLoginViewController.h",
+            "src/ApolloWebSessionLoginViewController.m",
+            "src/ApolloWebSessionStore.h",
+            "src/ApolloWebSessionStore.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "auth",
+            "networking"
+          ],
+          "summary": "This commit introduces a modern chat and modmail feature for Reddit, including enhancements for API-free accounts and responsive design. It also adds notification deep links and improves session handling.",
+          "security_implications": "The use of token_v2 as a bearer token raises concerns about secure handling of authentication tokens.",
+          "privacy_implications": "The introduction of a background poller for unread counts may affect user privacy depending on how data is handled and stored.",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "token_v2",
+            "poll a filtered /sync"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6c147b3b4f0ffc2eb3813228ac408d20d96c6046",
+          "short_sha": "6c147b3b"
+        },
+        {
+          "sha": "65e266581e77620afd7c69be8c7a72ca6bc497bf",
+          "title": "Badge Book: Reddit achievements + Trophy Case on profiles (#689)",
+          "author": "jordanearle",
+          "files_touched": [
+            ".github/images/badge-book/achievements-grid.jpg",
+            ".github/images/badge-book/detail-earned-glass.jpg",
+            ".github/images/badge-book/detail-locked.jpg",
+            ".github/images/badge-book/profile-strip.jpg",
+            ".github/images/badge-book/trophy-case.jpg",
+            "Makefile",
+            "Resources/BadgeBook/a_1.png",
+            "Resources/BadgeBook/a_10.png",
+            "Resources/BadgeBook/a_100-day-streak.png",
+            "Resources/BadgeBook/a_11.png",
+            "Resources/BadgeBook/a_12.png",
+            "Resources/BadgeBook/a_13.png",
+            "Resources/BadgeBook/a_14.png",
+            "Resources/BadgeBook/a_15.png",
+            "Resources/BadgeBook/a_150-day-streak.png",
+            "Resources/BadgeBook/a_16.png",
+            "Resources/BadgeBook/a_17.png",
+            "Resources/BadgeBook/a_18.png",
+            "Resources/BadgeBook/a_19.png",
+            "Resources/BadgeBook/a_2.png",
+            "Resources/BadgeBook/a_200-day-streak.png",
+            "Resources/BadgeBook/a_3.png",
+            "Resources/BadgeBook/a_300-day-streak.png",
+            "Resources/BadgeBook/a_365-day-streak.png",
+            "Resources/BadgeBook/a_4.png",
+            "Resources/BadgeBook/a_400-day-streak.png",
+            "Resources/BadgeBook/a_5.png",
+            "Resources/BadgeBook/a_500-day-streak.png",
+            "Resources/BadgeBook/a_6.png",
+            "Resources/BadgeBook/a_600-day-streak.png",
+            "Resources/BadgeBook/a_7.png",
+            "Resources/BadgeBook/a_75-day-streak.png",
+            "Resources/BadgeBook/a_9.png",
+            "Resources/BadgeBook/a_banana-aficionado.png",
+            "Resources/BadgeBook/a_banana-baby.png",
+            "Resources/BadgeBook/a_banana-beginner.png",
+            "Resources/BadgeBook/a_banana-enthusiast.png",
+            "Resources/BadgeBook/a_banana-master.png",
+            "Resources/BadgeBook/a_basecamp-bag.png",
+            "Resources/BadgeBook/a_buzz-worthy-post.png",
+            "Resources/BadgeBook/a_elder.png",
+            "Resources/BadgeBook/a_frequent-contributor.png",
+            "Resources/BadgeBook/a_monthly-top-1-commenter.png",
+            "Resources/BadgeBook/a_monthly-top-1-poster.png",
+            "Resources/BadgeBook/a_monthly-top-10-commenter.png",
+            "Resources/BadgeBook/a_monthly-top-10-poster.png",
+            "Resources/BadgeBook/a_monthly-top-25-commenter.png",
+            "Resources/BadgeBook/a_monthly-top-25-poster.png",
+            "Resources/BadgeBook/a_monthly-top-5-commenter.png",
+            "Resources/BadgeBook/a_monthly-top-5-poster.png"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds a badge book feature to user profiles, showcasing achievements and trophies. It includes various images and UI elements to enhance user engagement.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/65e266581e77620afd7c69be8c7a72ca6bc497bf",
+          "short_sha": "65e26658"
+        },
+        {
+          "sha": "81eec3eda0e43442bb262a312f72308ce5be70f6",
+          "title": "Enable ProMotion and optimize scrolling performance (#724)",
+          "author": "jordanearle",
+          "files_touched": [
+            "patch.sh",
+            "scripts/apply-patches.sh",
+            "scripts/build_release_variants.sh",
+            "scripts/modules/README.md",
+            "scripts/modules/_plist-helpers.sh",
+            "scripts/modules/enable-promotion.sh",
+            "scripts/validate_release_variants.sh",
+            "src/ApolloAutoHideTabBar.xm",
+            "src/ApolloDeletedCommentsUI.xm",
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloLiveCommentsFollow.xm",
+            "src/ApolloSubredditHeaders.xm",
+            "src/ApolloSubredditHighlights.xm",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/ApolloUserProfileCache.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit enables ProMotion for smoother scrolling and optimizes performance across various UI components. It aims to enhance the user experience by improving responsiveness.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/81eec3eda0e43442bb262a312f72308ce5be70f6",
+          "short_sha": "81eec3ed"
+        },
+        {
+          "sha": "4be69cfbe601f61b26efe3f00a90ad5a4a425af6",
+          "title": "Clarify what \"Inline Media in Chat\" covers now that modern Chat/Modmail exist (#740)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloState.h",
+            "src/UserDefaultConstants.h",
+            "src/settings/InlineMediaSettingsViewController.m"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit clarifies the functionality of the 'Inline Media in Chat' toggle, ensuring users understand its scope with the introduction of modern chat features. It updates UI labels and descriptions.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/4be69cfbe601f61b26efe3f00a90ad5a4a425af6",
+          "short_sha": "4be69cfb"
+        },
+        {
+          "sha": "008d2faefeb36fe41b4533e6be83ff86507552d7",
+          "title": "Info row: don't fire the comment tap when the touch was a scroll (#698) (#739)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloStatsRowTouch.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes an issue where a tap on a comment bubble would incorrectly trigger when the user intended to scroll. It improves the touch handling for better user experience.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/008d2faefeb36fe41b4533e6be83ff86507552d7",
+          "short_sha": "008d2fae"
+        },
+        {
+          "sha": "0c86c639a252babb7c5f2532e6d009fbc5e8ecb1",
+          "title": "Make Imgur work keyless: public-ID metadata, real gif/video info, album fallback proxies",
+          "author": "jordanearle",
+          "files_touched": [
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "This commit modifies how the application interacts with Imgur's API, allowing keyless users to access album metadata and content without a personal key. It introduces fallback proxies for better handling of requests.",
+          "security_implications": "The change involves network requests to Imgur, which could expose the application to potential abuse if not properly managed.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "keyless users",
+            "fallback proxies"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0c86c639a252babb7c5f2532e6d009fbc5e8ecb1",
+          "short_sha": "0c86c639"
+        },
+        {
+          "sha": "57a385cfa4fd5d5906acae242e7c3d6411278896",
+          "title": "Consistent nav bar title centering on Liquid Glass",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloCommon.h",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit improves the centering of navigation bar titles in the Liquid Glass interface, ensuring consistent appearance across different screen sizes and states.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/57a385cfa4fd5d5906acae242e7c3d6411278896",
+          "short_sha": "57a385cf"
+        },
+        {
+          "sha": "51582eb37a157d21501a91ed2e42c487ee724544",
+          "title": "Scroll performance round 2: profiler-guided hot-path fixes",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloCommentVoteFlicker.xm",
+            "src/ApolloInlineLinkPreviewURLHiding.xm",
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloLinkPreviewCache.m",
+            "src/ApolloScrollEdgePopFix.xm",
+            "src/ApolloTagFilters.xm",
+            "src/ApolloThemeIntegrations.xm",
+            "src/ApolloTranslation.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "threading"
+          ],
+          "summary": "This commit optimizes scrolling performance by offloading certain tasks from the main thread and improving cache management, resulting in smoother user experience.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improved threading management reduces the risk of UI freezes and crashes during scrolling.",
+          "risk_signals": [
+            "main thread",
+            "background layout"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/51582eb37a157d21501a91ed2e42c487ee724544",
+          "short_sha": "51582eb3"
+        },
+        {
+          "sha": "6cba04b6c6aa51ad7d1c90ffa52f031ef0b4934c",
+          "title": "Fix keyless multi-image gallery posts failing with INVALID_MEDIA_ASSETS",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloPhotoPostComposerScrollFix.xm",
+            "src/ApolloRedditMediaUpload.m",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "networking"
+          ],
+          "summary": "This commit resolves an issue where keyless accounts were unable to post multi-image galleries due to incorrect media asset ownership handling, ensuring proper authentication and media leasing.",
+          "security_implications": "Changes to how media assets are leased could introduce vulnerabilities if not properly validated.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "INVALID_MEDIA_ASSETS",
+            "media lease"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6cba04b6c6aa51ad7d1c90ffa52f031ef0b4934c",
+          "short_sha": "6cba04b6"
+        },
+        {
+          "sha": "605176aee0c7f8a9adb77ca6a608fee27866e536",
+          "title": "Fix stale cell background for Apollo Reborn settings",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "src/ApolloCommon.m",
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm",
+            "src/settings/ApolloSettingsTableViewController.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit addresses a visual issue with stale backgrounds in the settings interface, improving the overall user experience.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/605176aee0c7f8a9adb77ca6a608fee27866e536",
+          "short_sha": "605176ae"
+        },
+        {
+          "sha": "8515d7657c47dd44b282e18b380f3a4f84cecc7f",
+          "title": "Add two-step select-then-vote flow for Reddit polls with radio list and vote button",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "src/ApolloAISummary.xm",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloPollVoting.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloTextureDecls.h",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloPollSettingsViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit introduces a new voting flow for Reddit polls, enhancing user interaction with a radio list and vote button. It also includes various refactoring and layout improvements.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/8515d7657c47dd44b282e18b380f3a4f84cecc7f",
+          "short_sha": "8515d765"
+        },
+        {
+          "sha": "0582e199a4fc72016df8d676efcf58c198e8d12a",
+          "title": "Link previews: only reserve a full-size card when the image is known to be there",
+          "author": "icpryde",
+          "files_touched": [
+            "CHANGELOG.md",
+            "Makefile",
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloLinkPreviewCache.h",
+            "src/ApolloLinkPreviewCache.m",
+            "src/ApolloLinkPreviewFetcher.m",
+            "src/ApolloLinkPreviewShapeMemory.h",
+            "src/ApolloLinkPreviewShapeMemory.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit optimizes link previews by only reserving space for full-size cards when an image is confirmed to be present, reducing unnecessary layout issues.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0582e199a4fc72016df8d676efcf58c198e8d12a",
+          "short_sha": "0582e199"
+        },
+        {
+          "sha": "e6a73b034570136511583ea3dedae6af9aa2753c",
+          "title": "Modmail: cover its SPA transitions and stop the composer icon flickering",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloDirectChatWeb.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit addresses glitches in the Modmail interface by improving the handling of SPA transitions, ensuring smoother user experience without flickering icons.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/e6a73b034570136511583ea3dedae6af9aa2753c",
+          "short_sha": "e6a73b03"
+        },
+        {
+          "sha": "2a2df0738107d091bce997097ae3a2429dbd1b1f",
+          "title": "Modern Chat/Modmail: let every account choose, instead of locking the switches",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloChatUnreadPoller.h",
+            "src/ApolloChatUnreadPoller.m",
+            "src/ApolloDirectChatWeb.h",
+            "src/ApolloDirectChatWeb.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "auth"
+          ],
+          "summary": "This commit allows all accounts to choose their preferences for Modern Chat and Modmail, removing previous restrictions based on account type.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2a2df0738107d091bce997097ae3a2429dbd1b1f",
+          "short_sha": "2a2df073"
+        },
+        {
+          "sha": "682bc2a0e0adc9a14d80b422a790078498e1f041",
+          "title": "Show a 25-character counter in the Message Moderators subject field",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloModmailSubjectCounter.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds a character counter to the Message Moderators subject field, improving user feedback and preventing input errors.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/682bc2a0e0adc9a14d80b422a790078498e1f041",
+          "short_sha": "682bc2a0"
+        },
+        {
+          "sha": "4f343cdc54ee6a3a327b69be6eaf6a795d78daf9",
+          "title": "Keep the \"...\" control visible while its glass menu is open",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloNativeActionMenus.xm"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit modifies the rendering behavior of a UI control to ensure it remains visible during a specific animation. It addresses a visual glitch related to the control's opacity.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/4f343cdc54ee6a3a327b69be6eaf6a795d78daf9",
+          "short_sha": "4f343cdc"
+        },
+        {
+          "sha": "30153f16266a8431c3886b25eb71341197eab11a",
+          "title": "Fix Share as Image: show the picture for GIF posts instead of a link card",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloShareAsImageGallery.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit fixes the sharing functionality for GIF posts, ensuring that the actual image is displayed instead of a link card. It also addresses memory management issues related to object retention.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improves memory management by ensuring proper object retention, reducing the risk of crashes.",
+          "risk_signals": [
+            "memory management",
+            "retain counts"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/30153f16266a8431c3886b25eb71341197eab11a",
+          "short_sha": "30153f16"
+        },
+        {
+          "sha": "124d1fc80bfbb5a547bf3499788504709e8967f2",
+          "title": "Add universal Open in Apollo flow for sideloaded builds",
+          "author": "jordanearle",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            ".github/workflows/pr-build-ipa.yml",
+            "AGENTS.md",
+            "Makefile",
+            "README.md",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/Vector.svg",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/antennae 2.svg",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/apollo_antennaball 2.svg",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/eyes.svg",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/face_separate.svg",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/helmet.svg",
+            "liquid-glass/icons/jryng/jryng.icon/Assets/stem.svg",
+            "liquid-glass/icons/jryng/jryng.icon/icon.json",
+            "safari-extension/README.md",
+            "safari-extension/content.js",
+            "safari-extension/manifest.json",
+            "scripts/modules/fix-safari-extension.sh",
+            "src/settings/ApolloLinkCompanionIconData.h",
+            "src/settings/ApolloLinkCompanionIconData.m",
+            "src/settings/ApolloLinkCompanionViewController.h",
+            "src/settings/ApolloLinkCompanionViewController.m",
+            "src/settings/ApolloOpenInAppViewController.m",
+            "src/settings/ApolloSettingsRouter.m",
+            "userscript/open-in-apollo.user.js"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "permissions"
+          ],
+          "summary": "This commit introduces a new flow for opening links in the Apollo app from Safari, including enhancements to the settings and onboarding experience. It also fixes issues with the Safari extension across different build paths.",
+          "security_implications": "Potentially expands permissions related to the Safari extension functionality.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "sideloaded builds",
+            "permissions"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/124d1fc80bfbb5a547bf3499788504709e8967f2",
+          "short_sha": "124d1fc8"
+        },
+        {
+          "sha": "a60d2c4aa4b2c7f78682772abab800344fb85477",
+          "title": "Gallery View: browse an image subreddit as a grid",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloCommon.h",
+            "src/ApolloGalleryFeed.h",
+            "src/ApolloGalleryFeed.m",
+            "src/ApolloGalleryImageLoader.h",
+            "src/ApolloGalleryImageLoader.m",
+            "src/ApolloGalleryImageViewer.h",
+            "src/ApolloGalleryImageViewer.m",
+            "src/ApolloGalleryMenu.xm",
+            "src/ApolloGalleryVideoExport.h",
+            "src/ApolloGalleryVideoExport.xm",
+            "src/ApolloGalleryViewController.h",
+            "src/ApolloGalleryViewController.m",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloSubredditHeaders.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit adds a new gallery view feature that allows users to browse image subreddits in a grid format, enhancing the visual presentation of content.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a60d2c4aa4b2c7f78682772abab800344fb85477",
+          "short_sha": "a60d2c4a"
+        },
+        {
+          "sha": "7176a37b7ca2a1d56e98a056c05555ba40585f7d",
+          "title": "Improve settings search and subreddit layouts",
+          "author": "jordanearle",
+          "files_touched": [
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloSubredditHeaders.xm",
+            "src/settings/ApolloSettings.xm",
+            "src/settings/ApolloSettingsSearch.m",
+            "src/settings/ApolloSubredditLayoutViewController.h",
+            "src/settings/ApolloSubredditLayoutViewController.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit enhances the settings search functionality and improves the layout of subreddit views, providing a better user experience.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/7176a37b7ca2a1d56e98a056c05555ba40585f7d",
+          "short_sha": "7176a37b"
+        },
+        {
+          "sha": "f21005b2abab7d59a05c87eac8617cf337b8950e",
+          "title": "Fix release blockers and harden launch-time paths",
+          "author": "jordanearle",
+          "files_touched": [
+            "src/ApolloAccountCredentials.h",
+            "src/ApolloAccountCredentials.m",
+            "src/ApolloDeletedCommentsMenu.xm",
+            "src/ApolloFoundationModels.swift",
+            "src/ApolloOwnCommentFlair.xm",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "auth",
+            "storage"
+          ],
+          "summary": "This commit addresses release-blocking startup and stability issues, enhancing the robustness of the application during launch. It includes modifications to various source files to improve performance and reliability.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "The changes aim to improve stability and reduce crash-prone areas during startup.",
+          "risk_signals": [
+            "release blockers",
+            "stability issues"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f21005b2abab7d59a05c87eac8617cf337b8950e",
+          "short_sha": "f21005b2"
+        },
+        {
+          "sha": "1c40ea93021ce2ffcf1585799e64f53b3d39ce0c",
+          "title": "Prepare 3.5.0 release",
+          "author": "jordanearle",
+          "files_touched": [
+            "CHANGELOG.md",
+            "README.md",
+            "control",
+            "distribution/config.json",
+            "whats-new/generated/ApolloWhatsNewCatalog.gen.m",
+            "whats-new/releases/3.5.0.json"
+          ],
+          "kind": "docs",
+          "areas": [
+            "ui"
+          ],
+          "summary": "This commit prepares for the 3.5.0 release by updating documentation and configuration files. It includes changes to the changelog and other related files to reflect the upcoming release.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1c40ea93021ce2ffcf1585799e64f53b3d39ce0c",
+          "short_sha": "1c40ea93"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 42,
+        "by_kind": {
+          "build": 1,
+          "feature": 18,
+          "refactor": 3,
+          "fix": 14,
+          "ui": 4,
+          "asset": 1,
+          "docs": 1
+        },
+        "by_severity": {
+          "none": 28,
+          "low": 2,
+          "medium": 11,
+          "high": 1
+        },
+        "areas_touched": [
+          "auth",
+          "build",
+          "networking",
+          "permissions",
+          "storage",
+          "threading",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "aa665fa4ba1351cf8e94142efad07156fb6dfee2",
+            "title": "Add native poll voting and creation (#643)",
+            "author": "jordanearle",
+            "files_touched": [
+              "Makefile",
+              "Resources/ApolloPollSymbols.bundle/Assets.car",
+              "Resources/ApolloPollSymbols.bundle/Info.plist",
+              "src/ApolloCommon.h",
+              "src/ApolloNativeActionMenus.xm",
+              "src/ApolloPollCompose.xm",
+              "src/ApolloPollSettingsViewController.h",
+              "src/ApolloPollSettingsViewController.m",
+              "src/ApolloPollVoting.xm",
+              "src/ApolloSimDebugTap.xm",
+              "src/ApolloState.h",
+              "src/ApolloState.m",
+              "src/ApolloWebAuthViewController.m",
+              "src/ApolloWebSessionLoginViewController.h",
+              "src/ApolloWebSessionLoginViewController.m",
+              "src/ApolloWebSessionStore.h",
+              "src/ApolloWebSessionStore.m",
+              "src/CustomAPIViewController.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h"
+            ],
+            "kind": "feature",
+            "areas": [
+              "auth",
+              "networking",
+              "storage"
+            ],
+            "summary": "This commit introduces native poll voting and creation features, allowing users to vote on and create polls using their web session cookies.",
+            "security_implications": "The use of web session cookies for authentication may expose user accounts if not handled securely.",
+            "privacy_implications": "User web session data is utilized for voting and creating polls, which may raise privacy concerns.",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "web session",
+              "cookies",
+              "OAuth"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/aa665fa4ba1351cf8e94142efad07156fb6dfee2",
+            "short_sha": "aa665fa4"
+          },
+          {
+            "sha": "3f125cf1eec451cc8371422ed91129c4da07b63a",
+            "title": "User flair fixes: real per-sub emoji limits + over-limit warning on API-key-free accounts, and your own flair on a just-posted comment (#670)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloFlairColors.xm",
+              "src/ApolloImageUploadHost.xm",
+              "src/ApolloOwnCommentFlair.h",
+              "src/ApolloOwnCommentFlair.xm",
+              "src/ApolloUserFlair.h",
+              "src/ApolloUserFlair.xm",
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/ApolloWebJSONIdentity.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "networking",
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit fixes user flair functionality by ensuring proper emoji limits and providing warnings for API-key-free accounts. It also improves the handling of user flair on newly posted comments.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "The changes improve error handling related to user flair limits and session management.",
+            "risk_signals": [],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3f125cf1eec451cc8371422ed91129c4da07b63a",
+            "short_sha": "3f125cf1"
+          },
+          {
+            "sha": "11ba481b14f8fab38e95e86363f55a1dc603ca98",
+            "title": "Fix crash: inline preview resize stack overflow during row layout (#686)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloInlineLinkPreviews.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "threading"
+            ],
+            "summary": "This commit addresses a crash caused by stack overflow during the layout of inline previews. It introduces a stack-guard sentinel to prevent main-thread stack exhaustion.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "The changes enhance safety by preventing stack overflow crashes and improving error handling in layout processes.",
+            "risk_signals": [],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/11ba481b14f8fab38e95e86363f55a1dc603ca98",
+            "short_sha": "11ba481b"
+          },
+          {
+            "sha": "60704409d8095df461ac0d4991ea9bc49885d374",
+            "title": "AI Summaries: cloud-hosted model support (OpenRouter / Gemini / custom) (#674)",
+            "author": "nickclyde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloAICloudBridge.h",
+              "src/ApolloAICloudBridge.m",
+              "src/ApolloAISummary.xm",
+              "src/ApolloState.h",
+              "src/ApolloState.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h",
+              "src/settings/ApolloAISettingsViewController.m",
+              "src/settings/ApolloBackupRestore.m",
+              "src/settings/CustomAPIViewController.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "This commit adds support for cloud-hosted AI models, allowing users to select a provider and supply their own API key. It enhances the AI Summaries feature with new backend options.",
+            "security_implications": "The introduction of API key handling raises potential security concerns regarding key management and exposure.",
+            "privacy_implications": "User API keys are stored in standardUserDefaults, which may have privacy implications if not handled securely.",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "API key",
+              "cloud-hosted model"
+            ],
+            "severity": "high",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/60704409d8095df461ac0d4991ea9bc49885d374",
+            "short_sha": "60704409"
+          },
+          {
+            "sha": "89727b29f9e9f86bb4a37bbeee33bdab7ec172a1",
+            "title": "Fix Post Flair opening nothing in the composer on API-key-free accounts",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloNativeActionMenus.xm",
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/ApolloWebJSONIdentity.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "networking",
+              "storage"
+            ],
+            "summary": "This commit fixes an issue where the flair composer would not display any options for API-key-free accounts. It retrieves the correct flair list using OAuth tokens and improves error handling for session management.",
+            "security_implications": "The change involves handling OAuth tokens, which could expose sensitive data if not managed properly.",
+            "privacy_implications": "(none)",
+            "safety_implications": "Improvements in error handling and session management reduce the risk of crashes related to stale tokens.",
+            "risk_signals": [
+              "OAuth bearer",
+              "token management",
+              "session handling"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/89727b29f9e9f86bb4a37bbeee33bdab7ec172a1",
+            "short_sha": "89727b29"
+          },
+          {
+            "sha": "d3b4155cd80577b0d3813b6f4e611df50fa97ce1",
+            "title": "Immersive subreddit header: redesign, settings, and stability fixes",
+            "author": "jordanearle",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloAccountCredentials.h",
+              "src/ApolloAccountCredentials.m",
+              "src/ApolloAutoHideTabBar.xm",
+              "src/ApolloIdentityHeaderLayout.h",
+              "src/ApolloIdentityHeaderLayout.m",
+              "src/ApolloImmersiveHeaderBackground.h",
+              "src/ApolloImmersiveHeaderBackground.m",
+              "src/ApolloLiquidGlass.xm",
+              "src/ApolloNativeActionMenus.xm",
+              "src/ApolloScrollEdgeEffect.xm",
+              "src/ApolloSearchInPlace.xm",
+              "src/ApolloState.h",
+              "src/ApolloState.m",
+              "src/ApolloSubredditHeaders.xm",
+              "src/ApolloSubredditInfoCache.h",
+              "src/ApolloSubredditInfoCache.m",
+              "src/ApolloThemeRuntime.h",
+              "src/ApolloThemeRuntime.xm",
+              "src/ApolloTranslation.xm",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h",
+              "src/settings/ApolloSettingsRouter.m",
+              "src/settings/ApolloSubredditLayoutViewController.h",
+              "src/settings/ApolloSubredditLayoutViewController.m",
+              "src/settings/CustomAPIViewController.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "ui",
+              "auth",
+              "threading"
+            ],
+            "summary": "This commit redesigns the subreddit header with new immersive features and stability improvements. It includes better handling of asynchronous tasks to enhance performance.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "Improvements in threading and stability reduce the risk of crashes related to UI rendering.",
+            "risk_signals": [
+              "asynchronous",
+              "stability fixes"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d3b4155cd80577b0d3813b6f4e611df50fa97ce1",
+            "short_sha": "d3b4155c"
+          },
+          {
+            "sha": "6c147b3b4f0ffc2eb3813228ac408d20d96c6046",
+            "title": "Completed: Add selectable modern Reddit Chat and Modmail (#658)",
+            "author": "icpryde",
+            "files_touched": [
+              ".github/pr-assets/lg-inbox-switcher-chat.png",
+              ".github/pr-assets/lg-inbox-switcher-notifications.png",
+              ".github/pr-assets/modern-modmail-sanitized.png",
+              ".github/pr-assets/modern-reddit-chat-sanitized.png",
+              "Makefile",
+              "src/ApolloBarkNotifications.h",
+              "src/ApolloBarkNotifications.m",
+              "src/ApolloChatUnreadPoller.h",
+              "src/ApolloChatUnreadPoller.m",
+              "src/ApolloChatsFilter.xm",
+              "src/ApolloCommon.m",
+              "src/ApolloDirectChatWeb.h",
+              "src/ApolloDirectChatWeb.xm",
+              "src/ApolloLiquidGlass.xm",
+              "src/ApolloQuickActions.xm",
+              "src/ApolloWebAuthViewController.m",
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/ApolloWebSessionLoginViewController.h",
+              "src/ApolloWebSessionLoginViewController.m",
+              "src/ApolloWebSessionStore.h",
+              "src/ApolloWebSessionStore.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h",
+              "src/settings/CustomAPIViewController.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "ui",
+              "auth",
+              "networking"
+            ],
+            "summary": "This commit introduces a modern chat and modmail feature for Reddit, including enhancements for API-free accounts and responsive design. It also adds notification deep links and improves session handling.",
+            "security_implications": "The use of token_v2 as a bearer token raises concerns about secure handling of authentication tokens.",
+            "privacy_implications": "The introduction of a background poller for unread counts may affect user privacy depending on how data is handled and stored.",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "token_v2",
+              "poll a filtered /sync"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6c147b3b4f0ffc2eb3813228ac408d20d96c6046",
+            "short_sha": "6c147b3b"
+          },
+          {
+            "sha": "0c86c639a252babb7c5f2532e6d009fbc5e8ecb1",
+            "title": "Make Imgur work keyless: public-ID metadata, real gif/video info, album fallback proxies",
+            "author": "jordanearle",
+            "files_touched": [
+              "src/ApolloState.h",
+              "src/ApolloState.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h",
+              "src/settings/CustomAPIViewController.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "This commit modifies how the application interacts with Imgur's API, allowing keyless users to access album metadata and content without a personal key. It introduces fallback proxies for better handling of requests.",
+            "security_implications": "The change involves network requests to Imgur, which could expose the application to potential abuse if not properly managed.",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "keyless users",
+              "fallback proxies"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0c86c639a252babb7c5f2532e6d009fbc5e8ecb1",
+            "short_sha": "0c86c639"
+          },
+          {
+            "sha": "6cba04b6c6aa51ad7d1c90ffa52f031ef0b4934c",
+            "title": "Fix keyless multi-image gallery posts failing with INVALID_MEDIA_ASSETS",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloImageUploadHost.xm",
+              "src/ApolloPhotoPostComposerScrollFix.xm",
+              "src/ApolloRedditMediaUpload.m",
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "networking"
+            ],
+            "summary": "This commit resolves an issue where keyless accounts were unable to post multi-image galleries due to incorrect media asset ownership handling, ensuring proper authentication and media leasing.",
+            "security_implications": "Changes to how media assets are leased could introduce vulnerabilities if not properly validated.",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "INVALID_MEDIA_ASSETS",
+              "media lease"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6cba04b6c6aa51ad7d1c90ffa52f031ef0b4934c",
+            "short_sha": "6cba04b6"
+          },
+          {
+            "sha": "30153f16266a8431c3886b25eb71341197eab11a",
+            "title": "Fix Share as Image: show the picture for GIF posts instead of a link card",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloShareAsImageGallery.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "ui"
+            ],
+            "summary": "This commit fixes the sharing functionality for GIF posts, ensuring that the actual image is displayed instead of a link card. It also addresses memory management issues related to object retention.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "Improves memory management by ensuring proper object retention, reducing the risk of crashes.",
+            "risk_signals": [
+              "memory management",
+              "retain counts"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/30153f16266a8431c3886b25eb71341197eab11a",
+            "short_sha": "30153f16"
+          },
+          {
+            "sha": "124d1fc80bfbb5a547bf3499788504709e8967f2",
+            "title": "Add universal Open in Apollo flow for sideloaded builds",
+            "author": "jordanearle",
+            "files_touched": [
+              ".github/workflows/build-ipa.yml",
+              ".github/workflows/pr-build-ipa.yml",
+              "AGENTS.md",
+              "Makefile",
+              "README.md",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/Vector.svg",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/antennae 2.svg",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/apollo_antennaball 2.svg",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/eyes.svg",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/face_separate.svg",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/helmet.svg",
+              "liquid-glass/icons/jryng/jryng.icon/Assets/stem.svg",
+              "liquid-glass/icons/jryng/jryng.icon/icon.json",
+              "safari-extension/README.md",
+              "safari-extension/content.js",
+              "safari-extension/manifest.json",
+              "scripts/modules/fix-safari-extension.sh",
+              "src/settings/ApolloLinkCompanionIconData.h",
+              "src/settings/ApolloLinkCompanionIconData.m",
+              "src/settings/ApolloLinkCompanionViewController.h",
+              "src/settings/ApolloLinkCompanionViewController.m",
+              "src/settings/ApolloOpenInAppViewController.m",
+              "src/settings/ApolloSettingsRouter.m",
+              "userscript/open-in-apollo.user.js"
+            ],
+            "kind": "feature",
+            "areas": [
+              "ui",
+              "permissions"
+            ],
+            "summary": "This commit introduces a new flow for opening links in the Apollo app from Safari, including enhancements to the settings and onboarding experience. It also fixes issues with the Safari extension across different build paths.",
+            "security_implications": "Potentially expands permissions related to the Safari extension functionality.",
+            "privacy_implications": "(none)",
+            "safety_implications": "(none)",
+            "risk_signals": [
+              "sideloaded builds",
+              "permissions"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/124d1fc80bfbb5a547bf3499788504709e8967f2",
+            "short_sha": "124d1fc8"
+          },
+          {
+            "sha": "f21005b2abab7d59a05c87eac8617cf337b8950e",
+            "title": "Fix release blockers and harden launch-time paths",
+            "author": "jordanearle",
+            "files_touched": [
+              "src/ApolloAccountCredentials.h",
+              "src/ApolloAccountCredentials.m",
+              "src/ApolloDeletedCommentsMenu.xm",
+              "src/ApolloFoundationModels.swift",
+              "src/ApolloOwnCommentFlair.xm",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "ui",
+              "auth",
+              "storage"
+            ],
+            "summary": "This commit addresses release-blocking startup and stability issues, enhancing the robustness of the application during launch. It includes modifications to various source files to improve performance and reliability.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "The changes aim to improve stability and reduce crash-prone areas during startup.",
+            "risk_signals": [
+              "release blockers",
+              "stability issues"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f21005b2abab7d59a05c87eac8617cf337b8950e",
+            "short_sha": "f21005b2"
+          }
+        ]
+      },
+      "hard_flag": true,
+      "summary": "42 commits reviewed. severity: 1H 11M 2L 28none. areas: auth, build, networking, permissions, storage, threading"
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmpam0t5b6b/new/Apollo",
+      "baseline_path": null,
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 71,
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.apple.com",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
+      "removed": [],
+      "added_unallowlisted": [
+        "www.apple.com"
+      ],
+      "hard_flag": false,
+      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_3.5.0",
+  "baseline": "v1.15.11_3.4.2"
+}
