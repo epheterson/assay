@@ -1,14 +1,54 @@
 {
   "verdict": {
-    "verdict": "clean",
-    "score": 8,
-    "headline": "No hard flags from any module",
-    "anomalies": [],
+    "verdict": "review",
+    "score": 7,
+    "headline": "Routine bugfix/feature release from known contributors; a few medium-severity code changes worth a quick glance",
+    "release_summary": "v3.7.1 is a fix-and-polish release following 3.7.0, entirely authored by existing, established contributors (IllIIllIllIllII, icpryde, ryannair05, plus the release bot) \u2014 no new committers appear in this window. The release restores/refines the Liquid Glass header/tab-bar hiding behavior, fixes sluggish swipe navigation and comment-jump regressions from 3.7.0, corrects deep-link comment sort behavior for apollo:// URL opens, and resolves several crash bugs (TrollStore/ElleKit, LiveContainer misdetection, profile pagination, multireddit expansion, a third-party menu tweak crash, and a video-audio bug after rotation). Code review found no high-severity issues; three medium-severity commits touch broader surface area (LiveContainer/SDK-detection branching logic, a debug-only simulator audio-state dump, and a new network-completion hook for URL-derived post sorting) but all are directly explained by the release notes and paired with added test coverage. The url_inventory finding of 71 'added' hosts is an artifact of no baseline snapshot being available (baseline_path is null), not evidence of 71 new destinations in this release \u2014 the list is dominated by long-standing Reddit/media/charity domains Apollo has always used; only www.apple.com is flagged as not on the allowlist, which is low-risk (App Store/weather links).",
+    "top_changes_to_review": [
+      "d5ba6f88 by IllIIllIllIllII: 'Fix app crashes and LiveContainer compatibility (#1089)' \u2014 adds ApolloExecutableSDK runtime-environment detection and reworks notification backend logic; verify no unsafe fallback path is introduced by the new SDK-detection branching.",
+      "003cfd1b by icpryde: 'Video unmute: keep inline visibility ticks off the fullscreen player (#1080)' \u2014 adds a new debug-only ApolloSimDebugTap.xm that dumps player/audio-session state; confirm this tap is compiled out of production release builds.",
+      "762bbce5 by icpryde: 'Comments: respect suggested/per-subreddit/per-post sort on URL-scheme post opens (#1102)' \u2014 adds a 367-line hook intercepting network fetch-completions for apollo:// deep links; verify malformed/untrusted post IDs from URLs are handled safely.",
+      "url_inventory finding: 71 hosts listed as 'added' due to no baseline snapshot; confirm this is a diff-tooling artifact rather than genuinely new outbound destinations, and that apollopushserver.xyz / apollonotifications.com are pre-existing Apollo push infrastructure."
+    ],
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "New ApolloExecutableSDK detection logic changes runtime branching based on execution environment (e.g., LiveContainer)",
+        "why_it_matters": "Environment-detection branching can introduce unsafe fallback paths if not carefully scoped, even though this instance is a documented crash fix."
+      },
+      {
+        "severity": "low",
+        "module": "code_review",
+        "what": "Debug-only ApolloSimDebugTap.xm dumps player/audio-session/cell state for simulator debugging",
+        "why_it_matters": "Debug surfaces should be confirmed excluded from production builds to avoid inadvertent runtime exposure."
+      },
+      {
+        "severity": "low",
+        "module": "url_inventory",
+        "what": "www.apple.com flagged as added and not on the allowlist",
+        "why_it_matters": "Likely benign (App Store/weather links) but any unallowlisted host warrants a one-line confirmation of purpose."
+      },
+      {
+        "severity": "low",
+        "module": "url_inventory",
+        "what": "71 hosts reported as 'added' because baseline_path is null, preventing a true diff",
+        "why_it_matters": "Without a real baseline comparison, the human reviewer should treat this as a snapshot, not a genuine list of new destinations introduced by this release."
+      }
+    ],
+    "decision_inputs": [
+      "Diff d5ba6f88 for ApolloExecutableSDK.h/.m to confirm LiveContainer detection has no insecure fallback: github.com/Apollo-Reborn/Apollo-Reborn/commit/d5ba6f88",
+      "Check that ApolloSimDebugTap.xm (commit 003cfd1b) is guarded by a DEBUG/simulator-only compile flag",
+      "Review the 367-line hook added in 762bbce5 for handling of malformed post IDs from apollo:// URLs",
+      "Confirm www.apple.com's usage context (likely App Store/weather API) and consider adding it to examples/apollo/allowlist.json",
+      "Verify committer_diff new_authors list is empty (confirmed: IllIIllIllIllII, icpryde, ryannair05, github-actions[bot] are all existing contributors)"
+    ],
     "consistent_with_notes": true,
-    "reasoning": "\u26a0\ufe0f The LLM judge did not run \u2014 the GitHub Models request failed (HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n). Fell back to a conservative heuristic: any module hard_flag forces 'review'. Treat this as 'unjudged \u2014 a human should look', not a real LLM verdict.",
-    "judge_source": "heuristic-fallback:HTTPError",
-    "judge_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n",
+    "reasoning": "All 16 commits are attributed to existing, previously-known contributors and map cleanly to the release notes' stated fixes/features; no hard_flag was raised by any module and no secrets, obfuscation, or unexplained networking were found. Three medium-severity findings involve broader-than-usual surface area (SDK detection, a debug tap, a new URL-triggered network hook) but each is a documented, test-covered fix rather than a sign of malicious intent, so 'review' rather than 'blocked' is appropriate.",
+    "judge_source": "claude:sonnet",
+    "raw_response": "{\"verdict\":\"review\",\"score\":7,\"headline\":\"Routine bugfix/feature release from known contributors; a few medium-severity code changes worth a quick glance\",\"release_summary\":\"v3.7.1 is a fix-and-polish release following 3.7.0, entirely authored by existing, established contributors (IllIIllIllIllII, icpryde, ryannair05, plus the release bot) \u2014 no new committers appear in this window. The release restores/refines the Liquid Glass header/tab-bar hiding behavior, fixes sluggish swipe navigation and comment-jump regressions from 3.7.0, corrects deep-link comment sort behavior for apollo:// URL opens, and resolves several crash bugs (TrollStore/ElleKit, LiveContainer misdetection, profile pagination, multireddit expansion, a third-party menu tweak crash, and a video-audio bug after rotation). Code review found no high-severity issues; three medium-severity commits touch broader surface area (LiveContainer/SDK-detection branching logic, a debug-only simulator audio-state dump, and a new network-completion hook for URL-derived post sorting) but all are directly explained by the release notes and paired with added test coverage. The url_inventory finding of 71 'added' hosts is an artifact of no baseline snapshot being available (baseline_path is null), not evidence of 71 new destinations in this release \u2014 the list is dominated by long-standing Reddit/media/charity domains Apollo has always used; only www.apple.com is flagged as not on the allowlist, which is low-risk (App Store/weather links).\",\"top_changes_to_review\":[\"d5ba6f88 by IllIIllIllIllII: 'Fix app crashes and LiveContainer compatibility (#1089)' \u2014 adds ApolloExecutableSDK runtime-environment detection and reworks notification backend logic; verify no unsafe fallback path is introduced by the new SDK-detection branching.\",\"003cfd1b by icpryde: 'Video unmute: keep inline visibility ticks off the fullscreen player (#1080)' \u2014 adds a new debug-only ApolloSimDebugTap.xm that dumps player/audio-session state; confirm this tap is compiled out of production release builds.\",\"762bbce5 by icpryde: 'Comments: respect suggested/per-subreddit/per-post sort on URL-scheme post opens (#1102)' \u2014 adds a 367-line hook intercepting network fetch-completions for apollo:// deep links; verify malformed/untrusted post IDs from URLs are handled safely.\",\"url_inventory finding: 71 hosts listed as 'added' due to no baseline snapshot; confirm this is a diff-tooling artifact rather than genuinely new outbound destinations, and that apollopushserver.xyz / apollonotifications.com are pre-existing Apollo push infrastructure.\"],\"anomalies\":[{\"severity\":\"medium\",\"module\":\"code_review\",\"what\":\"New ApolloExecutableSDK detection logic changes runtime branching based on execution environment (e.g., LiveContainer)\",\"why_it_matters\":\"Environment-detection branching can introduce unsafe fallback paths if not carefully scoped, even though this instance is a documented crash fix.\"},{\"severity\":\"low\",\"module\":\"code_review\",\"what\":\"Debug-only ApolloSimDebugTap.xm dumps player/audio-session/cell state for simulator debugging\",\"why_it_matters\":\"Debug surfaces should be confirmed excluded from production builds to avoid inadvertent runtime exposure.\"},{\"severity\":\"low\",\"module\":\"url_inventory\",\"what\":\"www.apple.com flagged as added and not on the allowlist\",\"why_it_matters\":\"Likely benign (App Store/weather links) but any unallowlisted host warrants a one-line confirmation of purpose.\"},{\"severity\":\"low\",\"module\":\"url_inventory\",\"what\":\"71 hosts reported as 'added' because baseline_path is null, preventing a true diff\",\"why_it_matters\":\"Without a real baseline comparison, the human reviewer should treat this as a snapshot, not a genuine list of new destinations introduced by this release.\"}],\"decision_inputs\":[\"Diff d5ba6f88 for ApolloExecutableSDK.h/.m to confirm LiveContainer detection has no insecure fallback: github.com/Apollo-Reborn/Apollo-Reborn/commit/d5ba6f88\",\"Check that ApolloSimDebugTap.xm (commit 003cfd1b) is gu",
     "hard_flagged_modules": [],
+    "degraded_modules": [],
     "links": {
       "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.7.0...v1.15.11_3.7.1",
       "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.7.0...v1.15.11_3.7.1",
@@ -48,12 +88,11 @@
       "code_repo": "Apollo-Reborn",
       "base_ref": "v1.15.11_3.7.0",
       "head_ref": "v1.15.11_3.7.1",
-      "llm_used": false,
+      "llm_used": true,
       "capped": false,
       "reviews": [
         {
           "sha": "2427e2bec1b80e39fe625df2f5f8ab8bec601be8",
-          "short_sha": "2427e2be",
           "title": "Update distribution sources for v1.15.11_3.7.0",
           "author": "github-actions[bot]",
           "files_touched": [
@@ -65,20 +104,22 @@
             "apps_noext_glass_icons.json",
             "release-manifest.json"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Update distribution sources for v1.15.11_3.7.0",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "build",
+          "areas": [
+            "build",
+            "deps"
+          ],
+          "summary": "Automated bot commit updating distribution/app manifest JSON files and the release manifest to reflect a new version bump (v1.15.11_3.7.0). This is a routine release-metadata sync with no code changes.",
+          "security_implications": "(none) \u2014 no code or endpoint logic changed, though these manifests may reference download URLs/hashes which should be sanity-checked by the release pipeline rather than this review.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
           "risk_signals": [],
           "severity": "none",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2427e2bec1b80e39fe625df2f5f8ab8bec601be8",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "2427e2be"
         },
         {
           "sha": "d5ba6f880770c3fb340a8eaaa2497e9f9b599497",
-          "short_sha": "d5ba6f88",
           "title": "Fix app crashes and LiveContainer compatibility (#1089)",
           "author": "IllIIllIllIllII",
           "files_touched": [
@@ -91,22 +132,43 @@
             "src/ApolloInterruptibleNavTransition.xm",
             "src/ApolloMultiredditExpansion.h",
             "src/ApolloNotificationBackend.h",
-            "src/ApolloNotificationBackend.m"
+            "src/ApolloNotificationBackend.m",
+            "src/ApolloProfilePagination.xm",
+            "src/ApolloSubredditListLaunchSettle.xm",
+            "src/ApolloThemeIntegrations.xm",
+            "src/ApolloThemeRuntime.xm",
+            "tests/executable_sdk_tests.m",
+            "tests/find_in_comments_hook_tests.m",
+            "tests/multireddit_expansion_tests.m",
+            "tests/notification_backend_tests.m",
+            "tests/profile_pagination_tests.m",
+            "tests/run_executable_sdk_tests.sh",
+            "tests/run_find_in_comments_hook_tests.sh",
+            "tests/run_multireddit_expansion_tests.sh",
+            "tests/run_notification_backend_tests.sh",
+            "tests/run_profile_pagination_tests.sh"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Fix app crashes and LiveContainer compatibility (#1089)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
-          "risk_signals": [],
-          "severity": "none",
+          "kind": "fix",
+          "areas": [
+            "threading",
+            "ipc",
+            "ui"
+          ],
+          "summary": "Large multi-file fix targeting app crashes and compatibility with LiveContainer (a sideloading/execution environment), reworking executable SDK detection, notification backend logic, profile pagination, and several tweak injection points. Adds substantial new test coverage for the affected areas (SDK detection, notifications, pagination, multireddit expansion, comment search).",
+          "security_implications": "Adds a new ApolloExecutableSDK header that appears to detect/adapt behavior based on the execution environment (e.g., LiveContainer), which changes runtime branching logic in ways worth a glance to ensure no unsafe fallback paths are introduced.",
+          "privacy_implications": "Notification backend logic is refactored (ApolloNotificationBackend.m/.h) with a net reduction in code, touching how notification data is processed; no explicit new data collection is evident but the diff should be checked for changes to what's logged or persisted around notifications.",
+          "safety_implications": "This is explicitly a crash-fix commit touching multiple UI/navigation/pagination hooks and adds corresponding unit tests, which is a positive signal for stability though the surface area is broad.",
+          "risk_signals": [
+            "ApolloExecutableSDK",
+            "LiveContainer compatibility",
+            "notification backend rewrite"
+          ],
+          "severity": "medium",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d5ba6f880770c3fb340a8eaaa2497e9f9b599497",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "d5ba6f88"
         },
         {
           "sha": "3c0afc16d50417dd8644983847d44fb6031a942b",
-          "short_sha": "3c0afc16",
           "title": "Fix repeated comment jumps with native search insets (#1094)",
           "author": "IllIIllIllIllII",
           "files_touched": [
@@ -114,77 +176,82 @@
             "tests/comment_jump_tests.m",
             "tests/run_comment_jump_tests.sh"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Fix repeated comment jumps with native search insets (#1094)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a UI bug where comment-jump navigation misbehaved when native search bar insets were present, adjusting inset-handling logic in the search bar tweak. Includes new tests validating the comment jump behavior.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Purely a scroll/navigation UI fix with added test coverage; low risk of crashes given tests were added.",
           "risk_signals": [],
-          "severity": "none",
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3c0afc16d50417dd8644983847d44fb6031a942b",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "3c0afc16"
         },
         {
           "sha": "7f403a934c79b1c425ae8a749470f357b1a3a8c0",
-          "short_sha": "7f403a93",
           "title": "Fix highlight comment counts on explicit refresh (#1098)",
           "author": "IllIIllIllIllII",
           "files_touched": [
             "src/ApolloSubredditHighlights.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Fix highlight comment counts on explicit refresh (#1098)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Small fix correcting comment count display for subreddit highlights when the user performs an explicit refresh. Minimal diff limited to one file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none) \u2014 trivial, self-contained UI data-refresh fix.",
           "risk_signals": [],
           "severity": "none",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/7f403a934c79b1c425ae8a749470f357b1a3a8c0",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "7f403a93"
         },
         {
           "sha": "a91a5ed1050cb05ab83a4475dbc2ec0f251fba85",
-          "short_sha": "a91a5ed1",
           "title": "Fix Two-Gesture tab bar reveal snap (#1078)",
           "author": "IllIIllIllIllII",
           "files_touched": [
             "src/ApolloAutoHideTabBar.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Fix Two-Gesture tab bar reveal snap (#1078)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a snapping/animation glitch in the two-gesture auto-hide tab bar reveal interaction. Small, self-contained UI change.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none) \u2014 cosmetic gesture-animation fix with no persistence or threading impact.",
           "risk_signals": [],
           "severity": "none",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a91a5ed1050cb05ab83a4475dbc2ec0f251fba85",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "a91a5ed1"
         },
         {
           "sha": "be7ab5929fa0714bc5b6fbca74c152fcde7587f0",
-          "short_sha": "be7ab592",
           "title": "Fixes sluggish swipe navigation introduced in 3.7.0 (#1073)",
           "author": "IllIIllIllIllII",
           "files_touched": [
             "src/ApolloInterruptibleNavTransition.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Fixes sluggish swipe navigation introduced in 3.7.0 (#1073)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Adjusts the interruptible navigation transition logic to fix sluggish/laggy swipe-back gesture behavior that was introduced in a prior release. The change modifies gesture/animation state handling in a single file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touches interactive gesture/animation transition state machine; incorrect state handling here can cause UI hangs or crashes during interrupted transitions, though the diff is small and targeted.",
           "risk_signals": [],
-          "severity": "none",
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/be7ab5929fa0714bc5b6fbca74c152fcde7587f0",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "be7ab592"
         },
         {
           "sha": "fe2a9c2cdc8cb4ab49f8171b1a791d172dcc9486",
-          "short_sha": "fe2a9c2c",
           "title": "Restore Hidden header style option (#1074)",
           "author": "IllIIllIllIllII",
           "files_touched": [
@@ -194,20 +261,22 @@
             "src/UserDefaultConstants.h",
             "src/settings/CustomAPIViewController.m"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Restore Hidden header style option (#1074)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "Restores a previously removed 'Hidden' header style setting, wiring it back through app state, user defaults, and the settings UI. This is a cosmetic preference restoration with a persisted user default.",
+          "security_implications": "(none)",
+          "privacy_implications": "Adds/restores a stored user preference (header style) in local user defaults; no new data collection or transmission.",
+          "safety_implications": "Small, low-risk change to state/default wiring; low crash surface.",
           "risk_signals": [],
-          "severity": "none",
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fe2a9c2cdc8cb4ab49f8171b1a791d172dcc9486",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "fe2a9c2c"
         },
         {
           "sha": "e3e584c064aaf1467b40882619b8f55d605d02a6",
-          "short_sha": "e3e584c0",
           "title": "Restore Apollo top bar hiding on scroll (#1079)",
           "author": "IllIIllIllIllII",
           "files_touched": [
@@ -220,81 +289,101 @@
             "src/ApolloTabBarHideStyle.xm",
             "src/ApolloTopBarScrollPresentation.h",
             "src/ApolloTopBarScrollPresentation.m",
-            "src/Tweak.xm"
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Restore Apollo top bar hiding on scroll (#1079)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
-          "risk_signals": [],
-          "severity": "none",
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage",
+            "build"
+          ],
+          "summary": "Restores the top bar auto-hide-on-scroll feature by adding a new ~420-line ApolloTopBarScrollPresentation implementation and adjusting tab bar hide, scroll edge, and gallery view controller code, plus a new persisted user default. The CustomAPIViewController.m change is a large near-total rewrite (156/155 lines) likely due to settings UI restructuring rather than API/auth logic changes based on the commit's stated intent.",
+          "security_implications": "(none) \u2014 no auth/network endpoint changes evident; CustomAPIViewController.m changes appear to be settings-UI restructuring co-located with the same file rather than credential/auth logic changes, but the near-total rewrite of that file warrants a closer diff read given its name.",
+          "privacy_implications": "Adds a new persisted UI preference (top bar hide behavior) to user defaults; no new data collection.",
+          "safety_implications": "Large new file (416 lines) integrating with scroll/view-lifecycle events across multiple view controllers increases crash/edge-case surface (e.g., scroll edge pop fix interactions); should be manually verified given size.",
+          "risk_signals": [
+            "near-total rewrite of CustomAPIViewController.m (156 add/155 del) despite feature being about scroll UI, not API settings"
+          ],
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/e3e584c064aaf1467b40882619b8f55d605d02a6",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "e3e584c0"
         },
         {
           "sha": "5ded8498a658e2577958f658f4df707d8235784f",
-          "short_sha": "5ded8498",
           "title": "Multireddits: stop rejecting the add-subreddit response as malformed (#1081)",
           "author": "icpryde",
           "files_touched": [
             "src/ApolloMultiredditEdit.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Multireddits: stop rejecting the add-subreddit response as malformed (#1081)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
-          "risk_signals": [],
-          "severity": "none",
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "input-validation"
+          ],
+          "summary": "Narrows a response-shape validation guard (originally added in #864 to reject malformed multireddit API responses) by excluding the subreddit-membership PUT path, whose actual response shape ({\"name\": \"<sub>\"}) was previously misclassified as malformed and caused user-visible false error messages. The fix matches the existing exclusion pattern already used for DELETE and copy endpoints.",
+          "security_implications": "Slightly reduces the scope of a response-validation safeguard for one specific network endpoint; narrowly targeted and consistent with pre-existing exclusions (DELETE, copy) so risk is limited, but it does relax input validation on a network response path.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Fixes incorrect error-state handling that previously left the UI showing stale/incorrect subreddit membership status after a successful backend write.",
+          "risk_signals": [
+            "relaxes a response shape validation guard originally added for security/robustness reasons (#864)"
+          ],
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/5ded8498a658e2577958f658f4df707d8235784f",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "5ded8498"
         },
         {
           "sha": "003cfd1b87ea70f409d7806991a39a85f2f087b6",
-          "short_sha": "003cfd1b",
           "title": "Video unmute: keep inline visibility ticks off the player the fullscreen viewer is showing (#1072) (#1080)",
           "author": "icpryde",
           "files_touched": [
             "src/ApolloSimDebugTap.xm",
             "src/ApolloVideoUnmute.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Video unmute: keep inline visibility ticks off the player the fullscreen viewer is showing (#1072) (#1080)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
-          "risk_signals": [],
-          "severity": "none",
+          "kind": "fix",
+          "areas": [
+            "threading",
+            "media",
+            "ui"
+          ],
+          "summary": "Fixes an AVPlayer audio-state bug where rotating the device while a fullscreen video viewer is presented could cause background feed/comments cell visibility events to incorrectly mute/unmute the fullscreen video's shared player. Adds tracking of the presented MediaPageViewController lifecycle and a new debug-only tap (ApolloSimDebugTap.xm) that dumps player/audio-session state for simulator debugging.",
+          "security_implications": "(none)",
+          "privacy_implications": "New 'mediastate' debug dump exposes internal player/audio-session/cell state; appears intended for simulator/debug builds only, but should be confirmed it is not reachable in production release builds to avoid inadvertent runtime debug surface.",
+          "safety_implications": "Introduces timing-dependent logic (e.g., a T+50ms audio session downgrade) and view-lifecycle tracking across multiple playback paths (feed, comments, fullscreen viewer), which increases risk of race conditions or state desync between AVPlayer instances if lifecycle callbacks fire out of order.",
+          "risk_signals": [
+            "T+50ms timing-based audio session workaround",
+            "new debug tap dumping internal player/session state ('mediastate')",
+            "shared AVPlayer state coordinated across multiple view controllers"
+          ],
+          "severity": "medium",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/003cfd1b87ea70f409d7806991a39a85f2f087b6",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "003cfd1b"
         },
         {
           "sha": "5c90f5daabb34ded144bfa91bdda4b6365c29501",
-          "short_sha": "5c90f5da",
           "title": "Action menu: handle injected rows in willSelect so foreign didSelect hooks never see them (#1076)",
           "author": "icpryde",
           "files_touched": [
             "src/ApolloActionMenu.h",
             "src/ApolloActionMenu.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Action menu: handle injected rows in willSelect so foreign didSelect hooks never see them (#1076)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes a crash that occurred when a third-party tweak (Translomatic) also hooked ActionController's didSelect and null-dereferenced on Apollo's injected action-menu rows. The fix intercepts selection earlier, in willSelectRowAtIndexPath, returning nil for injected rows so no didSelect implementation (Apollo's or a third party's) ever sees an out-of-range index, while leaving native and other tweaks' rows untouched.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Prevents an EXC_BAD_ACCESS crash caused by interaction with other installed tweaks hooking the same table view delegate methods, improving robustness of a jailbreak-context UI hook.",
           "risk_signals": [],
-          "severity": "none",
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/5c90f5daabb34ded144bfa91bdda4b6365c29501",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "5c90f5da"
         },
         {
           "sha": "ba283fc02af1093ce42a712f839be3d697ab7055",
-          "short_sha": "ba283fc0",
           "title": "Guard AsyncDisplayKit display against bitmap-context failures on Liquid Glass builds (#1097) (#1099)",
           "author": "icpryde",
           "files_touched": [
@@ -304,20 +393,25 @@
             "src/ApolloAsyncDisplayGuard.xm",
             "src/ApolloSimDebugTap.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Guard AsyncDisplayKit display against bitmap-context failures on Liquid Glass builds (#1097) (#1099)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
-          "risk_signals": [],
-          "severity": "none",
+          "kind": "fix",
+          "areas": [
+            "threading",
+            "ui",
+            "build"
+          ],
+          "summary": "Adds a guard around AsyncDisplayKit's legacy bitmap-context-based rendering path that was causing an uncaught NSInternalInconsistencyException/abort on newer SDK-linked (Liquid Glass) builds when CGBitmapContextCreate fails or when encoding an oversized layer. The guard skips or catches failing display attempts and caps bitmap size at 64 million pixels; a simulator-only debug bridge is added to exercise the new paths.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Prevents an unhandled crash on a background display-queue thread that previously terminated the app; adds new size caps and exception handling around rendering, which is a meaningful change to a crash-prone async rendering path and should be exercised on real hardware, not just the simulator debug tap.",
+          "risk_signals": [
+            "new simulator debug bridge merged alongside production guard code"
+          ],
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ba283fc02af1093ce42a712f839be3d697ab7055",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "ba283fc0"
         },
         {
           "sha": "d6da25bd287938d3a188d89430f611581b8e7846",
-          "short_sha": "d6da25bd",
           "title": "removed redudant copies (#1069)",
           "author": "ryannair05",
           "files_touched": [
@@ -330,22 +424,27 @@
             "src/ApolloImmersiveHeaderBackground.m",
             "src/ApolloInlineImages.xm",
             "src/ApolloLiquidGlassIconPicker.xm",
-            "src/ApolloNativeActionMenus.xm"
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloPollCompose.xm",
+            "src/ApolloSubredditCustomBannerCache.m",
+            "src/ApolloSubredditCustomIconCache.m",
+            "src/ApolloTranslation.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "removed redudant copies (#1069)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "refactor",
+          "areas": [
+            "memory"
+          ],
+          "summary": "Removes redundant object copies scattered across many UI and caching modules, likely for minor performance/memory efficiency gains. No functional behavior change is described.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touches memory-management patterns (copy semantics) across many files, so incorrect removal of a needed copy could introduce subtle mutation/aliasing bugs, though the change is described as purely redundant-copy cleanup.",
           "risk_signals": [],
-          "severity": "none",
+          "severity": "low",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d6da25bd287938d3a188d89430f611581b8e7846",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "d6da25bd"
         },
         {
           "sha": "0aae1f8fc296dc4413492e5670b81930c2b5a949",
-          "short_sha": "0aae1f8f",
           "title": "Fix navigation pill preferences, title centering, and picker transitions (#1105)",
           "author": "IllIIllIllIllII",
           "files_touched": [
@@ -357,20 +456,22 @@
             "src/UserDefaultConstants.h",
             "src/settings/CustomAPIViewController.m"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Fix navigation pill preferences, title centering, and picker transitions (#1105)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "config"
+          ],
+          "summary": "Fixes UI bugs around navigation pill preferences, title centering, and picker transition animations, adding new user-default-backed state fields to support the preference. Also modifies CustomAPIViewController.m, likely for UI-related picker behavior rather than API configuration logic itself.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "New persisted preference state is added (ApolloState/UserDefaultConstants); low risk since it's purely UI toggle storage.",
           "risk_signals": [],
           "severity": "none",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0aae1f8fc296dc4413492e5670b81930c2b5a949",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "0aae1f8f"
         },
         {
           "sha": "762bbce5fba86c8e1ec348d0e4373ad03aba7f7e",
-          "short_sha": "762bbce5",
           "title": "Comments: respect suggested, per-subreddit and per-post sort on URL-scheme post opens (#1102)",
           "author": "icpryde",
           "files_touched": [
@@ -379,20 +480,26 @@
             "src/ApolloPerPostCommentSort.xm",
             "src/ApolloURLOpenCommentSort.xm"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Comments: respect suggested, per-subreddit and per-post sort on URL-scheme post opens (#1102)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
-          "risk_signals": [],
-          "severity": "none",
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "ui",
+            "deep-linking"
+          ],
+          "summary": "Adds a new module that intercepts comment-fetch completions for posts opened via apollo:// URL scheme (deep links, notifications, AI summary links) so the correct sort order (per-post, suggested, per-subreddit, or default) is applied, re-issuing the fetch with the correct sort when needed. Also exposes previously-internal per-post sort state via a new header for reuse.",
+          "security_implications": "Adds a fairly large (367-line) new hook around the network fetch-completion path for comments triggered by URL-scheme opens; while scoped to sort-order logic, any new interception of network completions and URL-derived post IDs merits a careful glance for correct handling of untrusted/malformed URL input and re-entrancy.",
+          "privacy_implications": "(none) \u2014 no new data collection or destinations; only reuses existing post/sort identifiers already handled by Apollo.",
+          "safety_implications": "Introduces a one-shot re-fetch/re-dispatch flow keyed by post id on top of an async network completion handler, which adds complexity and potential for race conditions or duplicate renders if the one-shot guard is not robust.",
+          "risk_signals": [
+            "new large file wrapping network fetch completion",
+            "URL-scheme-triggered logic re-issuing network requests"
+          ],
+          "severity": "medium",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/762bbce5fba86c8e1ec348d0e4373ad03aba7f7e",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "762bbce5"
         },
         {
           "sha": "c2fa4037c5d1861aa8e8460e3ea6b779745b6418",
-          "short_sha": "c2fa4037",
           "title": "Prepare 3.7.1 release (#1100)",
           "author": "icpryde",
           "files_touched": [
@@ -402,39 +509,165 @@
             "whats-new/generated/ApolloWhatsNewCatalog.gen.m",
             "whats-new/releases/3.7.1.json"
           ],
-          "kind": "other",
-          "areas": [],
-          "summary": "Prepare 3.7.1 release (#1100)",
-          "security_implications": "(heuristic; no LLM review available)",
-          "privacy_implications": "(heuristic; no LLM review available)",
-          "safety_implications": "(heuristic; no LLM review available)",
+          "kind": "docs",
+          "areas": [
+            "build",
+            "release"
+          ],
+          "summary": "Version bump for the 3.7.1 release: increments tweak version and IPA build number, updates the changelog with 13 merged PRs, and adds a generated 'What's New' catalog entry with six release highlights.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
           "risk_signals": [],
           "severity": "none",
           "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/c2fa4037c5d1861aa8e8460e3ea6b779745b6418",
-          "llm_error": "HTTP Error 410: Gone :: {\"error\":{\"code\":\"github_models_retirement_brownout\",\"message\":\"GitHub Models is temporarily unavailable as part of a scheduled retirement brownout.\"}}\n"
+          "short_sha": "c2fa4037"
         }
       ],
       "aggregate": {
         "total_commits": 16,
         "by_kind": {
-          "other": 16
+          "build": 1,
+          "fix": 10,
+          "feature": 3,
+          "refactor": 1,
+          "docs": 1
         },
         "by_severity": {
-          "none": 16,
-          "low": 0,
-          "medium": 0,
+          "none": 5,
+          "low": 8,
+          "medium": 3,
           "high": 0
         },
-        "areas_touched": [],
-        "high_or_medium_commits": []
+        "areas_touched": [
+          "build",
+          "config",
+          "deep-linking",
+          "deps",
+          "input-validation",
+          "ipc",
+          "media",
+          "memory",
+          "networking",
+          "release",
+          "storage",
+          "threading",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "d5ba6f880770c3fb340a8eaaa2497e9f9b599497",
+            "title": "Fix app crashes and LiveContainer compatibility (#1089)",
+            "author": "IllIIllIllIllII",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloCommon.m",
+              "src/ApolloExecutableSDK.h",
+              "src/ApolloFiltersBlocksInject.xm",
+              "src/ApolloFindInComments.xm",
+              "src/ApolloFollowingSection.xm",
+              "src/ApolloInterruptibleNavTransition.xm",
+              "src/ApolloMultiredditExpansion.h",
+              "src/ApolloNotificationBackend.h",
+              "src/ApolloNotificationBackend.m",
+              "src/ApolloProfilePagination.xm",
+              "src/ApolloSubredditListLaunchSettle.xm",
+              "src/ApolloThemeIntegrations.xm",
+              "src/ApolloThemeRuntime.xm",
+              "tests/executable_sdk_tests.m",
+              "tests/find_in_comments_hook_tests.m",
+              "tests/multireddit_expansion_tests.m",
+              "tests/notification_backend_tests.m",
+              "tests/profile_pagination_tests.m",
+              "tests/run_executable_sdk_tests.sh",
+              "tests/run_find_in_comments_hook_tests.sh",
+              "tests/run_multireddit_expansion_tests.sh",
+              "tests/run_notification_backend_tests.sh",
+              "tests/run_profile_pagination_tests.sh"
+            ],
+            "kind": "fix",
+            "areas": [
+              "threading",
+              "ipc",
+              "ui"
+            ],
+            "summary": "Large multi-file fix targeting app crashes and compatibility with LiveContainer (a sideloading/execution environment), reworking executable SDK detection, notification backend logic, profile pagination, and several tweak injection points. Adds substantial new test coverage for the affected areas (SDK detection, notifications, pagination, multireddit expansion, comment search).",
+            "security_implications": "Adds a new ApolloExecutableSDK header that appears to detect/adapt behavior based on the execution environment (e.g., LiveContainer), which changes runtime branching logic in ways worth a glance to ensure no unsafe fallback paths are introduced.",
+            "privacy_implications": "Notification backend logic is refactored (ApolloNotificationBackend.m/.h) with a net reduction in code, touching how notification data is processed; no explicit new data collection is evident but the diff should be checked for changes to what's logged or persisted around notifications.",
+            "safety_implications": "This is explicitly a crash-fix commit touching multiple UI/navigation/pagination hooks and adds corresponding unit tests, which is a positive signal for stability though the surface area is broad.",
+            "risk_signals": [
+              "ApolloExecutableSDK",
+              "LiveContainer compatibility",
+              "notification backend rewrite"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d5ba6f880770c3fb340a8eaaa2497e9f9b599497",
+            "short_sha": "d5ba6f88"
+          },
+          {
+            "sha": "003cfd1b87ea70f409d7806991a39a85f2f087b6",
+            "title": "Video unmute: keep inline visibility ticks off the player the fullscreen viewer is showing (#1072) (#1080)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloSimDebugTap.xm",
+              "src/ApolloVideoUnmute.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "threading",
+              "media",
+              "ui"
+            ],
+            "summary": "Fixes an AVPlayer audio-state bug where rotating the device while a fullscreen video viewer is presented could cause background feed/comments cell visibility events to incorrectly mute/unmute the fullscreen video's shared player. Adds tracking of the presented MediaPageViewController lifecycle and a new debug-only tap (ApolloSimDebugTap.xm) that dumps player/audio-session state for simulator debugging.",
+            "security_implications": "(none)",
+            "privacy_implications": "New 'mediastate' debug dump exposes internal player/audio-session/cell state; appears intended for simulator/debug builds only, but should be confirmed it is not reachable in production release builds to avoid inadvertent runtime debug surface.",
+            "safety_implications": "Introduces timing-dependent logic (e.g., a T+50ms audio session downgrade) and view-lifecycle tracking across multiple playback paths (feed, comments, fullscreen viewer), which increases risk of race conditions or state desync between AVPlayer instances if lifecycle callbacks fire out of order.",
+            "risk_signals": [
+              "T+50ms timing-based audio session workaround",
+              "new debug tap dumping internal player/session state ('mediastate')",
+              "shared AVPlayer state coordinated across multiple view controllers"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/003cfd1b87ea70f409d7806991a39a85f2f087b6",
+            "short_sha": "003cfd1b"
+          },
+          {
+            "sha": "762bbce5fba86c8e1ec348d0e4373ad03aba7f7e",
+            "title": "Comments: respect suggested, per-subreddit and per-post sort on URL-scheme post opens (#1102)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloPerPostCommentSort.h",
+              "src/ApolloPerPostCommentSort.xm",
+              "src/ApolloURLOpenCommentSort.xm"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "ui",
+              "deep-linking"
+            ],
+            "summary": "Adds a new module that intercepts comment-fetch completions for posts opened via apollo:// URL scheme (deep links, notifications, AI summary links) so the correct sort order (per-post, suggested, per-subreddit, or default) is applied, re-issuing the fetch with the correct sort when needed. Also exposes previously-internal per-post sort state via a new header for reuse.",
+            "security_implications": "Adds a fairly large (367-line) new hook around the network fetch-completion path for comments triggered by URL-scheme opens; while scoped to sort-order logic, any new interception of network completions and URL-derived post IDs merits a careful glance for correct handling of untrusted/malformed URL input and re-entrancy.",
+            "privacy_implications": "(none) \u2014 no new data collection or destinations; only reuses existing post/sort identifiers already handled by Apollo.",
+            "safety_implications": "Introduces a one-shot re-fetch/re-dispatch flow keyed by post id on top of an async network completion handler, which adds complexity and potential for race conditions or duplicate renders if the one-shot guard is not robust.",
+            "risk_signals": [
+              "new large file wrapping network fetch completion",
+              "URL-scheme-triggered logic re-issuing network requests"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/762bbce5fba86c8e1ec348d0e4373ad03aba7f7e",
+            "short_sha": "762bbce5"
+          }
+        ]
       },
       "hard_flag": false,
-      "summary": "16 commits reviewed. severity: 0H 0M 0L 16none. areas: (none)"
+      "summary": "16 commits reviewed. severity: 0H 3M 8L 5none. areas: build, config, deep-linking, deps, input-validation, ipc"
     },
     {
       "module": "url_inventory",
       "ok": true,
-      "new_path": "/tmp/tmpzy2n7z8y/new/Apollo",
+      "new_path": "/tmp/tmp93qafn6i/new/Apollo",
       "baseline_path": null,
       "allowlist_path": "examples/apollo/allowlist.json",
       "total_hosts": 71,
