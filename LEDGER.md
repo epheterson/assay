@@ -2,12 +2,13 @@
 
 Every verdict, every release, every target. Newest first. Auto-generated on each verdict.
 
-**Totals:** 13 verdicts · ✅ 3 clean · ⚠️ 10 review · 🚨 0 blocked
+**Totals:** 14 verdicts · ✅ 4 clean · ⚠️ 10 review · 🚨 0 blocked
 
 ## Apollo/Reborn
 
 | | Tag | Score | Headline | Judge | Baseline |
 |---|---|---|---|---|---|
+| ✅ `clean` | [`v1.15.11_3.7.1`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.7.1) | 8 | No hard flags from any module | `heuristic-fallback:HTTPError` | `v1.15.11_3.7.0` |
 | ✅ `clean` | [`v1.15.11_3.7.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.7.0) | 8 | No hard flags from any module | `heuristic-fallback:HTTPError` | `v1.15.11_3.6.0` |
 | ⚠️ `review` | [`v1.15.11_3.6.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.6.0) | 5 | Hard flag from module(s); manual review needed | `heuristic-fallback:HTTPError` | `v1.15.11_3.5.1` |
 | ✅ `clean` | [`v1.15.11_3.5.1`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.5.1) | 8 | No hard flags from any module | `heuristic-fallback:HTTPError` | `v1.15.11_3.5.0` |
