@@ -13,6 +13,11 @@ on:
     # no-new-release path exits in ~10s, and public-repo minutes are free.
     - cron: "17 * * * *"
   workflow_dispatch:
+    inputs:
+      rejudge_baseline:
+        description: "Re-judge the latest release against this older tag (blank = normal poll)"
+        required: false
+        default: ""
 
 concurrency:
   group: assay-Apollo-Reborn
@@ -21,7 +26,6 @@ concurrency:
 permissions:
   contents: write
   issues: write
-  models: read
 
 jobs:
   assay:
@@ -35,10 +39,19 @@ jobs:
           path: /tmp/assay-baseline
           key: assay-baseline-Apollo-Reborn-v1
 
+      # The judge and code_review ask Claude through the claude CLI, billed to
+      # a Claude subscription. CLAUDE_CODE_OAUTH_TOKEN comes from
+      # `claude setup-token`. Without it every verdict is "review" (unjudged),
+      # never "clean".
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2
+
       - name: Run assay pipeline
         id: assay
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          REJUDGE_BASELINE: ${{ github.event.inputs.rejudge_baseline }}
           ASSAY_OWNER: ${{ github.repository_owner }}
           ASSAY_REPO: ${{ github.event.repository.name }}
         run: |
@@ -51,7 +64,8 @@ jobs:
             --code-repo Apollo-Reborn \
             --binary-asset-pattern 'Apollo-Reborn-.*-GLASS\.ipa$' \
             --binary-inner-path 'Payload/Apollo.app/Apollo' \
-            --allowlist examples/apollo/allowlist.json
+            --allowlist examples/apollo/allowlist.json \
+            --rejudge-baseline "$REJUDGE_BASELINE"
 
       - name: Persist new verdict to repo
         if: steps.assay.outputs.new_release == 'true'

@@ -2,8 +2,10 @@
 #
 # Versioned, structured prompt for the LLM verdict step. Bump the `version`
 # when changing this file so cached responses can be invalidated.
-version: 3
-model: openai/gpt-4o-mini
+version: 4
+# Claude model alias, passed to `claude -p --model`. temperature and
+# max_tokens are kept for the loader but the CLI does not take them.
+model: sonnet
 temperature: 0.0
 max_tokens: 3000
 

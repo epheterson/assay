@@ -20,8 +20,9 @@ and have the LLM produce a structured summary:
     "severity": "none" | "low" | "medium" | "high"
   }
 
-Sends commits to GitHub Models in batches (default 5 per call) for efficiency.
-Falls back to a heuristic-only summary if no LLM token is available.
+Sends commits to Claude (judge/llm.py) in batches (default 5 per call).
+Falls back to a heuristic-only summary if the model can't be reached, and says
+so with `llm_used: false`, which the judge treats as "not reviewed".
 """
 
 from __future__ import annotations
@@ -35,11 +36,11 @@ import urllib.request
 from pathlib import Path
 
 GH_API = "https://api.github.com"
-MODELS_URL = "https://models.github.ai/inference/chat/completions"
 
 # Add judge/ to sys.path so we can reuse the prompt loader + extractor
 _SCRIPT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_SCRIPT_DIR / "judge"))
+import llm  # noqa: E402
 
 
 def gh_get(path: str, token: str) -> dict | list:
@@ -88,44 +89,6 @@ def list_commits(owner: str, repo: str, base: str, head: str, token: str) -> lis
             }
         )
     return enriched
-
-
-def call_llm(
-    *, model: str, system: str, user: str, token: str, max_tokens: int = 4000
-) -> str:
-    body = {
-        "model": model,
-        "temperature": 0.0,
-        "max_tokens": max_tokens,
-        "response_format": {"type": "json_object"},
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-    }
-    req = urllib.request.Request(
-        MODELS_URL,
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=120) as r:
-            data = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        body_text = "(no body)"
-        try:
-            body_text = e.read().decode("utf-8", errors="replace")[:1000]
-        except Exception:
-            pass
-        raise urllib.error.HTTPError(
-            e.url, e.code, f"{e.reason} :: {body_text}", e.headers, None
-        ) from e
-    return data["choices"][0]["message"]["content"]
 
 
 REVIEW_SYSTEM = """You are assay's commit-by-commit security/privacy/safety reviewer.
@@ -192,7 +155,7 @@ def heuristic_review(commit: dict) -> dict:
     }
 
 
-def review_batch(commits_batch: list[dict], model: str, token: str) -> list[dict]:
+def review_batch(commits_batch: list[dict], model: str) -> list[dict]:
     """Send one LLM call covering up to ~5 commits, return parsed reviews."""
     payload = [
         {
@@ -210,7 +173,7 @@ def review_batch(commits_batch: list[dict], model: str, token: str) -> list[dict
         "Review these commits per the schema. Reply with json only.\n\n"
         + json.dumps({"commits": payload}, indent=2)
     )
-    raw = call_llm(model=model, system=REVIEW_SYSTEM, user=user, token=token)
+    raw = llm.call(system=REVIEW_SYSTEM, user=user, model=model)
     # Extract first json object
     text = re.sub(r"^```(?:json)?\s*", "", raw.strip())
     text = re.sub(r"\s*```$", "", text)
@@ -268,7 +231,7 @@ def run(
     head_ref: str,
     token: str,
     *,
-    model: str = "openai/gpt-4o-mini",
+    model: str = llm.DEFAULT_MODEL,
     batch_size: int = 5,
     max_commits: int = 50,
 ) -> dict:
@@ -290,11 +253,11 @@ def run(
 
     reviews: list[dict] = []
     llm_used = False
-    if token and commits:
+    if commits and os.environ.get("USE_FAKE_JUDGE") != "1":
         for i in range(0, len(commits), batch_size):
             batch = commits[i : i + batch_size]
             try:
-                batch_reviews = review_batch(batch, model, token)
+                batch_reviews = review_batch(batch, model)
                 reviews.extend(batch_reviews)
                 llm_used = True
             except Exception as e:  # noqa: BLE001

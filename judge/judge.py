@@ -1,11 +1,14 @@
 """
 judge — render a structured verdict for a release given module findings.
 
-Talks to GitHub Models via the OpenAI-compatible inference endpoint, using
-the workflow's built-in GITHUB_TOKEN (no separate API key needed).
+Asks Claude through the `claude` CLI (see llm.py). GitHub Models, the
+original backend, was retired on 2026-07-30.
 
-If GITHUB_TOKEN is absent or USE_FAKE_JUDGE=1 in env, returns a heuristic
-verdict — useful for offline local testing.
+A verdict of "clean" means the model judged the release and nothing tripped.
+Anything reached without the model (USE_FAKE_JUDGE=1, the CLI missing, the
+call failing) comes out as "review" with an "unjudged" headline. The fallback
+used to say "clean" when no module hard-flagged, and after GitHub Models went
+away that stamped three Apollo releases clean that nobody had judged.
 """
 
 from __future__ import annotations
@@ -14,11 +17,10 @@ import json
 import os
 import re
 import sys
-import urllib.error
-import urllib.request
 from pathlib import Path
 
-MODELS_URL = "https://models.github.ai/inference/chat/completions"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import llm  # noqa: E402
 
 
 def load_prompt(path: Path) -> dict:
@@ -79,9 +81,9 @@ def render(template: str, vars: dict[str, str]) -> str:
 def compact_findings_for_judge(findings: list[dict], char_budget: int) -> list[dict]:
     """Project findings into a small, judge-ready shape that fits a token budget.
 
-    GitHub Models caps gpt-4o-mini requests at 8000 tokens. The code_review
+    The request has a token budget (see judge()). The code_review
     module's per-commit reviews dominate request size on large releases and
-    will 413 the request, forcing a heuristic fallback. Keep security-relevant
+    can overflow it, forcing a fallback. Keep security-relevant
     commits (high/medium) in full and roll routine ones (low/none) into compact
     one-liners, then trim to `char_budget` — dropping routine detail first, then
     lowest-severity notable detail — recording how much was omitted so the judge
@@ -154,9 +156,17 @@ def compact_findings_for_judge(findings: list[dict], char_budget: int) -> list[d
     return out
 
 
-def heuristic_verdict(findings: list[dict]) -> dict:
-    """Offline fallback. Conservative: any hard_flag → review (never blocked)."""
+def heuristic_verdict(findings: list[dict], why: str) -> dict:
+    """Verdict without the model. Never "clean": nobody judged the release.
+
+    `why` names the reason the model did not run, and goes in the headline so
+    the email and the issue say it too, not only the reasoning text.
+    """
     hard = [f for f in findings if f.get("hard_flag")]
+    reasoning = (
+        f"⚠️ The LLM judge did not run ({why}). Only the programmatic checks ran. "
+        "This release is unjudged, so it stays open for a human, whatever the checks found."
+    )
     if hard:
         return {
             "verdict": "review",
@@ -165,7 +175,7 @@ def heuristic_verdict(findings: list[dict]) -> dict:
                 for f in hard
             ],
             "score": 5,
-            "headline": "Hard flag from module(s); manual review needed",
+            "headline": f"Unjudged, and a check tripped: {', '.join(str(f.get('module', '?')) for f in hard)}",
             "anomalies": [
                 {
                     "severity": "medium",
@@ -176,63 +186,29 @@ def heuristic_verdict(findings: list[dict]) -> dict:
                 for f in hard
             ],
             "consistent_with_notes": False,
-            "reasoning": "Heuristic judge (no LLM available). One or more modules raised hard flags.",
+            "reasoning": reasoning,
         }
     return {
-        "verdict": "clean",
-        "score": 8,
-        "headline": "No hard flags from any module",
+        "verdict": "review",
+        "decision_inputs": ["The checks found nothing, but no model read the diff. Look at the compare link."],
+        "score": 6,
+        "headline": "Unjudged: the LLM judge did not run",
         "anomalies": [],
-        "consistent_with_notes": True,
-        "reasoning": "Heuristic judge (no LLM available). No module flagged anomalies.",
+        "consistent_with_notes": False,
+        "reasoning": reasoning,
     }
 
 
-def call_github_models(
-    *,
-    model: str,
-    temperature: float,
-    max_tokens: int,
-    system: str,
-    user: str,
-    token: str,
-) -> str:
-    body = {
-        "model": model,
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-        # Force structured JSON output — without this, GPT-4o tends to wrap
-        # the JSON in markdown or precede it with prose despite system-prompt
-        # instructions. OpenAI's json_object mode is a hard constraint.
-        "response_format": {"type": "json_object"},
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-    }
-    req = urllib.request.Request(
-        MODELS_URL,
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            data = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        # Surface the response body so we can debug 4xx/5xx
-        try:
-            err_body = e.read().decode("utf-8", errors="replace")[:1000]
-        except Exception:
-            err_body = "(no body)"
-        raise urllib.error.HTTPError(
-            e.url, e.code, f"{e.reason} :: {err_body}", e.headers, None
-        ) from e
-    return data["choices"][0]["message"]["content"]
+def degraded_modules(findings: list[dict]) -> list[str]:
+    """Modules that ran without the part that does the real checking."""
+    out = []
+    for f in findings:
+        name = str(f.get("module", "?"))
+        if f.get("ok") is False:
+            out.append(name)
+        elif name == "code_review" and f.get("reviews") and not f.get("llm_used"):
+            out.append(name)
+    return out
 
 
 def extract_json(text: str) -> dict:
@@ -270,28 +246,25 @@ def judge(
 ) -> dict:
     """Render a verdict. Returns a dict with `verdict`, `score`, etc.
 
-    Uses GitHub Models if GITHUB_TOKEN is set; falls back to heuristic
-    otherwise. Always applies the rule-based override: if any module has
-    `hard_flag: true`, the verdict cannot be `clean` regardless of what the
-    LLM says.
+    Asks Claude; without it the verdict is "review" (unjudged). Always applies
+    the rule-based overrides: a hard flag from any module, or a module that
+    could not do its job, means the verdict cannot be `clean`, whatever the
+    model says.
 
     Compare URLs are passed into the prompt so the LLM can include them in
     its `decision_inputs` for the human reviewer.
     """
-    token = os.environ.get("GITHUB_TOKEN")
-    use_fake = os.environ.get("USE_FAKE_JUDGE") == "1"
-
-    if not token or use_fake:
-        result = heuristic_verdict(findings)
+    if os.environ.get("USE_FAKE_JUDGE") == "1":
+        result = heuristic_verdict(findings, "USE_FAKE_JUDGE=1")
         result["judge_source"] = "heuristic"
     else:
         prompt = load_prompt(prompt_path)
-        # GitHub Models caps gpt-4o-mini requests at 8000 tokens. Size the
-        # findings payload to what's left after the system prompt + notes,
-        # rather than a fixed char cap that 413s on large releases (and that
-        # truncated JSON mid-structure). ~4 chars/token, with a safety margin.
+        # Size the findings payload to what's left after the system prompt +
+        # notes, rather than a fixed char cap that truncates JSON mid-structure.
+        # ~4 chars/token. Claude's window is far larger than GitHub Models'
+        # old 8000-token cap; 60K keeps a big release affordable.
         CHARS_PER_TOKEN = 4
-        REQUEST_TOKEN_LIMIT = 8000
+        REQUEST_TOKEN_LIMIT = 60000
         SAFETY_TOKENS = 700
         notes = release_notes[:3000]
         overhead_tokens = (
@@ -318,29 +291,13 @@ def judge(
         )
         raw = None
         try:
-            raw = call_github_models(
-                model=prompt["model"],
-                temperature=prompt["temperature"],
-                max_tokens=prompt["max_tokens"],
-                system=prompt["system"],
-                user=user,
-                token=token,
-            )
+            raw = llm.call(system=prompt["system"], user=user, model=prompt["model"])
             result = extract_json(raw)
-            result["judge_source"] = f"github-models:{prompt['model']}"
-        except (urllib.error.HTTPError, urllib.error.URLError) as e:
-            result = heuristic_verdict(findings)
-            result["judge_source"] = f"heuristic-fallback:{type(e).__name__}"
+            result["judge_source"] = f"claude:{prompt['model']}"
+        except llm.LLMUnavailable as e:
+            result = heuristic_verdict(findings, str(e)[:200])
+            result["judge_source"] = "heuristic-fallback:LLMUnavailable"
             result["judge_error"] = str(e)[:300]
-            # Don't leave the misleading "no LLM available" text from
-            # heuristic_verdict() — the LLM *was* reachable, the call failed.
-            # Name the real cause so a degraded verdict is self-explanatory.
-            result["reasoning"] = (
-                "⚠️ The LLM judge did not run — the GitHub Models request "
-                f"failed ({str(e)[:200]}). Fell back to a conservative "
-                "heuristic: any module hard_flag forces 'review'. Treat this "
-                "as 'unjudged — a human should look', not a real LLM verdict."
-            )
         except (ValueError, KeyError) as e:
             # LLM returned content we couldn't parse. Don't silently fall back
             # to clean — treat as a low-confidence review and surface the raw
@@ -364,19 +321,24 @@ def judge(
         if raw is not None:
             result["raw_response"] = raw[:4000]
 
-    # Rule-based override: hard_flag => not clean
+    # Rule-based overrides. A hard flag means not clean. So does a module that
+    # could not do its job: code_review falling back to its heuristic because
+    # the model was unreachable is "we didn't read the commits", not "the
+    # commits are fine".
     hard_flagged = [f.get("module") for f in findings if f.get("hard_flag")]
-    if hard_flagged and result.get("verdict") == "clean":
+    degraded = degraded_modules(findings)
+    if (hard_flagged or degraded) and result.get("verdict") == "clean":
+        why = []
+        if hard_flagged:
+            why.append("hard flag from " + ", ".join(m for m in hard_flagged if m))
+        if degraded:
+            why.append("could not run fully: " + ", ".join(degraded))
         result["verdict"] = "review"
         result["score"] = min(result.get("score", 5), 5)
-        result["reasoning"] = (
-            "Override: hard flag from module(s) "
-            + ", ".join(m for m in hard_flagged if m)
-            + ". "
-            + result.get("reasoning", "")
-        )
+        result["reasoning"] = "Override: " + "; ".join(why) + ". " + result.get("reasoning", "")
 
     result["hard_flagged_modules"] = hard_flagged
+    result["degraded_modules"] = degraded
     return result
 
 

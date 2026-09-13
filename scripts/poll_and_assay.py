@@ -175,6 +175,11 @@ def main() -> int:
         default="/tmp/assay-baseline",
         help="Where to keep the previous release's binary across runs.",
     )
+    ap.add_argument(
+        "--rejudge-baseline",
+        default="",
+        help="Re-run the latest release even if it was already judged, diffing against this tag.",
+    )
     args = ap.parse_args()
 
     token = os.environ.get("GITHUB_TOKEN")
@@ -213,7 +218,7 @@ def main() -> int:
         print(f"baseline established at {tag}")
         return 0
 
-    if last_state.get("tag") == tag:
+    if last_state.get("tag") == tag and not args.rejudge_baseline:
         # No new release
         emit_output("new_release", "false")
         emit_output("verdict", "none")
@@ -222,8 +227,11 @@ def main() -> int:
         print(f"no new release; latest still {tag}")
         return 0
 
-    baseline_tag = last_state["tag"]
-    print(f"new release detected: {baseline_tag} → {tag}")
+    baseline_tag = args.rejudge_baseline or last_state["tag"]
+    if args.rejudge_baseline:
+        print(f"re-judging {tag} against {baseline_tag}")
+    else:
+        print(f"new release detected: {baseline_tag} → {tag}")
 
     # ── Run modules
     findings: list[dict] = []

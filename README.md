@@ -39,7 +39,7 @@ State lives in the assay repo's own GitHub Issues. Each verdict opens an issue l
       └────────────────────┬───────────────────┘
                            ▼
       ┌────────────────────────────────────────┐
-      │   judge: GitHub Models LLM call,       │
+      │   judge: Claude, via claude -p         │
       │   produces structured verdict          │
       │   ★ rule-based override:               │
       │     hard_flag from any module          │
@@ -65,9 +65,13 @@ State lives in the assay repo's own GitHub Issues. Each verdict opens an issue l
 
 ## Judge
 
-Calls **GitHub Models** at `https://models.github.ai/inference/chat/completions` — free for public repos, no API key needed beyond the workflow's built-in `GITHUB_TOKEN` with `models: read` permission. Default model: `openai/gpt-4o-mini`. Uses `response_format=json_object` for structured output.
+Asks **Claude** through the `claude` CLI in headless mode (`judge/llm.py`): one call, no tools, no settings files, prompt on stdin. In Actions it runs on a Claude subscription through the `CLAUDE_CODE_OAUTH_TOKEN` repo secret, which you make once with `claude setup-token`. Default model: `sonnet`. The same helper runs `code_review`'s per-commit reviews.
 
-Falls back to a heuristic verdict if the LLM call fails or `USE_FAKE_JUDGE=1` is set. **Any module's hard_flag forces verdict ≥ review** — the LLM's job is to *explain*, not to *gate*.
+**A verdict of `clean` means the model judged the release.** Anything decided without it (the secret missing, the CLI failing, `USE_FAKE_JUDGE=1`, a reply that won't parse) comes out as `review` with an "Unjudged" headline, and the issue stays open. So does a release where a module could not do its job, such as `code_review` falling back to its heuristic. **Any module's hard_flag forces verdict ≥ review.** The LLM's job is to *explain*, not to *gate*.
+
+Until 2026-09-13 assay used GitHub Models, which GitHub retired on 2026-07-30. The old fallback said `clean` whenever no module hard-flagged, so three Apollo releases were stamped clean with no model involved. That is the bug the rule above closes.
+
+To re-judge the latest release, run the workflow by hand with `rejudge_baseline` set to the tag to diff against.
 
 ## Reference use case: Apollo for Reddit
 
