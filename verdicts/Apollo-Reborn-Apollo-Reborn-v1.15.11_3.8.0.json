@@ -1,0 +1,1854 @@
+{
+  "verdict": {
+    "verdict": "review",
+    "score": 7,
+    "headline": "Large feature release (Save All Media, Automatic Backups, Account Switcher redesign) from existing contributors \u2014 verify credential handling in new backup/restore and widget token-copy paths",
+    "release_summary": "v1.15.11_3.8.0 is a substantial feature release with 57 commits, all from the 8 existing project contributors (no new authors). Headline features include Save All Media (bulk gallery/album downloads, #1048), Action Menus for customizing UI menus (#1131), a redesigned Account Switcher bottom sheet (#1077), Automatic Backups to a user-chosen Files folder (#1060/#1148/#1152), Settings Shortcuts (#1150), a Return Button for scroll navigation (#1116), and a reworked Hidden & Deleted feed (#1137), among many UI/perf fixes. The code_review module found 0 high-severity, 9 medium-severity, and 21 low-severity commits with no hard-flag \u2014 the medium items cluster around new credential-touching code paths: the Automatic Backups feature captures and replays credentials during restore and writes archives to a user-selected Files location (potentially iCloud-synced), the Account Switcher touches the web session login controller, and a re-applied widget feature (#1195) copies a refresh token to the clipboard for widget setup. None of these show evidence of exfiltration or obfuscation \u2014 they are all directly described in the release notes and attributed to the same long-standing contributors (IllIIllIllIllII, icpryde). The url_inventory module ran without a baseline (baseline_path null), so its 71 'added' hosts are a full host inventory rather than a true release-to-release diff; only www.apple.com is not on the allowlist, which is low-risk (standard App Store links).",
+    "top_changes_to_review": [
+      "59a2f010 by IllIIllIllIllII: Automatic Backups (#1060) \u2014 new settings backup/restore system with credential capture-and-replay on restore, writing archives to a user-chosen Files folder; verify archive validation and that credentials aren't stored in plaintext or a syncable location without user warning.",
+      "d995b12b by IllIIllIllIllII: Account Switcher redesign (#1077) \u2014 ~900-line rewrite touching the web session login view controller and credential editor theming; verify no stale-account data leakage during the new feed-row recovery flow.",
+      "ed450591 by icpryde: Widget 'Copy with Account' restored (#1195) \u2014 copies a refresh token to the clipboard for widget setup; verify the fix correctly pairs token/username per-account and that new diagnostic logging excludes the token itself.",
+      "3b39438b by IllIIllIllIllII: Backup document ownership fix (#1152) \u2014 new ApolloBackupDocument (UIDocument subclass) managing Files-app handoff of backup files; check NSFileCoordinator/UIDocument state handling for race conditions.",
+      "cbbe62a4 by IllIIllIllIllII: Save All Media (#1048) \u2014 new bulk media download/export bridge (Obj-C/Swift); check filename/URL handling in the download-orchestration code for path traversal or injection issues."
+    ],
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "New Automatic Backups feature (#1060) captures and replays user credentials during restore and writes settings archives (potentially containing account/session data) to a user-chosen Files folder that may be iCloud-synced.",
+        "why_it_matters": "Credential handling and export of session data to a syncable location outside the app sandbox is a meaningful new attack/exposure surface, even though it's an intentional, documented feature."
+      },
+      {
+        "severity": "low",
+        "module": "code_review",
+        "what": "Widget setup code (#1195) copies a Reddit refresh token to the system clipboard for widget authentication.",
+        "why_it_matters": "Clipboard-exposed refresh tokens can be read by other apps with clipboard access, though this is an existing/re-applied feature rather than new behavior."
+      },
+      {
+        "severity": "low",
+        "module": "url_inventory",
+        "what": "url_inventory ran with baseline_path=null, so the 71 'added' hosts represent a full inventory of the new build rather than a true diff against the baseline release; only www.apple.com is not on the allowlist.",
+        "why_it_matters": "Without a real baseline comparison, host-list changes specific to this release can't be isolated, reducing confidence in this signal as evidence of new/anomalous networking."
+      }
+    ],
+    "decision_inputs": [
+      "Diff for commit 59a2f010 (Automatic Backups, #1060) \u2014 check how credentials are captured/replayed during restore and where the backup folder path is stored: https://github.com/Apollo-Reborn/Apollo-Reborn/commit/59a2f010",
+      "Diff for commit ed450591 (widget refresh token copy, #1195) \u2014 confirm token/username pairing fix and that debug logging excludes token content: https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed450591",
+      "Confirm all 8 window authors (icpryde, IllIIllIllIllII, JeffreyCA, DeltAndy123, nickclyde, nunoo, Thetromboneman1, github-actions[bot]) are known project maintainers/contributors at github.com/Apollo-Reborn/Apollo-Reborn/graphs/contributors",
+      "Check ApolloBackupDocument.m (commit 3b39438b, #1152) for correct NSFileCoordinator/UIDocument usage during Files-app restore handoff",
+      "Verify www.apple.com usage in the diff \u2014 expected to be App Store/update-related links, add to allowlist if confirmed benign"
+    ],
+    "consistent_with_notes": true,
+    "reasoning": "Every notable finding (Automatic Backups, Account Switcher redesign, Save All Media, widget token copy) directly corresponds to a feature explicitly described and credited by name in the release notes, and all 57 commits come from the 8 existing, known contributors with zero new authors. Code review found no high-severity issues and no hard_flag; the medium-severity items are inherent to legitimate credential-handling features (backup/restore, widget auth) rather than signs of malicious intent, and the host inventory anomaly is a tooling limitation (no baseline) rather than evidence of new suspicious networking. This warrants a human glance at the credential-touching code paths but not blocking.",
+    "judge_source": "claude:sonnet",
+    "raw_response": "{\n  \"verdict\": \"review\",\n  \"score\": 7,\n  \"headline\": \"Large feature release (Save All Media, Automatic Backups, Account Switcher redesign) from existing contributors \u2014 verify credential handling in new backup/restore and widget token-copy paths\",\n  \"release_summary\": \"v1.15.11_3.8.0 is a substantial feature release with 57 commits, all from the 8 existing project contributors (no new authors). Headline features include Save All Media (bulk gallery/album downloads, #1048), Action Menus for customizing UI menus (#1131), a redesigned Account Switcher bottom sheet (#1077), Automatic Backups to a user-chosen Files folder (#1060/#1148/#1152), Settings Shortcuts (#1150), a Return Button for scroll navigation (#1116), and a reworked Hidden & Deleted feed (#1137), among many UI/perf fixes. The code_review module found 0 high-severity, 9 medium-severity, and 21 low-severity commits with no hard-flag \u2014 the medium items cluster around new credential-touching code paths: the Automatic Backups feature captures and replays credentials during restore and writes archives to a user-selected Files location (potentially iCloud-synced), the Account Switcher touches the web session login controller, and a re-applied widget feature (#1195) copies a refresh token to the clipboard for widget setup. None of these show evidence of exfiltration or obfuscation \u2014 they are all directly described in the release notes and attributed to the same long-standing contributors (IllIIllIllIllII, icpryde). The url_inventory module ran without a baseline (baseline_path null), so its 71 'added' hosts are a full host inventory rather than a true release-to-release diff; only www.apple.com is not on the allowlist, which is low-risk (standard App Store links).\",\n  \"top_changes_to_review\": [\n    \"59a2f010 by IllIIllIllIllII: Automatic Backups (#1060) \u2014 new settings backup/restore system with credential capture-and-replay on restore, writing archives to a user-chosen Files folder; verify archive validation and that credentials aren't stored in plaintext or a syncable location without user warning.\",\n    \"d995b12b by IllIIllIllIllII: Account Switcher redesign (#1077) \u2014 ~900-line rewrite touching the web session login view controller and credential editor theming; verify no stale-account data leakage during the new feed-row recovery flow.\",\n    \"ed450591 by icpryde: Widget 'Copy with Account' restored (#1195) \u2014 copies a refresh token to the clipboard for widget setup; verify the fix correctly pairs token/username per-account and that new diagnostic logging excludes the token itself.\",\n    \"3b39438b by IllIIllIllIllII: Backup document ownership fix (#1152) \u2014 new ApolloBackupDocument (UIDocument subclass) managing Files-app handoff of backup files; check NSFileCoordinator/UIDocument state handling for race conditions.\",\n    \"cbbe62a4 by IllIIllIllIllII: Save All Media (#1048) \u2014 new bulk media download/export bridge (Obj-C/Swift); check filename/URL handling in the download-orchestration code for path traversal or injection issues.\"\n  ],\n  \"anomalies\": [\n    {\n      \"severity\": \"medium\",\n      \"module\": \"code_review\",\n      \"what\": \"New Automatic Backups feature (#1060) captures and replays user credentials during restore and writes settings archives (potentially containing account/session data) to a user-chosen Files folder that may be iCloud-synced.\",\n      \"why_it_matters\": \"Credential handling and export of session data to a syncable location outside the app sandbox is a meaningful new attack/exposure surface, even though it's an intentional, documented feature.\"\n    },\n    {\n      \"severity\": \"low\",\n      \"module\": \"code_review\",\n      \"what\": \"Widget setup code (#1195) copies a Reddit refresh token to the system clipboard for widget authentication.\",\n      \"why_it_matters\": \"Clipboard-exposed refresh tokens can be read by other apps with clipboard access, though this is an existing/re-applied feature rather than new behavior.\"\n    },\n    {\n      \"severity\": \"low\",\n      \"m",
+    "hard_flagged_modules": [],
+    "degraded_modules": [],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.7.1...v1.15.11_3.8.0",
+      "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.7.1...v1.15.11_3.8.0",
+      "release_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.8.0"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": true,
+      "owner": "Apollo-Reborn",
+      "repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.7.1",
+      "head_ref": "v1.15.11_3.8.0",
+      "window_commit_count": 57,
+      "window_authors": {
+        "github-actions[bot]": 1,
+        "JeffreyCA": 1,
+        "icpryde": 23,
+        "IllIIllIllIllII": 26,
+        "DeltAndy123": 1,
+        "nickclyde": 1,
+        "nunoo": 1,
+        "Thetromboneman1": 3
+      },
+      "new_authors": [],
+      "existing_authors": [
+        "DeltAndy123",
+        "IllIIllIllIllII",
+        "JeffreyCA",
+        "Thetromboneman1",
+        "github-actions[bot]",
+        "icpryde",
+        "nickclyde",
+        "nunoo"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": false,
+      "summary": "57 commits by 8 authors. 0 new author(s): none. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "Apollo-Reborn",
+      "code_repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.7.1",
+      "head_ref": "v1.15.11_3.8.0",
+      "llm_used": true,
+      "capped": true,
+      "reviews": [
+        {
+          "sha": "f47be10a4cd0bf78d8f2634b4b1c0e201b514218",
+          "title": "Update distribution sources for v1.15.11_3.7.1",
+          "author": "github-actions[bot]",
+          "files_touched": [
+            "apps.json",
+            "apps_glass.json",
+            "apps_glass_icons.json",
+            "apps_noext.json",
+            "apps_noext_glass.json",
+            "apps_noext_glass_icons.json",
+            "release-manifest.json"
+          ],
+          "kind": "build",
+          "areas": [
+            "build",
+            "deps"
+          ],
+          "summary": "Automated bot commit updating app distribution manifests and release manifest for a new version release. Pure data/JSON updates with version numbers, URLs, and checksums.",
+          "security_implications": "(none) \u2014 worth noting these manifests define download URLs/checksums for the app, but this is a routine automated version bump with no code change visible.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f47be10a4cd0bf78d8f2634b4b1c0e201b514218",
+          "short_sha": "f47be10a"
+        },
+        {
+          "sha": "6f766d6551b0595ad1f47971b496e53db7642314",
+          "title": "Remove my donation link (#1121)",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "contributors.json"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "Removes a contributor's personal donation link entry from the contributors metadata file. Purely a data/content edit with no functional impact.",
+          "security_implications": "(none)",
+          "privacy_implications": "Removing a personal donation link slightly reduces the contributor's public exposure, at their own request.",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6f766d6551b0595ad1f47971b496e53db7642314",
+          "short_sha": "6f766d65"
+        },
+        {
+          "sha": "790ac15ff40175c64663f60f8b3a6e8747607203",
+          "title": "Scroll to top: tap again (or the new Return Button) to go back where you were (#1116)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloAutoHideTabBar.h",
+            "src/ApolloAutoHideTabBar.xm",
+            "src/ApolloFeedGalleryCarousel.xm",
+            "src/ApolloScrollToTop.h",
+            "src/ApolloScrollToTop.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloTopBarScrollPresentation.h",
+            "src/ApolloTopBarScrollPresentation.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage",
+            "threading"
+          ],
+          "safety_implications": "New large (690-line) engine manages scroll-position bookkeeping, interruptible animations, notifications, and timed jumps (250ms delay) across multiple table types; increases crash/regression surface for scroll handling but is scoped to UI behavior with no memory/pointer red flags visible.",
+          "security_implications": "(none) \u2014 no network, auth, or crypto code touched.",
+          "privacy_implications": "Adds a new persisted user preference (Return Button toggle) stored via standard UserDefaults/ApolloState mechanism already used elsewhere in the app; no new data collection or external transmission.",
+          "summary": "Introduces a unified 'scroll to top / return to position' feature: tapping the status bar again (or a new Return Button) scrolls back to where the user was reading, replacing an earlier native-search-bar-specific workaround with one consolidated ApolloScrollToTop engine. Adds a new user-facing settings toggle and touches multiple tab-bar, gallery, and top-bar presentation files to wire in the new behavior.",
+          "risk_signals": [
+            "large new file (690 additions) handling scroll state and timed animations",
+            "touches multiple UI subsystems simultaneously (tab bar, search bar, gallery carousel, settings)"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/790ac15ff40175c64663f60f8b3a6e8747607203",
+          "short_sha": "790ac15f"
+        },
+        {
+          "sha": "22181cb3865fe0d5899444a5d3782f8b899d8506",
+          "title": "Issue templates: ask whether Apollo Reborn is running through LiveContainer (#1113)",
+          "author": "icpryde",
+          "files_touched": [
+            ".github/ISSUE_TEMPLATE/bug_report.yml",
+            ".github/ISSUE_TEMPLATE/login_api_help.yml",
+            ".github/ISSUE_TEMPLATE/question.yml"
+          ],
+          "kind": "docs",
+          "areas": [],
+          "summary": "Adds a required/optional dropdown to GitHub issue templates asking whether the reporter is running the app via LiveContainer, to help triage unsupported-environment bug reports. Pure repository documentation/tooling change.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none) \u2014 no change to app behavior or data collection, only issue-reporting metadata collected voluntarily by users filing GitHub issues.",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/22181cb3865fe0d5899444a5d3782f8b899d8506",
+          "short_sha": "22181cb3"
+        },
+        {
+          "sha": "0405cdf25ec94b53b317326de94a8c69409baaa3",
+          "title": "Fix scrolling stalls when reversing at the top of posts (#1119)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloAutoHideTabBar.xm",
+            "src/ApolloSearchNativeBar.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes a scroll-animation bug where reversing direction near the top of a list caused stalls/oscillation, by canceling the native search bar's settling animation on new drag gestures and using actual pan movement (rather than a flag) to decide auto-hide header behavior.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Cancels in-flight animations on new gesture input to prevent conflicting/competing scroll-position corrections, reducing a class of UI stall/jank bugs; author notes manual and simulator validation was performed.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0405cdf25ec94b53b317326de94a8c69409baaa3",
+          "short_sha": "0405cdf2"
+        },
+        {
+          "sha": "46833716df9f82d8ffeef3a9aa51a8833cee25c8",
+          "title": "Fix header visibility while editing (#1120)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloAutoHideTabBar.xm",
+            "src/ApolloTopBarScrollPresentation.h",
+            "src/ApolloTopBarScrollPresentation.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a bug where the top bar/tab bar would incorrectly hide or misbehave while a user is editing content, adjusting scroll-presentation state tracking. Purely a UI presentation logic fix within existing tweak code.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touches view-lifecycle/scroll state handling which could reintroduce UI glitches or crashes if edge cases are mishandled, but scope is limited to presentation logic.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/46833716df9f82d8ffeef3a9aa51a8833cee25c8",
+          "short_sha": "46833716"
+        },
+        {
+          "sha": "59a2f01057d0568918921b047c61861eb522c2e4",
+          "title": "Add Automatic Backups option for Reborn Settings (#1060)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            "Makefile",
+            "patch.sh",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloAutomaticBackup.h",
+            "src/settings/ApolloAutomaticBackup.m",
+            "src/settings/ApolloAutomaticBackupViewController.h",
+            "src/settings/ApolloAutomaticBackupViewController.m",
+            "src/settings/ApolloBackupActionsCell.h",
+            "src/settings/ApolloBackupActionsCell.m",
+            "src/settings/ApolloBackupRestore.h",
+            "src/settings/ApolloBackupRestore.m",
+            "src/settings/ApolloLocalBackupsViewController.h",
+            "src/settings/ApolloLocalBackupsViewController.m",
+            "src/settings/ApolloSettingsForm.h",
+            "src/settings/ApolloSettingsForm.m",
+            "src/settings/ApolloSettingsRouter.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "storage",
+            "auth",
+            "ui",
+            "permissions",
+            "build"
+          ],
+          "summary": "Adds a large new automatic/manual settings-backup system that writes archives to a user-chosen Files folder, including 'credential capture and replay with rollback on failure' during restore, archive validation before mutating live settings, and new UI (folder browser, backup list, actions cell). Also adds in-place document support and enables Liquid Glass IPA builds by default.",
+          "security_implications": "Backup/restore flow captures and replays credentials and parses/validates external archive files before applying them, which is a meaningful attack surface (malformed/malicious backup archives, credential handling) that should be scrutinized for injection/validation gaps.",
+          "privacy_implications": "Settings backups (potentially including account credentials) are persisted to a user-selected Files location, which could be an iCloud Drive or other synced folder, increasing exposure of sensitive data outside the device sandbox if not explicitly flagged to the user.",
+          "safety_implications": "Introduces new file I/O, scheduled/background backup jobs, and restore-time state mutation with rollback logic; bugs here risk data loss/corruption of user settings or partial/failed restores.",
+          "risk_signals": [
+            "credential capture and credential replay with rollback on failure",
+            "validate restore archives before mutation",
+            "backup access and ownership state private to the installation",
+            "Files folder destination for automatic backups",
+            "enable in-place document support"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/59a2f01057d0568918921b047c61861eb522c2e4",
+          "short_sha": "59a2f010"
+        },
+        {
+          "sha": "33d8db2f369dc909ab227626c345e7030a3c8caf",
+          "title": "Tab Bar: implement opt-in swipe to navigate for glass builds (#1075)",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "config"
+          ],
+          "summary": "Adds a new opt-in user preference enabling swipe-to-navigate gestures on the tab bar for Liquid Glass UI builds, with a restart prompt shown after toggling. Adds a new user default and settings toggle, wired through existing state/config plumbing.",
+          "security_implications": "(none)",
+          "privacy_implications": "Adds one new locally-stored boolean preference; no new data collection or transmission.",
+          "safety_implications": "New gesture handling could conflict with existing navigation gestures, but it's opt-in and gated behind a settings toggle with restart, limiting blast radius.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/33d8db2f369dc909ab227626c345e7030a3c8caf",
+          "short_sha": "33d8db2f"
+        },
+        {
+          "sha": "1380b99dd4a0adc09d2da15fa85cd0a5350129ed",
+          "title": "Add Apollo document icon and ZIP label to settings backups (#1148)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            ".github/workflows/build-ipa.yml",
+            "Resources/BackupDocument/ApolloBackupIcon.png",
+            "Resources/BackupDocument/README.md",
+            "build-ipa.sh",
+            "scripts/apply-patches.sh",
+            "scripts/build_release_variants.sh",
+            "scripts/inject-deb-local.sh",
+            "scripts/modules/backup-document.sh",
+            "scripts/register-backup-document.py",
+            "scripts/run-in-sim.sh",
+            "src/settings/ApolloAutomaticBackup.m",
+            "src/settings/ApolloBackupRestore.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "build",
+          "areas": [
+            "build",
+            "ui",
+            "storage"
+          ],
+          "summary": "Adds cosmetic branding (custom document icon) and a clearer file-type label for the backup ZIP archives introduced in the prior automatic-backups feature, plus a new build-time Python script that registers the backup document type/UTI into the app bundle during IPA assembly. Mostly build tooling and asset additions layered on the existing backup feature.",
+          "security_implications": "Registering a custom document/UTI type expands what file types the app declares itself able to open, which is a minor increase in app-exposed surface but consistent with the stated backup feature.",
+          "privacy_implications": "(none) \u2014 cosmetic/labeling change, no new data handling beyond the backup feature already introduced.",
+          "safety_implications": "New build script (register-backup-document.py) runs during IPA build across multiple build/CI scripts; a bug here could break builds but has no runtime user-facing crash risk.",
+          "risk_signals": [
+            "register-backup-document.py modifies Info.plist/UTI declarations during build"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1380b99dd4a0adc09d2da15fa85cd0a5350129ed",
+          "short_sha": "1380b99d"
+        },
+        {
+          "sha": "5457f59dcc5307894c9b35ba9bd015c2add59557",
+          "title": "Fix image and album transitions for a quicker, smoother browsing experience (#1143)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloFeedGalleryCarousel.xm",
+            "src/ApolloMedia.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Improves performance/smoothness of image and album transition animations in the media gallery carousel and media viewer. Purely a UI/animation and rendering-path change with no new data flows.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touches media loading/transition code paths which can be sensitive to race conditions or memory issues during rapid view transitions; worth a functional/regression check but no obvious red flags from the diff description.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/5457f59dcc5307894c9b35ba9bd015c2add59557",
+          "short_sha": "5457f59d"
+        },
+        {
+          "sha": "428ff9fafc0c014c76cade5975dd032db3ee9be0",
+          "title": "Fix forward history loss after cancelled edge swipes (#1128)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloForwardSwipeCancellation.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "navigation"
+          ],
+          "summary": "Adds a new tweak file that fixes a bug where cancelling an edge-swipe-back gesture caused the navigation controller's forward history to be lost. This is a self-contained UI/navigation-state fix with no new file, network, or data-persistence surface beyond in-memory nav stack handling.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touches navigation controller state management (interactive pop gesture handling), which could affect crash stability if the swap/interaction hook is mistimed, but the change is scoped and additive.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/428ff9fafc0c014c76cade5975dd032db3ee9be0",
+          "short_sha": "428ff9fa"
+        },
+        {
+          "sha": "d995b12ba1451d34c06494e33cbd3600dcdc46fc",
+          "title": "Redesign Account Switcher + bug/crash fixes (#1077)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "docs/account-switch-crash-investigation.md",
+            "src/ApolloAccountSwitcherViewController.xm",
+            "src/ApolloMetaFeedRowRecovery.h",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/ApolloWebSessionLoginViewController.m",
+            "tests/meta_feed_recovery_tests.m",
+            "tests/run_meta_feed_recovery_tests.sh"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "auth",
+            "storage",
+            "threading"
+          ],
+          "summary": "Large redesign (~900 line rewrite) of the account switcher UI, including avatar styling, swipe-to-dismiss, credential editor theming, and a new feed-row recovery mechanism after account changes; also modifies the web session login view controller (login/credential flow) with 38 new lines. Includes new tests and a docs file documenting a prior crash investigation.",
+          "security_implications": "Touches the account switching and web session login view controller, which handle account credentials/session tokens; a bug here could mis-associate a session with the wrong account or leak login UI state between accounts, though no obvious credential mishandling is described.",
+          "privacy_implications": "Account switcher changes affect which account's data (avatar, feed rows) is displayed/recovered after switching, so a regression could theoretically show one user's cached content under another account context; feed-row recovery logic should be verified not to leak stale/other-account data.",
+          "safety_implications": "Explicitly addresses crash fixes and stale-row recovery after account changes, indicating prior instability in this code path; large diff size increases regression risk despite added tests.",
+          "risk_signals": [
+            "credential editor",
+            "stale feed rows after account changes",
+            "crash-investigation doc referenced"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d995b12ba1451d34c06494e33cbd3600dcdc46fc",
+          "short_sha": "d995b12b"
+        },
+        {
+          "sha": "f77595f0da1d071784ed6ba545c2a32f8d18d844",
+          "title": "Add shared profile picture shapes across Apollo (#1136)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloAccountSwitcherViewController.xm",
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloState.m",
+            "src/ApolloUserAvatars.xm",
+            "src/Tweak.xm",
+            "src/settings/ApolloProfileLayoutViewController.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "settings"
+          ],
+          "summary": "Introduces a shared app-wide setting for profile picture shape (default Circle), applying it consistently across avatars, tagged-user preview cards, and the account switcher. Mostly UI/rendering changes plus a new persisted user setting.",
+          "security_implications": "(none)",
+          "privacy_implications": "Adds a new persisted UI preference (profile picture shape); no new personal data collected, purely cosmetic setting.",
+          "safety_implications": "Low risk of crashes; touches avatar rendering paths across multiple view controllers but changes are additive/cosmetic.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f77595f0da1d071784ed6ba545c2a32f8d18d844",
+          "short_sha": "f77595f0"
+        },
+        {
+          "sha": "a4539430b972e94121b356c76f3859eda89346b0",
+          "title": "Default Swipe Up for Comments to off (#1134)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "config",
+          "areas": [
+            "ui",
+            "settings"
+          ],
+          "summary": "Changes the default value of an existing 'Swipe Up for Comments' preference from on to off. A tiny, single-value default change with no logic restructuring.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a4539430b972e94121b356c76f3859eda89346b0",
+          "short_sha": "a4539430"
+        },
+        {
+          "sha": "72af9c4052501f118a81111fbc80dc2026309ca3",
+          "title": "Floating Tabs: remember the comment sort when a tab is reopened (#1125)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloFloatingTabs.h",
+            "src/ApolloFloatingTabs.xm",
+            "src/ApolloURLOpenCommentSort.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "Fixes floating tab behavior so that a cold-reopened comment tab remembers and restores its last-used comment sort order (including Live Update) instead of resetting to the default sort, avoiding a redundant re-fetch. Adds ~250 lines of tab-state tracking logic.",
+          "security_implications": "(none)",
+          "privacy_implications": "Persists per-tab UI state (comment sort preference) locally; no new external data collection or transmission.",
+          "safety_implications": "Moderate-sized change to tab lifecycle/state restoration logic; incorrect state handling could cause wrong content fetches or stale UI state, but scope is limited to comment sort routing.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/72af9c4052501f118a81111fbc80dc2026309ca3",
+          "short_sha": "72af9c40"
+        },
+        {
+          "sha": "cac13565a4d603a443c4f75da85d8527ae99db12",
+          "title": "Feed search: let the glass search bar scroll away as soon as you drag after cancelling (#1130)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloSearchNativeBar.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes a UI glitch where cancelling a surfaced subreddit search kept the search bar pinned/expanded for 1.4s, causing scroll content to move under it or snap back unexpectedly. The fix removes stale settle timers and ties the bar's collapse to the scroll-begin notification instead of a delayed timer.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Removes a timer-based state machine that could leave UI in an inconsistent scroll/offset state; reduces risk of visual glitches but is a narrow UI-thread change with low crash risk.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/cac13565a4d603a443c4f75da85d8527ae99db12",
+          "short_sha": "cac13565"
+        },
+        {
+          "sha": "d4b35563395abc8b92fa944119fb72bfb2cfcb21",
+          "title": "Gallery View: keep the first row below the nav bar (#1140)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloGalleryViewController.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Reverts a prior change that removed automatic top content inset in the gallery grid, which had caused the first row of tiles to be hidden behind the status/nav bar. Restores default UIKit inset behavior while keeping other layout changes intact.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Purely a layout/inset fix with no crash or data-handling surface.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d4b35563395abc8b92fa944119fb72bfb2cfcb21",
+          "short_sha": "d4b35563"
+        },
+        {
+          "sha": "9502438fdb7000cc6afac40d8ac011888fa78d49",
+          "title": "Listings: surface a non-dictionary JSON body as an error instead of crashing RedditKit (#1135) (#1147)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/ApolloWebJSONIdentity.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "storage"
+          ],
+          "summary": "Fixes a launch crash-loop caused by RedditKit assuming API JSON responses are always dictionaries; a non-dictionary root (array/string/number/null) from Reddit's API triggered an uncaught NSInvalidArgumentException. The serializer now validates root type for listing endpoints and returns a proper error instead of crashing, logging the unexpected shape.",
+          "security_implications": "Hardens JSON response handling against unexpected/malformed server responses, reducing the attack surface for crafted or malformed API payloads (defensive input validation on untrusted network data).",
+          "privacy_implications": "Adds logging of unexpected JSON body 'shape' on parse failure; should be checked that this log doesn't include sensitive response content.",
+          "safety_implications": "Directly fixes a reproducible crash (launch crash loop) by adding a type check before dictionary subscripting on network response data.",
+          "risk_signals": [
+            "logs the shape of unexpected JSON responses"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9502438fdb7000cc6afac40d8ac011888fa78d49",
+          "short_sha": "9502438f"
+        },
+        {
+          "sha": "a3c71c47e0100e109efc6a77c4be8396318d0a52",
+          "title": "Fix non-glass search Cancel stack overflow (feed offset pin below UIKit's floor) (#1133)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloSearchInPlace.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes a SIGSEGV caused by an infinite feedback loop between a search-dismiss scroll-offset pin and UIKit's own clamping logic, which recursed until the main thread's stack was exhausted (475+ nested frames). The fix floors the pin's target offset at UIKit's own minimum and adds a bounded loop-breaker as a safety net.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Eliminates an unbounded recursive UI layout loop causing a stack-overflow crash; adds a bounded 'clamp-fight breaker' as defense-in-depth against similar future mismatches.",
+          "risk_signals": [
+            "unbounded recursion / stack overflow crash prior to fix",
+            "adds a bounded loop-breaker as safety net (implies residual uncertainty about full root cause)"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a3c71c47e0100e109efc6a77c4be8396318d0a52",
+          "short_sha": "a3c71c47"
+        },
+        {
+          "sha": "57cb74844aeebfed5b8fd0d53e892dc2b251d621",
+          "title": "Gallery View: play GIF and video tiles silently in the grid (new Media toggles) (#1142)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloGalleryFeed.h",
+            "src/ApolloGalleryFeed.m",
+            "src/ApolloGalleryViewController.m",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "networking",
+            "storage",
+            "threading"
+          ],
+          "summary": "Adds two new user-facing settings ('Play Videos in Gallery View' and 'Play GIFs in Gallery View', both on by default) that autoplay muted/looping video and GIF-as-mp4 renditions for on-screen gallery tiles via AVPlayer, capped at 8-12 concurrent players with lifecycle handling for scroll-off, backgrounding, and memory warnings. Also fixes a rotation sizing bug for modally presented subreddit galleries.",
+          "security_implications": "(none) \u2014 media is fetched from Reddit's existing CDN URLs already used by the app, no new endpoints or credential handling introduced.",
+          "privacy_implications": "New settings are on by default, causing more media (video/GIF renditions) to be automatically fetched from Reddit's CDN while scrolling a gallery grid, even for tiles a user never taps into; this increases background network requests tied to browsing behavior, though within the app's existing trust boundary.",
+          "safety_implications": "Introduces concurrent AVPlayer instances with capped counts and explicit teardown on scroll-off/background/memory-warning/viewer-open, which mitigates memory/resource exhaustion risk but is new nontrivial state management (player pooling, AVPlayerItem status observation) that warrants scrutiny for leaks or crashes under rapid scrolling.",
+          "risk_signals": [
+            "autoplay enabled by default",
+            "new concurrent media players with caps and observers",
+            "on-screen-only playback with multiple teardown triggers (complexity increases regression risk)"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/57cb74844aeebfed5b8fd0d53e892dc2b251d621",
+          "short_sha": "57cb7484"
+        },
+        {
+          "sha": "3170062b00a7f43bd196f3b20e4426b3f03563fa",
+          "title": "Settings search: keep the navigation bar up while searching on Liquid Glass (#1156)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/settings/ApolloSettingsSearch.m"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a UI inconsistency where the Settings search field slid up and hid the title bar on Liquid Glass, unlike other search bars in the app. Sets hidesNavigationBarDuringPresentation to NO on Liquid Glass so the title stays visible; non-glass behavior is unchanged. Also adds a log line reporting which code path executed.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3170062b00a7f43bd196f3b20e4426b3f03563fa",
+          "short_sha": "3170062b"
+        },
+        {
+          "sha": "3b39438b83e30e673493f662db945793e477bf37",
+          "title": "Fix backup document ownership and confirm Files restore handoffs (#1152)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "Resources/BackupDocument/README.md",
+            "scripts/register-backup-document.py",
+            "src/ApolloQuickActions.xm",
+            "src/settings/ApolloBackupDocument.h",
+            "src/settings/ApolloBackupDocument.m",
+            "src/settings/ApolloLocalBackupsViewController.m",
+            "src/settings/CustomAPIViewController.m",
+            "tests/backup_document_tests.m",
+            "tests/run_backup_document_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "storage",
+            "ipc",
+            "permissions"
+          ],
+          "summary": "Introduces a new ApolloBackupDocument class (UIDocument subclass) to properly manage ownership/handoff of backup files exchanged via the Files app, replacing ad-hoc duplicated logic previously in the local backups and Custom API view controllers. Adds tests and documentation, and wires quick actions to confirm restore handoffs correctly.",
+          "security_implications": "Centralizes file ownership/coordination for backup documents shared via Files app, which is a reasonable place for permission/race bugs if not done carefully \u2014 worth a glance at ApolloBackupDocument.m for correct use of NSFileCoordinator/UIDocument state handling.",
+          "privacy_implications": "Backup files can contain user account/session data; ensuring correct ownership and restore handoff reduces risk of stale or leaked data during Files-based transfer, but no new data collection is introduced.",
+          "safety_implications": "Fixes an ownership/state bug in backup restore flow, which if broken previously could cause data corruption or lost backups during Files app handoffs; adds test coverage for the new document class.",
+          "risk_signals": [
+            "backup document ownership",
+            "restore handoffs",
+            "new UIDocument subclass touching persisted user backup files"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3b39438b83e30e673493f662db945793e477bf37",
+          "short_sha": "3b39438b"
+        },
+        {
+          "sha": "c959e9d333b9a8a42c5bcaa3c877287b6391352d",
+          "title": "Strip the legacy CydiaSubstrate arm64e slice under Xcode 27 lipo, and fail instead of warn (#1155)",
+          "author": "nickclyde",
+          "files_touched": [
+            "AGENTS.md",
+            "scripts/modules/strip-substrate-arm64e.sh"
+          ],
+          "kind": "build",
+          "areas": [
+            "build"
+          ],
+          "summary": "Fixes a build script bug where a newer lipo version silently failed to strip the legacy arm64e CydiaSubstrate slice, which could ship an IPA that crashes at launch on iOS 26 arm64e devices due to a dyld ABI mismatch. The script now tries multiple removal strategies and hard-fails the build if none succeed, rather than warning and continuing.",
+          "security_implications": "(none) \u2014 build tooling change only, no runtime code shipped is altered beyond correctly stripping an incompatible binary slice.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Prevents shipping an IPA that would crash at launch on arm64e devices by turning a previously silent build warning into a hard failure.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/c959e9d333b9a8a42c5bcaa3c877287b6391352d",
+          "short_sha": "c959e9d3"
+        },
+        {
+          "sha": "c1827d243644756154d20e98a5a023f5abc4560b",
+          "title": "Fix row highlight colors with softer automatic theme feedback (#1166)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/ApolloThemeCompiler.m",
+            "src/ApolloThemeIntegrations.xm",
+            "src/ApolloThemeManagerViewController.m",
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm",
+            "src/ApolloThemeShareImage.m",
+            "src/ApolloThemeTokens.h",
+            "src/ApolloThemeTokens.m"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Adjusts row highlight color tokens and theme runtime to produce softer, more subtle automatic-theme selection feedback across subreddit index and theme manager UI. Purely visual/theming change spanning several theme-related source files.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/c1827d243644756154d20e98a5a023f5abc4560b",
+          "short_sha": "c1827d24"
+        },
+        {
+          "sha": "1592152891f34fa84a4512995e19f2bed60bfd1d",
+          "title": "Fix Reborn settings text size and native theme colors (#1165)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm",
+            "src/settings/ApolloSettings.xm",
+            "src/settings/ApolloSettingsForm.m",
+            "src/settings/ApolloSettingsTableViewController.h",
+            "src/settings/ApolloSettingsTableViewController.m",
+            "src/settings/CustomAPIViewController.m",
+            "src/settings/README.md"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes text sizing and native theme color application within the Settings UI (Reborn theme), with a sizable addition to ApolloSettingsTableViewController.m to handle dynamic type/theme-aware rendering. Also tweaks CustomAPIViewController.m styling and theme runtime helper additions.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Adds nontrivial new logic (115 lines) to the settings table view controller; worth confirming no crash-prone edge cases (e.g., nil theme/dynamic type callbacks) were introduced, though nothing in the diff summary suggests risk beyond typical UI code.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1592152891f34fa84a4512995e19f2bed60bfd1d",
+          "short_sha": "15921528"
+        },
+        {
+          "sha": "cbbe62a4b499726374c49c7f26d16d89f315bbff",
+          "title": "Add Save All Media and improve media menus and downloads (#1048)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloFeedAlbumMenus.xm",
+            "src/ApolloFeedGalleryCarousel.xm",
+            "src/ApolloGIFSaveActivity.xm",
+            "src/ApolloGalleryVideoExport.h",
+            "src/ApolloGalleryVideoExport.xm",
+            "src/ApolloLinkedAlbumPostControls.xm",
+            "src/ApolloMediaDownloadActions.xm",
+            "src/ApolloNativeActionMenus.h",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloNativeActionMetadata.h",
+            "src/ApolloSaveAllMedia.h",
+            "src/ApolloSaveAllMedia.xm",
+            "src/ApolloSaveAllMediaBridge.swift",
+            "src/ApolloSaveAllMediaItems.h",
+            "src/ApolloSaveAllMediaItems.m",
+            "src/ApolloSaveAllMediaMenus.xm",
+            "tests/*"
+          ],
+          "kind": "feature",
+          "areas": [
+            "storage",
+            "ui",
+            "networking",
+            "ipc"
+          ],
+          "summary": "Adds a new 'Save All Media' feature and reworks feed/gallery/GIF media menus and video export logic, including a new Objective-C/Swift bridge for bulk media downloads. Extensive new file-writing and download-orchestration code is added, backed by a large new test suite.",
+          "security_implications": "New code downloads and writes multiple media files to local storage; no evidence of unsafe network handling but the download/export paths (Objective-C/Swift bridge) merit a look for input validation on filenames/URLs.",
+          "privacy_implications": "Feature only affects locally saved media the user already has access to within the app; no indication of new data collection or exfiltration.",
+          "safety_implications": "Large rewrite of video export and media save paths increases surface for crashes/race conditions during bulk file writes; mitigated somewhat by the accompanying test suite covering manifest, menu lifecycle, and file-save behaviors.",
+          "risk_signals": [
+            "large new file-writing surface (ApolloSaveAllMediaItems.m, 349 lines)",
+            "new Swift/ObjC bridge for saving media",
+            "bulk download/export logic rewritten"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/cbbe62a4b499726374c49c7f26d16d89f315bbff",
+          "short_sha": "cbbe62a4"
+        },
+        {
+          "sha": "b16a1cd3300322a14ac4dc53edb0e2a6556cb9a3",
+          "title": "Improve Hidden & Deleted section with a native row, combined feed, and album support (#1137)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloGalleryMenu.xm",
+            "src/ApolloHiddenContentData.h",
+            "src/ApolloHiddenContentData.m",
+            "src/ApolloHiddenContentMedia.h",
+            "src/ApolloHiddenContentMedia.m",
+            "src/ApolloHiddenContentMediaBridge.swift",
+            "src/ApolloHiddenContentMenu.xm",
+            "src/ApolloHiddenContentViewController.h",
+            "src/ApolloHiddenContentViewController.m",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloProfileMoreMenu.xm",
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "storage",
+            "ui",
+            "ipc"
+          ],
+          "summary": "Substantially rewrites the Hidden & Deleted content section, adding a native list row, a combined feed view, and album support, with a major rewrite of ApolloHiddenContentViewController.m (over 1000 lines changed) and a new data/bridge layer for hidden content items.",
+          "security_implications": "(none) \u2014 purely local UI/data-management feature, no new network endpoints or auth changes observed.",
+          "privacy_implications": "Hidden/deleted content is inherently sensitive to the user (content they chose to hide); the rewritten storage/data model (ApolloHiddenContentData.m, +101/-14) should be checked to ensure hidden-item data isn't persisted or exposed more broadly than before.",
+          "safety_implications": "Very large rewrite of a stateful view controller and its persistence layer raises risk of new bugs/crashes in list/data synchronization; no tests included for this change unlike the prior commit.",
+          "risk_signals": [
+            "1072 lines changed in a single view controller file",
+            "new persistence-layer additions in ApolloHiddenContentData.m with no accompanying tests"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b16a1cd3300322a14ac4dc53edb0e2a6556cb9a3",
+          "short_sha": "b16a1cd3"
+        },
+        {
+          "sha": "fac3c84d1668c3a525a3ab384ecdb607aabecae9",
+          "title": "Add customizable Settings tab shortcuts (#1150)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloNavigationActions.xm",
+            "src/ApolloThemeManagerIntegration.xm",
+            "src/ApolloThemeManagerViewController.m",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloSettingsForm.h",
+            "src/settings/ApolloSettingsForm.m",
+            "src/settings/ApolloSettingsRouter.m",
+            "src/settings/ApolloSettingsShortcutsViewController.h",
+            "src/settings/ApolloSettingsShortcutsViewController.m",
+            "src/settings/ApolloSettingsTabMenu.xm",
+            "src/settings/ApolloShortcutListEditing.xm",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "Adds a new settings UI allowing users to customize shortcuts shown in a settings tab, including a new shortcuts view controller and list-editing UI, with a new UserDefaults key for storing the configuration.",
+          "security_implications": "(none) \u2014 local settings/UI feature only.",
+          "privacy_implications": "Stores user's shortcut preference locally via UserDefaults; no new data collection beyond user-chosen UI configuration.",
+          "safety_implications": "Moderate new UI code (list editing, drag/reorder likely) could introduce crashes in edge cases (e.g., empty lists), but scope is limited to settings screen.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fac3c84d1668c3a525a3ab384ecdb607aabecae9",
+          "short_sha": "fac3c84d"
+        },
+        {
+          "sha": "4b829d8c0cbd5249f497691ee1631cb3d083809e",
+          "title": "Fix Posts tab to scroll before navigating back (#1153)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloScrollToTop.xm",
+            "src/ApolloSearchNativeBar.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes navigation/scroll behavior so tapping the Posts tab scrolls to top before navigating back, moving logic out of ApolloSearchNativeBar.xm and consolidating it in ApolloScrollToTop.xm.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Minor UI-behavior fix touching navigation/scroll handling; low risk of introducing crashes given small, self-contained diff.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/4b829d8c0cbd5249f497691ee1631cb3d083809e",
+          "short_sha": "4b829d8c"
+        },
+        {
+          "sha": "e834504b6f72fde8807cc33a0eb5de71ca5e8ea8",
+          "title": "Fix live-comment pagination and local-media Safari crashes (#1171)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloLiveCommentsFollow.xm",
+            "src/ApolloShareAsImageLink.xm",
+            "src/ApolloSwiftIvarBridge.swift"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "ui",
+            "ipc"
+          ],
+          "safety_implications": "Directly addresses crash bugs in live-comment pagination and a local-media/Safari share flow, and adds bridging code between Swift and Objective-C ivars \u2014 improves stability but any bridge changes to memory/ivar access warrant a sanity check for correctness.",
+          "summary": "Fixes a pagination bug in live comments and crashes occurring when sharing/viewing local media via Safari, adding a small Swift-ObjC ivar bridge to support the fix.",
+          "security_implications": "(none) \u2014 no new network endpoints, auth, or crypto touched; changes are bug fixes to existing local UI/data flows.",
+          "privacy_implications": "(none) \u2014 no new data collection or persistence introduced.",
+          "risk_signals": [
+            "new Swift/ObjC ivar bridge code (ApolloSwiftIvarBridge.swift) touching low-level interop"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/e834504b6f72fde8807cc33a0eb5de71ca5e8ea8",
+          "short_sha": "e834504b"
+        },
+        {
+          "sha": "2c1289e062e954757d87239793c9615c9beaaa8b",
+          "title": "Fix and polish subreddit list editing (#1174)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloFollowingSection.h",
+            "src/ApolloFollowingSection.xm",
+            "src/ApolloHideModSubreddits.xm",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/ApolloSubredditListEditing.xm",
+            "src/ApolloThemeRuntime.h",
+            "src/ApolloThemeRuntime.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "Adds a new ApolloSubredditListEditing.xm module and significantly expands hide-mod-subreddits and following-section logic to fix bugs and polish the subreddit list editing UI/UX. Also adds minor theme runtime helper additions used by the new editing flow.",
+          "security_implications": "(none)",
+          "privacy_implications": "No new data collection; only local list/preference state for followed/hidden subreddits is affected.",
+          "safety_implications": "Large new code path manipulating locally persisted subreddit list state (follow/hide) could introduce state-corruption or crash bugs if edge cases in list editing aren't handled, but this is standard UI feature work.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2c1289e062e954757d87239793c9615c9beaaa8b",
+          "short_sha": "2c1289e0"
+        },
+        {
+          "sha": "e0029d0f2851441053ce08bb06fd16e47b9d4a25",
+          "title": "Fix downward movement during comment collapse (#1180)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloCommentsCollapse.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a visual bug where the comment list would move downward unexpectedly when collapsing a comment thread. Purely a UI/animation correction.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/e0029d0f2851441053ce08bb06fd16e47b9d4a25",
+          "short_sha": "e0029d0f"
+        },
+        {
+          "sha": "4fd616d60d5206f30583ee7631503b00c85441ec",
+          "title": "Fix composer GIF overlap and keyboard toolbar positioning (#1164)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloMarkdownToolbarGif.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a UI layout bug where the GIF picker overlapped content and the keyboard toolbar was mispositioned in the markdown composer. Purely visual/layout fix.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/4fd616d60d5206f30583ee7631503b00c85441ec",
+          "short_sha": "4fd616d6"
+        },
+        {
+          "sha": "fc6cba422ff32907e5d0f78bb73d6da3fcaf46fb",
+          "title": "Remove duplicate subreddit theme background function (#1187)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloThemeRuntime.xm"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Removes a duplicated implementation of a subreddit theme background function, cleaning up redundant code introduced by earlier theming work. No behavior change intended beyond deduplication.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Removing a duplicate function definition reduces risk of divergent/conflicting behavior between two copies, a minor safety improvement.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fc6cba422ff32907e5d0f78bb73d6da3fcaf46fb",
+          "short_sha": "fc6cba42"
+        },
+        {
+          "sha": "0c91b1613a7a495e77cef1cb93123439f7804229",
+          "title": "Inbox: tell Reddit through the signed-in account when a tapped chat mirror is read (#1141)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloChatsFilter.xm",
+            "src/ApolloSimDebugTap.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "Fixes a bug where tapping a chat-mirror row in the native inbox marked the message read locally but failed server-side because the /api/read_message call was made through the app-only bootstrap client (RDKClient.sharedClient) instead of the signed-in user's client, causing Reddit to reject it with 'Authentication required'. The fix resolves the client via AccountManager's selected account (ApolloActiveAccountClient()), matching the existing Mark Read swipe action, and logs completion so failures are visible instead of silent; it also adds simulator-only debug-tap commands ('chatread'/'chatunread') to test read/unread toggling via either client.",
+          "security_implications": "Switches an authenticated write API call to use the correct per-user credentialed client rather than an unauthenticated/app-only client, which is a correctness fix rather than a privilege expansion, but changes which credentials are used for a network request and is worth a human glance.",
+          "privacy_implications": "Adds debug logging of read-mark completion status (success/failure), not message content, and adds sim-only debug probes that manipulate message read state for testing.",
+          "safety_implications": "Failure to mark messages read server-side previously caused silent, confusing state desync (message reappearing as unread); this fix adds logging to surface failures instead of failing silently.",
+          "risk_signals": [
+            "Authentication required error previously swallowed silently",
+            "auth client selection changed for a network write endpoint",
+            "debug-tap probes added (stated sim-only, should be verified as build-gated)"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0c91b1613a7a495e77cef1cb93123439f7804229",
+          "short_sha": "0c91b161"
+        },
+        {
+          "sha": "0e7c16414cd31ff9805b0f194a6e62f8a1be73b0",
+          "title": "Fix comment age overflow with long usernames (#1162)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloCommentHeaderLayout.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Adds a new layout file to fix a text overflow bug where long usernames pushed the comment age/timestamp label out of the visible header. Purely a UI rendering fix for comment headers.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none) \u2014 layout-only change, no crash-prone logic altered.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0e7c16414cd31ff9805b0f194a6e62f8a1be73b0",
+          "short_sha": "0e7c1641"
+        },
+        {
+          "sha": "5988ae234464c97abd81ac46411622c2f2b653cf",
+          "title": "Fix Feed search: leave a scrolled-away glass search bar alone; keep the field clear of the Hard header edge (#1146)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloCommentsCollapse.xm",
+            "src/ApolloFindInCommentsGlass.h",
+            "src/ApolloFindInCommentsGlass.xm",
+            "src/ApolloInterruptibleNavTransition.xm",
+            "src/ApolloLiquidGlass.xm",
+            "src/ApolloRecentlyRead.xm",
+            "src/ApolloScrollEdgeEffect.xm",
+            "src/ApolloScrollToTop.xm",
+            "src/ApolloSearchNativeBar.h",
+            "src/ApolloSearchNativeBar.xm",
+            "src/ApolloSimDebugTap.xm",
+            "src/ApolloState.h",
+            "src/ApolloThemeGalleryViewController.m",
+            "src/ApolloThemeRuntime.xm",
+            "src/GiphyPickerViewController.m",
+            "src/settings/ApolloAISettingsViewController.m",
+            "src/settings/ApolloSettingsSearch.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Large fix (1100+ lines) addressing a scroll/animation interaction bug where the native Liquid Glass search bar would unexpectedly re-expand after being scrolled away or after collapsing a comment thread; also fixes search field positioning under a header style. Introduces new gating logic (arm/disarm flags) tied to specific scroll/navigation events and adds a sim debug tap helper.",
+          "security_implications": "(none) \u2014 no network, auth, or data-handling code touched.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Reworks scroll-animation state machine and waits out running animations to avoid re-triggering reveal logic; incorrect gating could reintroduce UI glitches or stuck animations but no memory-safety or crash risk evident from the diff description.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/5988ae234464c97abd81ac46411622c2f2b653cf",
+          "short_sha": "5988ae23"
+        },
+        {
+          "sha": "32831c857d69ab1f1e371890e9044eb774b0c7cd",
+          "title": "Reborn settings: the form owns its footer heights (no stalled scrolls, no footer text over the rows above), and the hub stays still on swipe-back (#1170)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/settings/ApolloProfileLayoutViewController.m",
+            "src/settings/ApolloSettingsForm.m",
+            "src/settings/CustomAPIViewController.m",
+            "src/settings/README.md"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes an unbounded re-measurement loop in the settings table footer logic that could run thousands of layout passes in seconds and stall scrolling; also fixes footer text visually overlapping rows and unwanted section reloads during swipe-back navigation. Bounds the retry logic to a fixed number of states per section.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Fixes a real hang/performance bug (2,293 layout passes observed in ~10 seconds) by bounding retry logic \u2014 a meaningful stability improvement for the settings UI.",
+          "risk_signals": [
+            "unbounded re-measure loop observed running 2,293 times before fix"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/32831c857d69ab1f1e371890e9044eb774b0c7cd",
+          "short_sha": "32831c85"
+        },
+        {
+          "sha": "2cb07904bd6cf472d2effac59454d86cc70e0049",
+          "title": "Add IllIIllIllIllII's Buy Me a Coffee link (#1192)",
+          "author": "icpryde",
+          "files_touched": [
+            "README.md",
+            "contributors.json"
+          ],
+          "kind": "docs",
+          "areas": [
+            "docs"
+          ],
+          "summary": "Adds a contributor's donation link to the README and contributors metadata file. Purely documentation/metadata change.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2cb07904bd6cf472d2effac59454d86cc70e0049",
+          "short_sha": "2cb07904"
+        },
+        {
+          "sha": "87c7d35f8b03ece12600a42cb83fb80d5bb5a40d",
+          "title": "Fix gallery counter layout on iPhone 18 Pro models (#1189)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Small fix adjusting gallery image counter layout to account for iPhone 18 Pro screen dimensions/notch geometry. Purely cosmetic device-specific UI adjustment.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/87c7d35f8b03ece12600a42cb83fb80d5bb5a40d",
+          "short_sha": "87c7d35f"
+        },
+        {
+          "sha": "487c6bd985969c664f42ed26512153fec5438947",
+          "title": "Improve immersive profile headers (#1186)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloImmersiveHeaderBackground.h",
+            "src/ApolloImmersiveHeaderBackground.m",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloProfileBannerURL.h",
+            "src/ApolloScrollEdgeEffect.xm",
+            "src/ApolloState.h",
+            "src/ApolloUserAvatars.xm",
+            "src/ApolloUserProfileCache.m",
+            "src/settings/ApolloProfileLayoutViewController.m",
+            "tests/profile_banner_url_tests.m",
+            "tests/run_profile_banner_tests.sh"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "networking",
+            "storage"
+          ],
+          "summary": "Reworks profile header UI with immersive banner artwork, theme-aware fades, and native glass stat cards. Adds a new profile banner URL parsing/retry helper, banner-image viewing, and 'native save feedback' (likely saving images to the photo library), plus cache changes for profile data.",
+          "security_implications": "(none) \u2014 no new auth/crypto/endpoint handling, banner URLs are parsed/retried but sourced from existing Reddit API responses.",
+          "privacy_implications": "Profile banner images are fetched and cached (ApolloUserProfileCache changes) and can now be saved locally by the user; no new external destinations or identifiers appear to be introduced.",
+          "safety_implications": "Adds retry logic for image loading and cache rewrites, which could affect stability if retry loops or cache invalidation are mishandled; includes new unit tests mitigating regression risk.",
+          "risk_signals": [
+            "new ApolloProfileBannerURL.h URL-parameter handling",
+            "'native save feedback' implies photo library write access",
+            "cache rewrite in ApolloUserProfileCache.m"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/487c6bd985969c664f42ed26512153fec5438947",
+          "short_sha": "487c6bd9"
+        },
+        {
+          "sha": "70f56b179cf46aa66d07f92c405f02b0c6242fd8",
+          "title": "Fix Search tab keyboard reactivation (#1190)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloSearchTabFixes.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a bug where the keyboard failed to reactivate properly on the Search tab. Purely a UI interaction fix confined to a single existing fixes file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Minor UI state-handling change; low risk of crashes given the small, targeted scope.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/70f56b179cf46aa66d07f92c405f02b0c6242fd8",
+          "short_sha": "70f56b17"
+        },
+        {
+          "sha": "1194aa928a584af73ef00f10254358811864109f",
+          "title": "Add Confirm Favorite Changes toggle for the Subreddits list star (#1173)",
+          "author": "nunoo",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloFavoriteConfirm.h",
+            "src/ApolloFavoriteConfirm.xm",
+            "src/ApolloFollowingSection.h",
+            "src/ApolloFollowingSection.xm",
+            "src/ApolloState.h",
+            "src/ApolloState.m",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "storage"
+          ],
+          "summary": "Adds a new user-facing settings toggle that requires confirmation before favoriting/unfavoriting a subreddit from the list star icon. Introduces a new persisted user default and wires it into the subreddit list and settings UI.",
+          "security_implications": "(none)",
+          "privacy_implications": "Adds one new boolean preference stored in standard user defaults; no new data collection or transmission.",
+          "safety_implications": "New confirmation dialog and state hook add UI branching but no threading/persistence risk beyond a simple defaults flag.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1194aa928a584af73ef00f10254358811864109f",
+          "short_sha": "1194aa92"
+        },
+        {
+          "sha": "f0249739f9d527b5b10ec9313c9cb0084e907137",
+          "title": "Fix feed usernames drifting right after returning to the feed (#1208)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloTranslation.xm",
+            "src/ApolloUserAvatars.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a text-rewriting bug where the 'Translate Post Titles' feature incorrectly matched and mangled the byline (username/avatar row) instead of only the selftext preview, causing avatars to visually drift rightward on repeated passes. Adds node-type exclusions and avatar-slot deduplication to prevent the compounding bug.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none) \u2014 no change to what data is fetched or sent, purely a rendering/text-matching correction.",
+          "safety_implications": "Fixes a state-corruption bug (compounding rewrite on each pass) that degraded UI correctness over repeated navigations; the fix reduces a category of accumulating rendering bugs.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f0249739f9d527b5b10ec9313c9cb0084e907137",
+          "short_sha": "f0249739"
+        },
+        {
+          "sha": "db813467eaa9c45ea1cb3706a8df8b7b45ccf2c5",
+          "title": "Sim builds: install %hooks on Texture lifecycle callbacks a node inherits (#1205)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloSimTextureInit.m"
+          ],
+          "kind": "build",
+          "areas": [
+            "build",
+            "threading"
+          ],
+          "summary": "Adds a simulator-only +load hook (ApolloSimTextureInit.m) that forces ASDisplayNode's lifecycle callback stubs to be materialized before Logos hooks are installed, working around a difference between class_copyMethodList (used by the sim build's hook generator) and class_getInstanceMethod (used by Substrate on device). This only affects the simulator/test build target; device and release builds are explicitly unchanged.",
+          "security_implications": "(none) \u2014 file is only included in the simulator build target per the Makefile change, not shipped in device/release builds.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Ensures 17 existing runtime hooks (translation, link previews, flair colors, devvit posts, deleted comments UI, AI summary) actually install correctly in simulator testing, improving test fidelity for hook-dependent features; no runtime behavior change on real devices.",
+          "risk_signals": [
+            "runtime method hooking via class_addMethod / +load, but scoped to APOLLO_SIM_BUILD only"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/db813467eaa9c45ea1cb3706a8df8b7b45ccf2c5",
+          "short_sha": "db813467"
+        },
+        {
+          "sha": "831d310fcb830367c2ead5aee83c99b981308087",
+          "title": "Fix Bark icon fallback for missing assets (#1204)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "Makefile",
+            "scripts/generate-bark-icon-names.py",
+            "src/ApolloBarkIconResolver.h",
+            "src/ApolloBarkIconResolver.m",
+            "src/ApolloBarkNotifications.m",
+            "src/generated/ApolloBarkIconNames.gen.h",
+            "tests/bark_icon_resolver_tests.m",
+            "tests/run_bark_icon_resolver_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "build"
+          ],
+          "summary": "Adds a generated icon-name lookup table and resolver so Bark notification icons fall back gracefully when a subreddit icon asset is missing, instead of failing to display. Includes a build script to generate the name table and a small test suite.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Prevents a missing-asset lookup from producing a bad/empty icon reference, reducing crash or broken-UI risk in notification rendering.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/831d310fcb830367c2ead5aee83c99b981308087",
+          "short_sha": "831d310f"
+        },
+        {
+          "sha": "399634016d6558797f0c6a1adba862e13fe6e194",
+          "title": "Comments: fade a freshly posted comment into the thread, and bind its avatar before the row is measured (#1196)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloPostedCommentInsert.xm",
+            "src/ApolloUserAvatars.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Hooks the comment submit completion to switch the comments list's insert animation from a snap-in to an animated fade, and forces the new cell to lay out synchronously before its first animated frame. Also moves avatar binding earlier in the comment cell's layout pass so rows don't re-measure after the avatar loads.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touches list-adapter batch updates and main-thread synchronous layout timing; incorrect sequencing here could reintroduce race conditions or layout glitches, but change is scoped to UI animation/timing.",
+          "risk_signals": [
+            "synchronous layout in willDisplayCell",
+            "main-thread completion hook into RDKClient submit"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/399634016d6558797f0c6a1adba862e13fe6e194",
+          "short_sha": "39963401"
+        },
+        {
+          "sha": "f56ab0747915f742b83950aba1e44f7a247c6c2b",
+          "title": "Fix rich link cards overlapping post controls (#1191)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloInlineLinkPreviews.xm",
+            "tests/link_preview_overflow_manual_checklist.md",
+            "tests/link_preview_overflow_tests.mm",
+            "tests/run_link_preview_overflow_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Reworks link preview card layout/sizing logic to stop rich link cards from overlapping post action controls, with substantial new automated and manual test coverage.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Pure layout/sizing fix with no persistence or threading changes; low risk given large accompanying test suite.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f56ab0747915f742b83950aba1e44f7a247c6c2b",
+          "short_sha": "f56ab074"
+        },
+        {
+          "sha": "9346214d07547e69d71011b942a3e523775bde29",
+          "title": "Fix crash when a post's long-press preview targets an off-screen view (#1193)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloPostPreviewWindowGuard.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes a crash (NSInternalInconsistencyException) in the post long-press preview when the hit-tested cell view has no window, by remembering the interaction's original view and falling back to it via a hook on -initWithView:. This is a targeted UIKit/AsyncDisplayKit interaction fix for issue #1188.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Directly fixes a reproducible crash caused by stale cell lookups in a pending-map/off-screen scenario, improving app stability.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9346214d07547e69d71011b942a3e523775bde29",
+          "short_sha": "9346214d"
+        },
+        {
+          "sha": "ed450591312a551b44472f4897fb6d2f6ec332e4",
+          "title": "Widgets: bring back \"Copy with Account\" for the setup code (#1195)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "storage",
+            "ui"
+          ],
+          "summary": "Re-applies a previously reverted feature that lets users copy a widget setup code including a refresh token tied to their signed-in account, so Home/multireddit widgets can authenticate. It also fixes a bug where the username could be read from a different account than the token, and adds logging for why the account option is unavailable.",
+          "security_implications": "Widget setup code now bundles a refresh token onto the user's clipboard for external widget configuration; a token/name mismatch bug (token from one account paired with a different account's name) is fixed, but clipboard exposure of a refresh token remains an inherent risk of this feature.",
+          "privacy_implications": "Adds diagnostic logging around account/token availability (no-account, web-session, no-refresh-token, no-client-id, code version) explicitly designed to avoid logging the token or account name itself.",
+          "safety_implications": "Ensures token and username are sourced from the same live client to prevent an account-name/token mismatch bug.",
+          "risk_signals": [
+            "refresh token copied to clipboard",
+            "cross-account token/name mismatch bug being fixed",
+            "logging around auth state"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed450591312a551b44472f4897fb6d2f6ec332e4",
+          "short_sha": "ed450591"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 50,
+        "by_kind": {
+          "build": 4,
+          "docs": 3,
+          "feature": 12,
+          "fix": 27,
+          "config": 1,
+          "ui": 2,
+          "refactor": 1
+        },
+        "by_severity": {
+          "none": 20,
+          "low": 21,
+          "medium": 9,
+          "high": 0
+        },
+        "areas_touched": [
+          "auth",
+          "build",
+          "config",
+          "deps",
+          "docs",
+          "ipc",
+          "navigation",
+          "networking",
+          "permissions",
+          "settings",
+          "storage",
+          "threading",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "59a2f01057d0568918921b047c61861eb522c2e4",
+            "title": "Add Automatic Backups option for Reborn Settings (#1060)",
+            "author": "IllIIllIllIllII",
+            "files_touched": [
+              ".github/workflows/build-ipa.yml",
+              "Makefile",
+              "patch.sh",
+              "src/ApolloState.h",
+              "src/ApolloState.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h",
+              "src/settings/ApolloAutomaticBackup.h",
+              "src/settings/ApolloAutomaticBackup.m",
+              "src/settings/ApolloAutomaticBackupViewController.h",
+              "src/settings/ApolloAutomaticBackupViewController.m",
+              "src/settings/ApolloBackupActionsCell.h",
+              "src/settings/ApolloBackupActionsCell.m",
+              "src/settings/ApolloBackupRestore.h",
+              "src/settings/ApolloBackupRestore.m",
+              "src/settings/ApolloLocalBackupsViewController.h",
+              "src/settings/ApolloLocalBackupsViewController.m",
+              "src/settings/ApolloSettingsForm.h",
+              "src/settings/ApolloSettingsForm.m",
+              "src/settings/ApolloSettingsRouter.m",
+              "src/settings/CustomAPIViewController.m"
+            ],
+            "kind": "feature",
+            "areas": [
+              "storage",
+              "auth",
+              "ui",
+              "permissions",
+              "build"
+            ],
+            "summary": "Adds a large new automatic/manual settings-backup system that writes archives to a user-chosen Files folder, including 'credential capture and replay with rollback on failure' during restore, archive validation before mutating live settings, and new UI (folder browser, backup list, actions cell). Also adds in-place document support and enables Liquid Glass IPA builds by default.",
+            "security_implications": "Backup/restore flow captures and replays credentials and parses/validates external archive files before applying them, which is a meaningful attack surface (malformed/malicious backup archives, credential handling) that should be scrutinized for injection/validation gaps.",
+            "privacy_implications": "Settings backups (potentially including account credentials) are persisted to a user-selected Files location, which could be an iCloud Drive or other synced folder, increasing exposure of sensitive data outside the device sandbox if not explicitly flagged to the user.",
+            "safety_implications": "Introduces new file I/O, scheduled/background backup jobs, and restore-time state mutation with rollback logic; bugs here risk data loss/corruption of user settings or partial/failed restores.",
+            "risk_signals": [
+              "credential capture and credential replay with rollback on failure",
+              "validate restore archives before mutation",
+              "backup access and ownership state private to the installation",
+              "Files folder destination for automatic backups",
+              "enable in-place document support"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/59a2f01057d0568918921b047c61861eb522c2e4",
+            "short_sha": "59a2f010"
+          },
+          {
+            "sha": "d995b12ba1451d34c06494e33cbd3600dcdc46fc",
+            "title": "Redesign Account Switcher + bug/crash fixes (#1077)",
+            "author": "IllIIllIllIllII",
+            "files_touched": [
+              "docs/account-switch-crash-investigation.md",
+              "src/ApolloAccountSwitcherViewController.xm",
+              "src/ApolloMetaFeedRowRecovery.h",
+              "src/ApolloSubredditIndexPolish.xm",
+              "src/ApolloWebSessionLoginViewController.m",
+              "tests/meta_feed_recovery_tests.m",
+              "tests/run_meta_feed_recovery_tests.sh"
+            ],
+            "kind": "feature",
+            "areas": [
+              "ui",
+              "auth",
+              "storage",
+              "threading"
+            ],
+            "summary": "Large redesign (~900 line rewrite) of the account switcher UI, including avatar styling, swipe-to-dismiss, credential editor theming, and a new feed-row recovery mechanism after account changes; also modifies the web session login view controller (login/credential flow) with 38 new lines. Includes new tests and a docs file documenting a prior crash investigation.",
+            "security_implications": "Touches the account switching and web session login view controller, which handle account credentials/session tokens; a bug here could mis-associate a session with the wrong account or leak login UI state between accounts, though no obvious credential mishandling is described.",
+            "privacy_implications": "Account switcher changes affect which account's data (avatar, feed rows) is displayed/recovered after switching, so a regression could theoretically show one user's cached content under another account context; feed-row recovery logic should be verified not to leak stale/other-account data.",
+            "safety_implications": "Explicitly addresses crash fixes and stale-row recovery after account changes, indicating prior instability in this code path; large diff size increases regression risk despite added tests.",
+            "risk_signals": [
+              "credential editor",
+              "stale feed rows after account changes",
+              "crash-investigation doc referenced"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/d995b12ba1451d34c06494e33cbd3600dcdc46fc",
+            "short_sha": "d995b12b"
+          },
+          {
+            "sha": "9502438fdb7000cc6afac40d8ac011888fa78d49",
+            "title": "Listings: surface a non-dictionary JSON body as an error instead of crashing RedditKit (#1135) (#1147)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/ApolloWebJSONIdentity.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "networking",
+              "storage"
+            ],
+            "summary": "Fixes a launch crash-loop caused by RedditKit assuming API JSON responses are always dictionaries; a non-dictionary root (array/string/number/null) from Reddit's API triggered an uncaught NSInvalidArgumentException. The serializer now validates root type for listing endpoints and returns a proper error instead of crashing, logging the unexpected shape.",
+            "security_implications": "Hardens JSON response handling against unexpected/malformed server responses, reducing the attack surface for crafted or malformed API payloads (defensive input validation on untrusted network data).",
+            "privacy_implications": "Adds logging of unexpected JSON body 'shape' on parse failure; should be checked that this log doesn't include sensitive response content.",
+            "safety_implications": "Directly fixes a reproducible crash (launch crash loop) by adding a type check before dictionary subscripting on network response data.",
+            "risk_signals": [
+              "logs the shape of unexpected JSON responses"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9502438fdb7000cc6afac40d8ac011888fa78d49",
+            "short_sha": "9502438f"
+          },
+          {
+            "sha": "a3c71c47e0100e109efc6a77c4be8396318d0a52",
+            "title": "Fix non-glass search Cancel stack overflow (feed offset pin below UIKit's floor) (#1133)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloSearchInPlace.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "ui",
+              "threading"
+            ],
+            "summary": "Fixes a SIGSEGV caused by an infinite feedback loop between a search-dismiss scroll-offset pin and UIKit's own clamping logic, which recursed until the main thread's stack was exhausted (475+ nested frames). The fix floors the pin's target offset at UIKit's own minimum and adds a bounded loop-breaker as a safety net.",
+            "security_implications": "(none)",
+            "privacy_implications": "(none)",
+            "safety_implications": "Eliminates an unbounded recursive UI layout loop causing a stack-overflow crash; adds a bounded 'clamp-fight breaker' as defense-in-depth against similar future mismatches.",
+            "risk_signals": [
+              "unbounded recursion / stack overflow crash prior to fix",
+              "adds a bounded loop-breaker as safety net (implies residual uncertainty about full root cause)"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a3c71c47e0100e109efc6a77c4be8396318d0a52",
+            "short_sha": "a3c71c47"
+          },
+          {
+            "sha": "3b39438b83e30e673493f662db945793e477bf37",
+            "title": "Fix backup document ownership and confirm Files restore handoffs (#1152)",
+            "author": "IllIIllIllIllII",
+            "files_touched": [
+              "Makefile",
+              "Resources/BackupDocument/README.md",
+              "scripts/register-backup-document.py",
+              "src/ApolloQuickActions.xm",
+              "src/settings/ApolloBackupDocument.h",
+              "src/settings/ApolloBackupDocument.m",
+              "src/settings/ApolloLocalBackupsViewController.m",
+              "src/settings/CustomAPIViewController.m",
+              "tests/backup_document_tests.m",
+              "tests/run_backup_document_tests.sh"
+            ],
+            "kind": "fix",
+            "areas": [
+              "storage",
+              "ipc",
+              "permissions"
+            ],
+            "summary": "Introduces a new ApolloBackupDocument class (UIDocument subclass) to properly manage ownership/handoff of backup files exchanged via the Files app, replacing ad-hoc duplicated logic previously in the local backups and Custom API view controllers. Adds tests and documentation, and wires quick actions to confirm restore handoffs correctly.",
+            "security_implications": "Centralizes file ownership/coordination for backup documents shared via Files app, which is a reasonable place for permission/race bugs if not done carefully \u2014 worth a glance at ApolloBackupDocument.m for correct use of NSFileCoordinator/UIDocument state handling.",
+            "privacy_implications": "Backup files can contain user account/session data; ensuring correct ownership and restore handoff reduces risk of stale or leaked data during Files-based transfer, but no new data collection is introduced.",
+            "safety_implications": "Fixes an ownership/state bug in backup restore flow, which if broken previously could cause data corruption or lost backups during Files app handoffs; adds test coverage for the new document class.",
+            "risk_signals": [
+              "backup document ownership",
+              "restore handoffs",
+              "new UIDocument subclass touching persisted user backup files"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3b39438b83e30e673493f662db945793e477bf37",
+            "short_sha": "3b39438b"
+          },
+          {
+            "sha": "cbbe62a4b499726374c49c7f26d16d89f315bbff",
+            "title": "Add Save All Media and improve media menus and downloads (#1048)",
+            "author": "IllIIllIllIllII",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloFeedAlbumMenus.xm",
+              "src/ApolloFeedGalleryCarousel.xm",
+              "src/ApolloGIFSaveActivity.xm",
+              "src/ApolloGalleryVideoExport.h",
+              "src/ApolloGalleryVideoExport.xm",
+              "src/ApolloLinkedAlbumPostControls.xm",
+              "src/ApolloMediaDownloadActions.xm",
+              "src/ApolloNativeActionMenus.h",
+              "src/ApolloNativeActionMenus.xm",
+              "src/ApolloNativeActionMetadata.h",
+              "src/ApolloSaveAllMedia.h",
+              "src/ApolloSaveAllMedia.xm",
+              "src/ApolloSaveAllMediaBridge.swift",
+              "src/ApolloSaveAllMediaItems.h",
+              "src/ApolloSaveAllMediaItems.m",
+              "src/ApolloSaveAllMediaMenus.xm",
+              "tests/*"
+            ],
+            "kind": "feature",
+            "areas": [
+              "storage",
+              "ui",
+              "networking",
+              "ipc"
+            ],
+            "summary": "Adds a new 'Save All Media' feature and reworks feed/gallery/GIF media menus and video export logic, including a new Objective-C/Swift bridge for bulk media downloads. Extensive new file-writing and download-orchestration code is added, backed by a large new test suite.",
+            "security_implications": "New code downloads and writes multiple media files to local storage; no evidence of unsafe network handling but the download/export paths (Objective-C/Swift bridge) merit a look for input validation on filenames/URLs.",
+            "privacy_implications": "Feature only affects locally saved media the user already has access to within the app; no indication of new data collection or exfiltration.",
+            "safety_implications": "Large rewrite of video export and media save paths increases surface for crashes/race conditions during bulk file writes; mitigated somewhat by the accompanying test suite covering manifest, menu lifecycle, and file-save behaviors.",
+            "risk_signals": [
+              "large new file-writing surface (ApolloSaveAllMediaItems.m, 349 lines)",
+              "new Swift/ObjC bridge for saving media",
+              "bulk download/export logic rewritten"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/cbbe62a4b499726374c49c7f26d16d89f315bbff",
+            "short_sha": "cbbe62a4"
+          },
+          {
+            "sha": "b16a1cd3300322a14ac4dc53edb0e2a6556cb9a3",
+            "title": "Improve Hidden & Deleted section with a native row, combined feed, and album support (#1137)",
+            "author": "IllIIllIllIllII",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloGalleryMenu.xm",
+              "src/ApolloHiddenContentData.h",
+              "src/ApolloHiddenContentData.m",
+              "src/ApolloHiddenContentMedia.h",
+              "src/ApolloHiddenContentMedia.m",
+              "src/ApolloHiddenContentMediaBridge.swift",
+              "src/ApolloHiddenContentMenu.xm",
+              "src/ApolloHiddenContentViewController.h",
+              "src/ApolloHiddenContentViewController.m",
+              "src/ApolloLiquidGlass.xm",
+              "src/ApolloProfileMoreMenu.xm",
+              "src/ApolloThemeRuntime.h",
+              "src/ApolloThemeRuntime.xm"
+            ],
+            "kind": "feature",
+            "areas": [
+              "storage",
+              "ui",
+              "ipc"
+            ],
+            "summary": "Substantially rewrites the Hidden & Deleted content section, adding a native list row, a combined feed view, and album support, with a major rewrite of ApolloHiddenContentViewController.m (over 1000 lines changed) and a new data/bridge layer for hidden content items.",
+            "security_implications": "(none) \u2014 purely local UI/data-management feature, no new network endpoints or auth changes observed.",
+            "privacy_implications": "Hidden/deleted content is inherently sensitive to the user (content they chose to hide); the rewritten storage/data model (ApolloHiddenContentData.m, +101/-14) should be checked to ensure hidden-item data isn't persisted or exposed more broadly than before.",
+            "safety_implications": "Very large rewrite of a stateful view controller and its persistence layer raises risk of new bugs/crashes in list/data synchronization; no tests included for this change unlike the prior commit.",
+            "risk_signals": [
+              "1072 lines changed in a single view controller file",
+              "new persistence-layer additions in ApolloHiddenContentData.m with no accompanying tests"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b16a1cd3300322a14ac4dc53edb0e2a6556cb9a3",
+            "short_sha": "b16a1cd3"
+          },
+          {
+            "sha": "0c91b1613a7a495e77cef1cb93123439f7804229",
+            "title": "Inbox: tell Reddit through the signed-in account when a tapped chat mirror is read (#1141)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloChatsFilter.xm",
+              "src/ApolloSimDebugTap.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "Fixes a bug where tapping a chat-mirror row in the native inbox marked the message read locally but failed server-side because the /api/read_message call was made through the app-only bootstrap client (RDKClient.sharedClient) instead of the signed-in user's client, causing Reddit to reject it with 'Authentication required'. The fix resolves the client via AccountManager's selected account (ApolloActiveAccountClient()), matching the existing Mark Read swipe action, and logs completion so failures are visible instead of silent; it also adds simulator-only debug-tap commands ('chatread'/'chatunread') to test read/unread toggling via either client.",
+            "security_implications": "Switches an authenticated write API call to use the correct per-user credentialed client rather than an unauthenticated/app-only client, which is a correctness fix rather than a privilege expansion, but changes which credentials are used for a network request and is worth a human glance.",
+            "privacy_implications": "Adds debug logging of read-mark completion status (success/failure), not message content, and adds sim-only debug probes that manipulate message read state for testing.",
+            "safety_implications": "Failure to mark messages read server-side previously caused silent, confusing state desync (message reappearing as unread); this fix adds logging to surface failures instead of failing silently.",
+            "risk_signals": [
+              "Authentication required error previously swallowed silently",
+              "auth client selection changed for a network write endpoint",
+              "debug-tap probes added (stated sim-only, should be verified as build-gated)"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0c91b1613a7a495e77cef1cb93123439f7804229",
+            "short_sha": "0c91b161"
+          },
+          {
+            "sha": "ed450591312a551b44472f4897fb6d2f6ec332e4",
+            "title": "Widgets: bring back \"Copy with Account\" for the setup code (#1195)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/settings/CustomAPIViewController.m"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "storage",
+              "ui"
+            ],
+            "summary": "Re-applies a previously reverted feature that lets users copy a widget setup code including a refresh token tied to their signed-in account, so Home/multireddit widgets can authenticate. It also fixes a bug where the username could be read from a different account than the token, and adds logging for why the account option is unavailable.",
+            "security_implications": "Widget setup code now bundles a refresh token onto the user's clipboard for external widget configuration; a token/name mismatch bug (token from one account paired with a different account's name) is fixed, but clipboard exposure of a refresh token remains an inherent risk of this feature.",
+            "privacy_implications": "Adds diagnostic logging around account/token availability (no-account, web-session, no-refresh-token, no-client-id, code version) explicitly designed to avoid logging the token or account name itself.",
+            "safety_implications": "Ensures token and username are sourced from the same live client to prevent an account-name/token mismatch bug.",
+            "risk_signals": [
+              "refresh token copied to clipboard",
+              "cross-account token/name mismatch bug being fixed",
+              "logging around auth state"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed450591312a551b44472f4897fb6d2f6ec332e4",
+            "short_sha": "ed450591"
+          }
+        ]
+      },
+      "hard_flag": false,
+      "summary": "50 commits reviewed. severity: 0H 9M 21L 20none. areas: auth, build, config, deps, docs, ipc"
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmphpd27aaj/new/Apollo",
+      "baseline_path": null,
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 71,
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.apple.com",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
+      "removed": [],
+      "added_unallowlisted": [
+        "www.apple.com"
+      ],
+      "hard_flag": false,
+      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_3.8.0",
+  "baseline": "v1.15.11_3.7.1"
+}
