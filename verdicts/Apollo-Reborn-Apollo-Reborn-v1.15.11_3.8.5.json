@@ -1,0 +1,1975 @@
+{
+  "verdict": {
+    "verdict": "review",
+    "score": 7,
+    "headline": "Apollo-Reborn v3.8.5 adds Google Search (Google-scraping web views) plus many auth, RedGIFs and perf fixes; review the new networking and auth paths",
+    "release_summary": "v1.15.11_3.8.5 is a 51-commit release from 7 existing contributors, with no new authors (36 by icpryde). Headline feature is a Google mode in the Search tab (ed33135d, #1260, credited in the release notes). It loads google.com results in hidden web views, scrapes them with injected JavaScript, and resolves redirect links with Google cookies. Search queries and typing suggestions now go to a third party, and the mode choice is persisted. This is a real privacy and attack-surface expansion, but it is disclosed in the notes and is user-initiated.\n\nThe rest is mostly fixes and hardening. Auth-related changes include per-account bearer token scoping (29ce2720), Add Account using the default API key (68e8f671), clearer OAuth rejection messaging (3df6e98d), and backup restore that ignores out-of-namespace keychain rows (27f46a71). Networking changes include RedGIFs token re-minting and mp4 header duration parsing, comment-failure diagnosis, and avatar rate-limit batching, all aimed at Reddit or RedGIFs hosts. A crash fix (ed2d81e3) rebinds swift_beginAccess/dispatch_sync globally via fishhook, which is fragile but not malicious. The large perf port (9c8d998b) changes ApolloUsageHeartbeat.m, which is worth checking. The URL inventory shows no removed hosts and only www.apple.com off the allowlist. The 71 hosts are all 'added' because there is no baseline, so this is not a real signal. No secrets, obfuscation, or unexplained hosts were seen.",
+    "top_changes_to_review": [
+      "ed33135d by icpryde: Google search in Search tab (~3.7k lines) with hidden web view JS scraping and cookie-based redirect resolution \u2014 verify only google.com is contacted, the injected JS is inert, and no Reddit credentials reach Google.",
+      "9c8d998b by icpryde: perf port that also modifies ApolloUsageHeartbeat.m (+53/-9) \u2014 confirm no change to what telemetry is sent or where.",
+      "29ce2720 and 68e8f671 by icpryde: bearer token and API-key scoping for account and Add Account flows \u2014 verify tokens are not sent to the wrong account or host.",
+      "3387a24a by icpryde: mp4 mvhd atom parser rewriting RedGIFs JSON \u2014 check bounds checks on untrusted bytes.",
+      "f05b95f5 by icpryde: non-http(s) URLs from recovered comments are forwarded to the system opener \u2014 consider whether arbitrary schemes are acceptable."
+    ],
+    "anomalies": [
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "New Google search mode uses hidden web views with JS scraping and Google cookies; queries and suggestions go to Google, with no setting to disable it",
+        "why_it_matters": "It adds a third-party data flow and a larger attack surface, though it is disclosed and user-initiated."
+      },
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "ApolloUsageHeartbeat.m modified in the bundled perf commit 9c8d998b without explanation",
+        "why_it_matters": "Telemetry behavior changes should be confirmed as benign."
+      },
+      {
+        "severity": "medium",
+        "module": "code_review",
+        "what": "Multiple auth and token handling changes (bearer scoping, OAuth client key selection, RedGIFs token substitution)",
+        "why_it_matters": "Errors in credential scoping could leak or misbind tokens."
+      },
+      {
+        "severity": "low",
+        "module": "url_inventory",
+        "what": "www.apple.com not on allowlist; the other hosts show as added only because there is no baseline",
+        "why_it_matters": "Likely a benign link, but confirm."
+      },
+      {
+        "severity": "low",
+        "module": "code_review",
+        "what": "Global fishhook rebinding of dispatch_sync and Swift access functions (ed2d81e3)",
+        "why_it_matters": "Fragile runtime patching that risks deadlocks, not a malicious pattern."
+      }
+    ],
+    "decision_inputs": [
+      "Read ed33135d and confirm the Google search code only contacts google.com and reddit.com hosts",
+      "Diff ApolloUsageHeartbeat.m in 9c8d998b at github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.8.0...v1.15.11_3.8.5",
+      "Check the www.apple.com reference to confirm it is a benign link",
+      "Review token handling in 29ce2720 (ApolloActiveAccountRedditBearerToken) and 68e8f671",
+      "Confirm icpryde's history at github.com/Apollo-Reborn/Apollo-Reborn/commits?author=icpryde"
+    ],
+    "consistent_with_notes": true,
+    "reasoning": "The diff matches the release notes: Google Search, RedGIFs, auth and performance fixes are all credited and described. All contributors are existing, no secrets or obfuscation appear, and network targets are Reddit, RedGIFs, and Google. The new Google data flow, auth-path edits and the heartbeat change warrant human confirmation, so the verdict is review.",
+    "judge_source": "claude:sonnet",
+    "raw_response": "{\"verdict\":\"review\",\"score\":7,\"headline\":\"Apollo-Reborn v3.8.5 adds Google Search (Google-scraping web views) plus many auth, RedGIFs and perf fixes; review the new networking and auth paths\",\"release_summary\":\"v1.15.11_3.8.5 is a 51-commit release from 7 existing contributors, with no new authors (36 by icpryde). Headline feature is a Google mode in the Search tab (ed33135d, #1260, credited in the release notes). It loads google.com results in hidden web views, scrapes them with injected JavaScript, and resolves redirect links with Google cookies. Search queries and typing suggestions now go to a third party, and the mode choice is persisted. This is a real privacy and attack-surface expansion, but it is disclosed in the notes and is user-initiated.\\n\\nThe rest is mostly fixes and hardening. Auth-related changes include per-account bearer token scoping (29ce2720), Add Account using the default API key (68e8f671), clearer OAuth rejection messaging (3df6e98d), and backup restore that ignores out-of-namespace keychain rows (27f46a71). Networking changes include RedGIFs token re-minting and mp4 header duration parsing, comment-failure diagnosis, and avatar rate-limit batching, all aimed at Reddit or RedGIFs hosts. A crash fix (ed2d81e3) rebinds swift_beginAccess/dispatch_sync globally via fishhook, which is fragile but not malicious. The large perf port (9c8d998b) changes ApolloUsageHeartbeat.m, which is worth checking. The URL inventory shows no removed hosts and only www.apple.com off the allowlist. The 71 hosts are all 'added' because there is no baseline, so this is not a real signal. No secrets, obfuscation, or unexplained hosts were seen.\",\"top_changes_to_review\":[\"ed33135d by icpryde: Google search in Search tab (~3.7k lines) with hidden web view JS scraping and cookie-based redirect resolution \u2014 verify only google.com is contacted, the injected JS is inert, and no Reddit credentials reach Google.\",\"9c8d998b by icpryde: perf port that also modifies ApolloUsageHeartbeat.m (+53/-9) \u2014 confirm no change to what telemetry is sent or where.\",\"29ce2720 and 68e8f671 by icpryde: bearer token and API-key scoping for account and Add Account flows \u2014 verify tokens are not sent to the wrong account or host.\",\"3387a24a by icpryde: mp4 mvhd atom parser rewriting RedGIFs JSON \u2014 check bounds checks on untrusted bytes.\",\"f05b95f5 by icpryde: non-http(s) URLs from recovered comments are forwarded to the system opener \u2014 consider whether arbitrary schemes are acceptable.\"],\"anomalies\":[{\"severity\":\"medium\",\"module\":\"code_review\",\"what\":\"New Google search mode uses hidden web views with JS scraping and Google cookies; queries and suggestions go to Google, with no setting to disable it\",\"why_it_matters\":\"It adds a third-party data flow and a larger attack surface, though it is disclosed and user-initiated.\"},{\"severity\":\"medium\",\"module\":\"code_review\",\"what\":\"ApolloUsageHeartbeat.m modified in the bundled perf commit 9c8d998b without explanation\",\"why_it_matters\":\"Telemetry behavior changes should be confirmed as benign.\"},{\"severity\":\"medium\",\"module\":\"code_review\",\"what\":\"Multiple auth and token handling changes (bearer scoping, OAuth client key selection, RedGIFs token substitution)\",\"why_it_matters\":\"Errors in credential scoping could leak or misbind tokens.\"},{\"severity\":\"low\",\"module\":\"url_inventory\",\"what\":\"www.apple.com not on allowlist; the other hosts show as added only because there is no baseline\",\"why_it_matters\":\"Likely a benign link, but confirm.\"},{\"severity\":\"low\",\"module\":\"code_review\",\"what\":\"Global fishhook rebinding of dispatch_sync and Swift access functions (ed2d81e3)\",\"why_it_matters\":\"Fragile runtime patching that risks deadlocks, not a malicious pattern.\"}],\"decision_inputs\":[\"Read ed33135d and confirm the Google search code only contacts google.com and reddit.com hosts\",\"Diff ApolloUsageHeartbeat.m in 9c8d998b at github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.8.0...v1.15.11_3.8.5\",\"Check the www.apple.com ref",
+    "hard_flagged_modules": [
+      "code_review"
+    ],
+    "degraded_modules": [],
+    "links": {
+      "code_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.8.0...v1.15.11_3.8.5",
+      "release_compare_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/compare/v1.15.11_3.8.0...v1.15.11_3.8.5",
+      "release_url": "https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.8.5"
+    }
+  },
+  "findings": [
+    {
+      "module": "committer_diff",
+      "ok": true,
+      "owner": "Apollo-Reborn",
+      "repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.8.0",
+      "head_ref": "v1.15.11_3.8.5",
+      "window_commit_count": 51,
+      "window_authors": {
+        "github-actions[bot]": 1,
+        "DeltAndy123": 2,
+        "IllIIllIllIllII": 4,
+        "icpryde": 36,
+        "JeffreyCA": 1,
+        "nunoo": 1,
+        "Thetromboneman1": 6
+      },
+      "new_authors": [],
+      "existing_authors": [
+        "DeltAndy123",
+        "IllIIllIllIllII",
+        "JeffreyCA",
+        "Thetromboneman1",
+        "github-actions[bot]",
+        "icpryde",
+        "nunoo"
+      ],
+      "has_unknown_author_commits": false,
+      "hard_flag": false,
+      "summary": "51 commits by 7 authors. 0 new author(s): none. "
+    },
+    {
+      "module": "code_review",
+      "ok": true,
+      "code_owner": "Apollo-Reborn",
+      "code_repo": "Apollo-Reborn",
+      "base_ref": "v1.15.11_3.8.0",
+      "head_ref": "v1.15.11_3.8.5",
+      "llm_used": true,
+      "capped": true,
+      "reviews": [
+        {
+          "sha": "cdb6e9776c074925ff54f8161b6a6fad3a1928d3",
+          "title": "Update distribution sources for v1.15.11_3.8.0",
+          "author": "github-actions[bot]",
+          "files_touched": [
+            "apps.json",
+            "apps_glass.json",
+            "apps_glass_icons.json",
+            "apps_noext.json",
+            "apps_noext_glass.json",
+            "apps_noext_glass_icons.json",
+            "release-manifest.json"
+          ],
+          "kind": "config",
+          "areas": [
+            "build",
+            "networking",
+            "deps"
+          ],
+          "summary": "Automated bot commit updating the sideloading source JSON files and the release manifest for version v1.15.11_3.8.0. Changes are about 25 lines per source file and 29 in the manifest, and likely cover version, download URL, size, and hash/date metadata.",
+          "security_implications": "These files point users' sideloading sources to release artifacts, so the download URLs and checksums (if present) should be verified to point to the official repo release and match the built IPA.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "bot-generated distribution metadata; download URLs/hashes not visible in the diff summary"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/cdb6e9776c074925ff54f8161b6a6fad3a1928d3",
+          "short_sha": "cdb6e977"
+        },
+        {
+          "sha": "b92a722ef51c5cce4f94aaf0ecb6255bc677a6fd",
+          "title": "Move lowercase resources to uppercase Resources (#1213)",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "Makefile",
+            "Resources/ApolloRebornPreviewBanner.jpg",
+            "Resources/ApolloRebornPreviewIcon.png",
+            "Resources/reddit-alien_banned.png",
+            "Resources/screenshots/banned-profile-ui/compact-card.png",
+            "Resources/screenshots/banned-profile-ui/long-press-peek.png",
+            "Resources/screenshots/banned-profile-ui/profile-overlay.png",
+            "scripts/badgebook-assets.mjs",
+            "src/ApolloBadgeBookCatalog.m",
+            "src/ApolloVideoPlaybackSpeed.xm"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "build",
+            "ui"
+          ],
+          "summary": "Renames the resources directory to an uppercase 'Resources' and updates path references in the Makefile, an asset script, and two source files. Image files are pure renames with no content change.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Path references must match exactly on case-sensitive filesystems, otherwise assets may fail to load at runtime or build.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b92a722ef51c5cce4f94aaf0ecb6255bc677a6fd",
+          "short_sha": "b92a722e"
+        },
+        {
+          "sha": "544622a56427c386fcba3d72909b055954e7b90f",
+          "title": "Fix Settings Shortcuts Remove button (#1212)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/settings/ApolloShortcutListEditing.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes the Remove button in the Settings Shortcuts list editing UI, with a net simplification (10 additions, 21 deletions) in one hook file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Modifies UIKit list-editing hook logic; the removal of code reduces complexity, but the shortcut list mutation should be checked for index/bounds handling.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/544622a56427c386fcba3d72909b055954e7b90f",
+          "short_sha": "544622a5"
+        },
+        {
+          "sha": "2136dd6fde7fb2b05be18b2baf0e83c3c29ab8f6",
+          "title": "Bring the reply bar back after a cancelled swipe-back between message threads (#1234)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloMessagesReplyBarRestore.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "build"
+          ],
+          "summary": "Adds a new hook file that re-asserts first responder on a message thread after a cancelled interactive swipe-back, restoring the missing reply bar. It only acts on visible threads whose bar isn't docked, and the Makefile is updated to compile it.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Hooks into UIKit transition-completion callbacks; a deferred first-responder call could hit a deallocated or non-visible controller if the guards are wrong, but the visibility checks reduce that risk.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2136dd6fde7fb2b05be18b2baf0e83c3c29ab8f6",
+          "short_sha": "2136dd6f"
+        },
+        {
+          "sha": "8a124a88c7e3d257a7d4e43fc060e7befbdb6c7d",
+          "title": "Make Command-Return in the post body editors do what the Done checkmark does (#1233)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloPhotoPostComposerScrollFix.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Hooks the ComposeViewController's keyboardSubmit so Command-Return in the two post body editors runs the Done action instead of submitting or dismissing. It retitles the key command to 'Done' there, and ignores presses while the editor or post form is transitioning.",
+          "security_implications": "(none)",
+          "privacy_implications": "Prevents an unintended post submission via a keyboard shortcut, a mild improvement in avoiding accidental publishing.",
+          "safety_implications": "Modifies submit-path control flow with state guards for repeat and in-transition presses; a bug could suppress submission or double-fire, but other compose controllers are unchanged.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/8a124a88c7e3d257a7d4e43fc060e7befbdb6c7d",
+          "short_sha": "8a124a88"
+        },
+        {
+          "sha": "b42782792b843b11675528fc121e8cae61117483",
+          "title": "Keep the newest message above the reply bar in modmail and message threads on iOS 26/27 (#1228)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloMessagesKeyboardInset.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "build"
+          ],
+          "summary": "Adds a new Logos/ObjC++ tweak file that hooks the keyboard-frame handling in Apollo's message thread view controller (MessageKit). It repairs unusable keyboard frames on iOS 26/27 and re-runs Apollo's own inset calculator so the newest message is not covered by the reply bar. Makefile updated to compile the new file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Runtime swizzling of private/Swift-backed view controller internals is version-gated to iOS 26+ and only touches invalid frames, but a wrong assumption could cause layout glitches or crashes in threads.",
+          "risk_signals": [
+            "286-line new hook on private class internals",
+            "runtime method swizzling"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b42782792b843b11675528fc121e8cae61117483",
+          "short_sha": "b4278279"
+        },
+        {
+          "sha": "29ce2720099183722e505ced090183df02b84b63",
+          "title": "Keep avatar and subreddit lookups on the active account's own credential (#1227)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloBadgeBookScraper.m",
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloLinkPreviewFetcher.m",
+            "src/ApolloState.h",
+            "src/ApolloSubredditInfoCache.m",
+            "src/ApolloUserAvatars.xm",
+            "src/ApolloUserFlair.xm",
+            "src/ApolloUserProfileCache.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "networking",
+            "storage"
+          ],
+          "summary": "Introduces ApolloActiveAccountRedditBearerToken(), which returns the captured bearer token only when the active account can own it, so API-Key-Free accounts send bearer-less requests that are signed with the active web session. Also stops negative-caching 401/403 responses on about.json, instead holding lookups on the rejected credential for 60s, and re-applies profile header info when a later lookup succeeds.",
+          "security_implications": "Fixes credential mix-up where one account's OAuth bearer was used for another account's requests, and falls back to web-session signing; token handling logic changed so worth a human glance.",
+          "privacy_implications": "Prevents requests for one account from being attributed to another account (follow/subscribe state, rate limits), improving account isolation; no new data collected.",
+          "safety_implications": "Avoids caching auth failures as 'missing user' and adds a 60s hold keyed on the credential, reducing blank avatars and repeated failing requests.",
+          "risk_signals": [
+            "bearer token selection logic changed across multiple networking call sites",
+            "credential-keyed cache hold"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/29ce2720099183722e505ced090183df02b84b63",
+          "short_sha": "29ce2720"
+        },
+        {
+          "sha": "fc988b5cac48e1c714de18a8c60c6b6f93e89d8b",
+          "title": "Keep the Media body editor's Done checkmark while typing (#1226)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloPhotoPostComposerScrollFix.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Shares a tagged UINavigationItem and setter-redirect helper between the Text and Media body editors so Apollo's per-keystroke restoration of the Post item no longer replaces the Done checkmark. Adds logging for pin and first redirect per editor.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Swizzles setters on a Swift-backed compose controller; low risk, and logging is limited to pin/redirect events.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fc988b5cac48e1c714de18a8c60c6b6f93e89d8b",
+          "short_sha": "fc988b5c"
+        },
+        {
+          "sha": "f05b95f581e0f45f36ea51d6dcd7b4863c3e3714",
+          "title": "Deleted comments: fix the crash when tapping \"Translated from \u2026\" on a recovered comment (#1222)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloCommon.m",
+            "src/ApolloDeletedCommentsUI.xm",
+            "src/ApolloTranslation.h",
+            "src/ApolloTranslation.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "networking",
+            "ipc"
+          ],
+          "summary": "Recovered-comment link taps now open only http(s) URLs directly and forward other schemes (such as the apollo-translation://toggle sentinel) to the text node's delegate. ApolloPresentWebURLFromViewController now refuses to give non-http(s) URLs to the in-app browser, routing other schemes to the system and dropping scheme-less ones. Also stops a rewrite loop between translation and deleted-comment modules.",
+          "security_implications": "Adds scheme validation so only http(s) reach SFSafariViewController, but non-http(s) URLs are still passed to the system opener, which could launch other apps via arbitrary schemes from recovered comment content.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Fixes an NSInvalidArgumentException crash and removes a ~80Hz node rewrite loop, improving stability and performance.",
+          "risk_signals": [
+            "untrusted comment-derived URLs routed to system openURL for non-http schemes"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f05b95f581e0f45f36ea51d6dcd7b4863c3e3714",
+          "short_sha": "f05b95f5"
+        },
+        {
+          "sha": "c193dfad1418f7d07b3185bae32266259802d7f9",
+          "title": "Fix the post composer's Post button turning white on Liquid Glass (#1221)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloNavigationActions.xm"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Gives the composer's submit buttons an accent role in the navigation-actions module so their tint pins to the theme accent instead of neutral chrome on iOS 26 Liquid Glass. Uses a cached dynamic color provider so the existing setter guard remains a no-op.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/c193dfad1418f7d07b3185bae32266259802d7f9",
+          "short_sha": "c193dfad"
+        },
+        {
+          "sha": "a6474207e8684617e8787fa66953a27c3bd0143a",
+          "title": "Stop the Social Links WebView fallback scraping Reddit's footer (#1231)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloProfileSocialLinks.h",
+            "src/ApolloProfileSocialLinks.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "storage",
+            "ui"
+          ],
+          "summary": "Restricts the hidden-WebView fallback's injected JS to read only faceplate-tracker social_link markers, removing the page-wide anchor scraping that picked up Reddit's footer links. Footer/legal domains are filtered at the JSON-to-link chokepoint, the disk cache is bumped to v2 (v1 entries ignored and refetched), and the producing path is logged. Adds a simulator-only APOLLO_SL_FORCE_WEB_FALLBACK env switch.",
+          "security_implications": "Narrowing the JS extraction of untrusted page content and filtering domains reduces the chance of surfacing unintended links; the cache version bump discards potentially tainted entries.",
+          "privacy_implications": "Logs now include which path produced results and what the band will show (may include usernames/link URLs in logs); no new network endpoints or identifiers.",
+          "safety_implications": "Cache invalidation forces one-time refetch of entries; low crash risk.",
+          "risk_signals": [
+            "APOLLO_SL_FORCE_WEB_FALLBACK env flag (sim-only)",
+            "expanded logging of link results"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/a6474207e8684617e8787fa66953a27c3bd0143a",
+          "short_sha": "a6474207"
+        },
+        {
+          "sha": "344823bf26e85a5e90e8eb29a5ae26d744b8e358",
+          "title": "Clean up Download Video copies Apollo leaves in tmp (#1219)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloMedia.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "storage"
+          ],
+          "summary": "When a share's first download completes, deletes leftover _gifvideo.mp4 and _gifaudio.aac copies in tmp older than five minutes. The second download of a v.redd.it share doesn't sweep, preserving the copy needed for merge; other tmp files are left alone.",
+          "security_implications": "Deletes files in tmp by name pattern and age; scoped narrowly, so the risk is limited to pattern-matching mistakes.",
+          "privacy_implications": "Positive: reduces leftover downloaded media persisting in tmp.",
+          "safety_implications": "File deletion in shared tmp could remove a file still needed by an in-flight share if timing assumptions fail; the five-minute age threshold and the skip on the second download mitigate this.",
+          "risk_signals": [
+            "file deletion in tmp based on name suffix and age"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/344823bf26e85a5e90e8eb29a5ae26d744b8e358",
+          "short_sha": "344823bf"
+        },
+        {
+          "sha": "cbee0cbc0090a38e5c33625f8f90888f3a02b819",
+          "title": "Keep feed avatars out of post titles that name their own author (#1218)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloUserAvatars.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Once a cell has a known author node, the avatar binder searches only that node rather than scanning all text nodes in the cell. This prevents avatars from being inserted into post titles that contain 'by <author>'.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Small UI logic change; the existing retry ladder handles late layout.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/cbee0cbc0090a38e5c33625f8f90888f3a02b819",
+          "short_sha": "cbee0cbc"
+        },
+        {
+          "sha": "27f46a717e726ca77c07d45490f474a86c8fbbef",
+          "title": "Restore pre-3.8 backups instead of rejecting them as Invalid Backup (#1217)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/settings/ApolloBackupRestore.m",
+            "tests/backup_restore_keychain_tests.m",
+            "tests/run_backup_restore_keychain_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "storage",
+            "auth",
+            "deserialization"
+          ],
+          "summary": "Backup restore now drops keychain rows outside Apollo's owned namespaces (such as the heartbeat seed) instead of rejecting the entire archive. Still rejects non-dictionary entries, owned rows without data, and duplicate owned identities. Adds detailed rejection/success logging and a host-side test harness.",
+          "security_implications": "Loosens validation for pre-3.8 archives but only by ignoring, never writing, out-of-namespace keychain rows, which preserves the restriction on what gets written to the keychain; strict checks on owned rows remain.",
+          "privacy_implications": "New logs name the file, key, or check that refused an archive and report restore counts; unlikely to include secret values but worth confirming.",
+          "safety_implications": "Improves restore reliability and avoids failed restores; validation of corrupt input is retained.",
+          "risk_signals": [
+            "keychain restore validation changed",
+            "logging in keychain-handling path"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/27f46a717e726ca77c07d45490f474a86c8fbbef",
+          "short_sha": "27f46a71"
+        },
+        {
+          "sha": "1994f1a52c3e74e85c2c97f66eb6a0797b1d95dd",
+          "title": "Download Video/GIF: give every share its own file so Messages stops resending the first one (#1216)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloShareMediaHandoff.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "storage",
+            "ipc",
+            "build"
+          ],
+          "summary": "Adds a new hook that swaps the share-sheet activity item for an APFS clone with a unique per-share filename in tmp/ApolloShareMedia. The previous handoff is removed when the next share begins, and Apollo's own Copy/Save still read the original path. The Makefile is updated to include the new file.",
+          "security_implications": "Creates files in the app's tmp directory and hooks share-sheet items; no new network or permission surface.",
+          "privacy_implications": "Fixes a bug where Messages could send a previously shared video, which is a privacy improvement; cloned copies persist briefly in tmp until the next share.",
+          "safety_implications": "New hook and file cloning/cleanup add moderate surface for failure (clone failure, stale files), though the change is scoped.",
+          "risk_signals": [
+            "new hook on share activity items",
+            "file clone and deletion in tmp"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/1994f1a52c3e74e85c2c97f66eb6a0797b1d95dd",
+          "short_sha": "1994f1a5"
+        },
+        {
+          "sha": "905fad7d359320a568d9351b83a55eb84a6bf97d",
+          "title": "User flair: old-reddit sprite flairs paint on every row again (#1215)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloUserFlair.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "storage",
+            "threading"
+          ],
+          "summary": "Fixes missing sprite images in the flair selector for old-reddit CSS sprite flairs. Cropped sprites were evicted from a 256-entry process-wide cache before rows requested them. Each flair selector now owns its crops, and the process-wide table references them weakly, so they are released when the selector closes.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Changes object lifetime and ownership (weak table plus per-selector strong refs); a mistake could cause missing images or stale references, but weak references reduce the risk of leaks and unbounded memory growth.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/905fad7d359320a568d9351b83a55eb84a6bf97d",
+          "short_sha": "905fad7d"
+        },
+        {
+          "sha": "feea512a86e3a15b38bac47562cfc08f967f3738",
+          "title": "Remove unnecessary apolloreq.com from ApolloLegacyBackendHosts (#1230)",
+          "author": "DeltAndy123",
+          "files_touched": [
+            "README.md",
+            "src/ApolloNotificationBackend.m"
+          ],
+          "kind": "config",
+          "areas": [
+            "networking"
+          ],
+          "summary": "Removes apolloreq.com from the list of legacy Apollo backend hosts and updates the README to match. This shrinks the set of hosts handled as legacy backend traffic.",
+          "security_implications": "Reduces the list of hosts treated as legacy backend endpoints; no new endpoints are added, though it is worth confirming that requests to that host are no longer intercepted or redirected in a way that changes behavior.",
+          "privacy_implications": "Removing a host from the legacy list likely means less traffic is matched or rerouted, which is neutral to slightly positive for privacy.",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/feea512a86e3a15b38bac47562cfc08f967f3738",
+          "short_sha": "feea512a"
+        },
+        {
+          "sha": "0793656167a4eb8b4cc0be31ec5d0ea083ee81c4",
+          "title": "Fix API-Key-Free feeds getting stuck on a spinner: stop avatar lookups from using up the Reddit session limit (#1220)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloSubredditInfoCache.m",
+            "src/ApolloUserAvatars.xm",
+            "src/ApolloUserProfileCache.h",
+            "src/ApolloUserProfileCache.m",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/ApolloWebJSONIdentity.xm",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "auth",
+            "storage",
+            "threading",
+            "ui"
+          ],
+          "summary": "Reduces Reddit requests made on the web-session cookie by populating the avatar cache from Apollo's existing user_data_by_account_ids responses and batching keyless lookups. A 429 on a keyless session now pauses optional lookups until the rate-limit window resets, and a toast tells the user about the limit. The WebJSON session probe's 429 also starts the hold.",
+          "security_implications": "Touches session-cookie-authenticated requests to www.reddit.com and adds a batched endpoint use, all to the existing Reddit host; the response-serializer hook now reads response data into a cache, which needs sound parsing of untrusted JSON.",
+          "privacy_implications": "Fewer per-author profile requests are sent with the session cookie, which reduces exposure; the response data is cached in the avatar cache, and the log line names the request that hit the limit (check that it does not include usernames or tokens).",
+          "safety_implications": "Adds shared rate-limit state, batch-wait logic and hooks across threads in a fairly large change; a bug could cause stalled avatar loads or a wrongly paused lookup, and the toast is throttled to once every 30s.",
+          "risk_signals": [
+            "session cookie used for requests",
+            "new shared rate-limit state",
+            "response serializer hook feeds cache"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0793656167a4eb8b4cc0be31ec5d0ea083ee81c4",
+          "short_sha": "07936561"
+        },
+        {
+          "sha": "5734c41c58a81121626afd4b7f0185ee738184ad",
+          "title": "Pixel Pals: follow the real Dynamic Island on iPhone 18 Pro and newer (#1244)",
+          "author": "JeffreyCA",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloPixelPals.xm",
+            "src/Tweak.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "ui",
+            "build"
+          ],
+          "summary": "Moves the Pixel Pals feature out of Tweak.xm into a new ApolloPixelPals.xm file and adds logic to follow the real Dynamic Island on newer iPhones. The Makefile is updated to compile the new file.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Large UI code move with new layout logic that may rely on private or undocumented view hierarchy for the Dynamic Island, so a layout or crash bug on new devices is possible; this is contained to UI.",
+          "risk_signals": [
+            "possible private view hierarchy dependence"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/5734c41c58a81121626afd4b7f0185ee738184ad",
+          "short_sha": "5734c41c"
+        },
+        {
+          "sha": "767fc177caa974a917f7beae0a7373ce58acef61",
+          "title": "Unmute Videos in Feed: stop auto-unmuting videos on screens you already left (#1247)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloVideoUnmute.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Adds a check so feed auto-unmute and the two delayed comments-header unmutes skip videos whose view is not in a window. This stops sound from playing from screens the user already left.",
+          "security_implications": "(none)",
+          "privacy_implications": "Prevents unexpected audio playing with nothing on screen, which is a mild privacy and annoyance improvement.",
+          "safety_implications": "Adds a simple window-nil guard around delayed callbacks; low risk.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/767fc177caa974a917f7beae0a7373ce58acef61",
+          "short_sha": "767fc177"
+        },
+        {
+          "sha": "c12befd4c47b942ab3aac01e86434f95dfd8602f",
+          "title": "Image comments: stop the just-posted copy showing \"[Unknown Image]\" under the picture (#1246)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloInlineImages.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "ui"
+          ],
+          "summary": "Extends the posted-comment transformer to unwrap Reddit's native image embed tokens pointing at the comment's own uploads into display URLs. Also fixes the richtext_json sent with comments so the image block covers the whole embed, and makes inline-image suppression treat i.redd.it, preview.redd.it and redd.it hosts alike.",
+          "security_implications": "Adds parsing/rewriting of URLs in comment bodies and outgoing richtext_json, but it is scoped to the comment's own uploads and there is no new endpoint or auth change.",
+          "privacy_implications": "(none)",
+          "safety_implications": "New string/regex rewriting of comment bodies and richtext payloads could mangle content if matching is wrong, but the failure mode is cosmetic.",
+          "risk_signals": [
+            "modifies outgoing richtext_json payload sent to Reddit"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/c12befd4c47b942ab3aac01e86434f95dfd8602f",
+          "short_sha": "c12befd4"
+        },
+        {
+          "sha": "689acf2537a9f44f813accf7631d0e2623c8d2b5",
+          "title": "Unmute Videos: mute the inline video while a different video is fullscreen (#1252)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloVideoUnmute.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Mutes the inline video that the tweak unmuted whenever a different video opens in the fullscreen viewer, and restores sound on dismissal according to the feed or comments setting. It adds new hooks on the tap, transition and viewer player paths.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Additional runtime hooks and state tracking around AVPlayer mute and transitions could cause stale state or retain players if unbalanced, but the change is confined to playback behaviour.",
+          "risk_signals": [
+            "new swizzles on AVPlayer and viewer transition paths"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/689acf2537a9f44f813accf7631d0e2623c8d2b5",
+          "short_sha": "689acf25"
+        },
+        {
+          "sha": "68e8f6717f7204098ec1cf85ea14ba95dd225400",
+          "title": "Add Account: sign in with the default API key, not the active account's saved key (#1237)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloAccountCredentials.h",
+            "src/ApolloAccountCredentials.m",
+            "src/ApolloAccountSwitcherViewController.xm",
+            "src/ApolloUserAvatars.xm",
+            "src/Tweak.h",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "storage",
+            "networking"
+          ],
+          "summary": "Changes OAuth sign-in so a new Add Account flow uses the default API key from Settings instead of the active account's pinned key. The override is captured per new RDKOAuthCredential via a hook on authenticateWithClientIdentifier:redirectURI:, and the new username is then pinned to the key it actually used. Other credentials, including the active account's refreshes, resolve as before.",
+          "security_implications": "Touches OAuth client ID/redirect URI selection, the Basic auth header for the code exchange, and the per-account key pinning, so incorrect scoping could send the wrong client credentials or bind a refresh token to the wrong key.",
+          "privacy_implications": "Client identifiers are sent to Reddit as before, and only the account-to-key pin mapping changes.",
+          "safety_implications": "Per-credential state replaces a global flag, which is safer for concurrency, and failed sign-ins need no cleanup; the pin-mapping update could still leave a bad pin if it fails.",
+          "risk_signals": [
+            "OAuth clientIdentifier/redirectURI hooks",
+            "credential reinstall to rebake Basic auth header",
+            "account-to-API-key pin storage changes"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/68e8f6717f7204098ec1cf85ea14ba95dd225400",
+          "short_sha": "68e8f671"
+        },
+        {
+          "sha": "9c8d998b54899232780fa9ae526d2eae390226ea",
+          "title": "Port five performance/stability fixes from paradoxally's fork: idle text hooks, image cache budgets, non-blocking edit repair, launch trims, comments title and sort (#1169)",
+          "author": "icpryde",
+          "files_touched": [
+            "AGENTS.md",
+            "Makefile",
+            "src/ApolloBadgeBookCatalog.m",
+            "src/ApolloBadgeBookViewController.m",
+            "src/ApolloChatInlineImages.xm",
+            "src/ApolloChatUnreadPoller.m",
+            "src/ApolloCommon.h",
+            "src/ApolloCommon.m",
+            "src/ApolloDeletedCommentsData.m",
+            "src/ApolloDeletedCommentsUI.xm",
+            "src/ApolloFloatingTabs.xm",
+            "src/ApolloGalleryImageLoader.m",
+            "src/ApolloImageUploadHost.xm",
+            "src/ApolloImmersiveHeaderBackground.m",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloInlineLinkPreviews.xm",
+            "src/ApolloLiquidGlassIconPicker.xm",
+            "src/ApolloMemoryDiagnostics.h",
+            "src/ApolloMemoryDiagnostics.m",
+            "src/ApolloMultiredditEdit.xm",
+            "src/ApolloPerPostCommentSort.xm",
+            "src/ApolloPhotoPostComposerScrollFix.xm",
+            "src/ApolloRecentlyRead.xm",
+            "src/ApolloSubredditCustomBannerCache.m",
+            "src/ApolloSubredditCustomIconCache.m",
+            "src/ApolloSubredditSidebar.xm",
+            "src/ApolloThemeRuntime.xm",
+            "src/ApolloTranslation.xm",
+            "src/ApolloURLOpenCommentSort.xm",
+            "src/ApolloUsageHeartbeat.m",
+            "src/ApolloUserFlair.xm",
+            "src/ApolloUserProfileCache.m",
+            "src/ApolloWebJSON.h",
+            "src/ApolloWebJSON.m",
+            "src/ApolloWebJSONIdentity.xm",
+            "src/ApolloWebJSONWriteRepair.h",
+            "src/ApolloWebJSONWriteRepair.m",
+            "src/Tweak.xm",
+            "src/UserDefaultConstants.h",
+            "src/settings/ApolloWallpaperViewerViewController.m",
+            "tests/run_web_json_write_repair_tests.sh",
+            "tests/web_json_write_repair_tests.m"
+          ],
+          "kind": "refactor",
+          "areas": [
+            "storage",
+            "networking",
+            "threading",
+            "deps",
+            "build"
+          ],
+          "summary": "Large bundle of ported performance and stability changes: idle-gating deleted-comments and sidebar hooks, registering all image NSCaches with a memory-warning purge and cutting budgets, and splitting the web JSON write/edit repair into a new ~950-line module with tests. It also includes launch trims, comment title and sort fixes, and changes to translation and the usage heartbeat.",
+          "security_implications": "The web JSON write-repair path (moved and extended) and the identity code handle authenticated web requests to Reddit, and the code is too large to fully verify from the summary.",
+          "privacy_implications": "ApolloUsageHeartbeat.m changed (+53/-9) and could alter what usage telemetry is sent or when, and the heartbeat is not explained in the visible commit message.",
+          "safety_implications": "Cache budgets, lock-free feature checks, threading changes and non-blocking edit repair touch data-persistence and concurrency in many files, so regressions are plausible; the new tests help.",
+          "risk_signals": [
+            "3,176-line multi-topic cherry-pick",
+            "ApolloUsageHeartbeat.m telemetry change",
+            "new ApolloWebJSONWriteRepair module",
+            "ApolloTranslation.xm +143 lines",
+            "lock-free check in hook path",
+            "truncated commit message"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9c8d998b54899232780fa9ae526d2eae390226ea",
+          "short_sha": "9c8d998b"
+        },
+        {
+          "sha": "f883e8f4c97316d7a39df6a1073e02c8c9f16f8c",
+          "title": "Fix favorite confirmation and multireddit row behavior (#1229)",
+          "author": "nunoo",
+          "files_touched": [
+            "src/ApolloSubredditIndexPolish.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Adjusts the favorite-confirmation and multireddit row behaviour in the subreddit index UI hooks. Changes are confined to a single UI polish file with no network or storage surface visible.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "UI hook logic changed, so incorrect row handling could cause minor UI glitches, but nothing crash-prone or persistent is evident.",
+          "risk_signals": [
+            "vague commit message ('fix')"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f883e8f4c97316d7a39df6a1073e02c8c9f16f8c",
+          "short_sha": "f883e8f4"
+        },
+        {
+          "sha": "405c856d20a6f91cf5f8b8fcaba99f3a0ce01211",
+          "title": "Multireddit Edit: open the editor again when Multireddits isn't the second section (#1267)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloFollowingSection.h",
+            "src/ApolloFollowingSection.xm",
+            "src/ApolloMultiredditEdit.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes the multireddit edit tap when a custom section order moves Multireddits. Adds a bridge that converts Apollo's native index path back to the table's visible index path before deselect and cell lookup calls.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Corrects an index-path mismatch that returned the wrong or nil cell; a small, contained change.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/405c856d20a6f91cf5f8b8fcaba99f3a0ce01211",
+          "short_sha": "405c856d"
+        },
+        {
+          "sha": "3387a24a18c83e9e4eb7696955a1eb4079955e74",
+          "title": "Play RedGIFs videos whose API record has no duration (#1258)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloRedgifsMissingDuration.h",
+            "src/ApolloRedgifsMissingDuration.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "deserialization"
+          ],
+          "summary": "When a RedGIFs API response has a null duration, the tweak makes a ranged request for the video's mp4 header, parses the mvhd atom, and patches the duration into the JSON before Apollo decodes it. Adds a new source file and hooks in Tweak.xm.",
+          "security_implications": "Parses untrusted mp4 header bytes and rewrites JSON responses in-process, so bounds checking in the atom parser deserves a review.",
+          "privacy_implications": "Makes an additional ranged request to the RedGIFs video host, which reveals the same IP and User-Agent that already contact that host.",
+          "safety_implications": "Hand-written binary parsing and response rewriting carry a crash risk if the size checks are wrong, but failures should fall back to Apollo's normal error card.",
+          "risk_signals": [
+            "parses untrusted binary mp4 data",
+            "modifies network responses before the app parses them"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3387a24a18c83e9e4eb7696955a1eb4079955e74",
+          "short_sha": "3387a24a"
+        },
+        {
+          "sha": "f92f56ae41d59a4660ff52158fedee8bde359405",
+          "title": "Fix RedGIFs posts failing after the device's IP address changes (#1256)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloRedgifsTokenRefresh.h",
+            "src/ApolloRedgifsTokenRefresh.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "networking",
+            "auth"
+          ],
+          "summary": "Records the temporary RedGIFs tokens that the tweak hands to Apollo. On a 401 it mints a fresh token on the same session and retries the request once, then substitutes the fresh token into later requests that carry Apollo's stale copy. Requests carrying any other token are left alone.",
+          "security_implications": "Handles bearer tokens in memory and rewrites Authorization headers, but only for tokens the tweak itself issued, and retries are limited to one.",
+          "privacy_implications": "Sends extra requests to the RedGIFs auth endpoint; the tokens are temporary, anonymous, and not logged as far as the description says.",
+          "safety_implications": "Shared minting across concurrent requests needs correct synchronization, and the single retry limit prevents retry loops.",
+          "risk_signals": [
+            "Authorization header rewriting",
+            "token caching and substitution"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f92f56ae41d59a4660ff52158fedee8bde359405",
+          "short_sha": "f92f56ae"
+        },
+        {
+          "sha": "6a37a7547ad24fc7a6072cb818ce33759726d411",
+          "title": "Translation: put the post header's language marker after the edited pencil, not on top of it (#1259)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloTranslation.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Changes the layout of the translation language marker in the post info row so it is placed after the last stat Apollo lays out, which stops it covering the edited pencil. The offset is re-measured on every update and on screen heal.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Layout math that runs on every update; low risk, though it depends on Apollo's private view hierarchy.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/6a37a7547ad24fc7a6072cb818ce33759726d411",
+          "short_sha": "6a37a754"
+        },
+        {
+          "sha": "ed33135d73510762d519c5030f9ff283a1ba6dfb",
+          "title": "Search tab: search Reddit through Google, picked from the magnifier (#1260)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloGoogleSearch.h",
+            "src/ApolloGoogleSearch.m",
+            "src/ApolloGoogleSearchTab.h",
+            "src/ApolloGoogleSearchTab.m",
+            "src/ApolloGoogleSearchViewController.h",
+            "src/ApolloGoogleSearchViewController.m",
+            "src/ApolloSearchTabFixes.xm",
+            "src/ApolloSimDebugTap.xm",
+            "src/UserDefaultConstants.h"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "ui",
+            "storage",
+            "ipc"
+          ],
+          "summary": "Adds a Google search mode to the Search tab, roughly 3.7k lines. Result pages are loaded in hidden web views and scraped with a JavaScript extractor. Result redirect links are resolved only when the user acts on a result, using the search's own Google cookies. Read More fetches the post from Reddit on the account's usual auth path. The chosen mode is remembered in user defaults.",
+          "security_implications": "Runs JavaScript scraping in hidden web views against google.com, fetches redirect links with session cookies, and uses authenticated Reddit reads, which enlarges the attack and failure surface.",
+          "privacy_implications": "Search queries, typing suggestions, and cookies now go to Google, and the user's Reddit auth path is used for Read More, so third-party data sharing is new and the choice is persisted with no setting to disable it.",
+          "safety_implications": "Scraping depends on Google's page structure and can break silently; it may hit bot checks or consent pages, though redirects are deferred to limit automated behaviour.",
+          "risk_signals": [
+            "hidden web view scraping",
+            "sends user queries to Google",
+            "cookie reuse for redirect requests",
+            "evading bot detection by deferring link resolution",
+            "large new code volume",
+            "debug tap file touched"
+          ],
+          "severity": "high",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed33135d73510762d519c5030f9ff283a1ba6dfb",
+          "short_sha": "ed33135d"
+        },
+        {
+          "sha": "b906d4a9f485f3650b1cf9c034788a27b2381fe0",
+          "title": "Search tab: keep the search placeholder dim after Cancel on Liquid Glass (#1261)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloThemeRuntime.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Adjusts a runtime hook on -[UINavigationItem setTitleView:] so it skips text fields, which were wrongly treated as custom navigation titles. This prevents the search placeholder color from staying stuck after Cancel. Adds a log line when a skip occurs.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Small early-return guard in a swizzled UIKit setter; low crash risk. It touches a private UIKit class path but only via a type check.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b906d4a9f485f3650b1cf9c034788a27b2381fe0",
+          "short_sha": "b906d4a9"
+        },
+        {
+          "sha": "f10ae9646358d02dc3ee4e733246c8cf3b2ef022",
+          "title": "Interactive posts: show Reddit's permission prompt, and keep Apollo in sync when a post subscribes you (#1264)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloAccountSubscriptions.h",
+            "src/ApolloAccountSubscriptions.m",
+            "src/ApolloDevvitPosts.xm",
+            "src/ApolloSubredditHeaders.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth",
+            "storage",
+            "ui",
+            "build"
+          ],
+          "summary": "Lets Reddit's Devvit app consent sheet show through the embedded web widget crop and enlarges the widget while it is open. After a tap in an interactive post, the app queries Reddit as the active account to check whether the subscription state changed, then updates Apollo's local subscription list. The subreddit Join pill now tracks subscription changes and updates Apollo's list. A new ApolloAccountSubscriptions module is added.",
+          "security_implications": "Exposes Reddit's third-party app authorization prompt in the embedded web view, and makes authenticated Reddit API calls using the active account's credentials. Those calls go to Reddit, which is expected, but the change deserves review of which endpoint and token are used.",
+          "privacy_implications": "Sends an additional authenticated request to Reddit after widget taps to check subscription state, and persists the resulting subscription changes in the local account list.",
+          "safety_implications": "Adds state synchronization between the web widget, the Join pill, and the subscriptions list, with a risk of stale or incorrect subscription state or races. It also relies on page DOM structure to unhide the sheet, which could break if Reddit changes it.",
+          "risk_signals": [
+            "authenticated requests as active account triggered by web content interaction",
+            "unhides third-party consent UI in embedded web view",
+            "new subscription-state persistence module"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f10ae9646358d02dc3ee4e733246c8cf3b2ef022",
+          "short_sha": "f10ae964"
+        },
+        {
+          "sha": "58a67194b3338038518cbdcac8fa1ed8a38a90ba",
+          "title": "Feed search: keep a scrolled-away glass search bar away after swiping back from a post (#1243) (#1249)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloSearchNativeBar.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes a double viewWillAppear: call during swipe-back by recording the transition coordinator that consumed the state notes and treating a second call in the same transition as a replay. The record is cleared in viewDidAppear and viewWillDisappear.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Adds transient view-controller state tied to a transition coordinator. It is cleared at lifecycle endpoints, and a stale record could cause a missed reveal but not a crash.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/58a67194b3338038518cbdcac8fa1ed8a38a90ba",
+          "short_sha": "58a67194"
+        },
+        {
+          "sha": "69be86ab2aff185bc617354698897a05d9440ed0",
+          "title": "Fix legacy Open in Apollo routing (#1268)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "README.md",
+            "safari-extension/README.md",
+            "safari-extension/legacy/content.js",
+            "safari-extension/legacy/content.test.js",
+            "safari-extension/legacy/popup.html",
+            "safari-extension/link-utils.js",
+            "safari-extension/link-utils.test.js",
+            "scripts/validate_release_variants.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "ipc",
+            "build"
+          ],
+          "summary": "Fixes how the legacy Safari extension builds and routes Open in Apollo links. It updates the link utilities, content script, popup text, tests, and docs, and adds checks to the release validation script.",
+          "security_implications": "Changes URL rewriting and scheme routing in a Safari extension content script that runs on web pages, so the URL parsing and scheme construction deserve a quick check for injection or open-redirect issues.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Covered by added unit tests, and the validation script adds a release check.",
+          "risk_signals": [
+            "URL/scheme rewriting in content script"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/69be86ab2aff185bc617354698897a05d9440ed0",
+          "short_sha": "69be86ab"
+        },
+        {
+          "sha": "0e64dfee85639f326d9f6d13d69e61a574ce6e50",
+          "title": "fix(gallery): yield boundary swipes to Apollo (#1271)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "src/ApolloFeedGalleryCarousel.xm",
+            "src/ApolloFeedGalleryGesturePolicy.h",
+            "src/settings/CustomAPIViewController.m",
+            "tests/feed_gallery_gesture_policy_tests.c",
+            "tests/run_feed_gallery_gesture_policy_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Moves the feed gallery gesture handoff logic into a standalone header-based policy so boundary swipes are yielded to Apollo's native navigation. It adds C unit tests and a runner script, and makes a one-line change in the settings view controller.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Replaces about 150 lines of inline gesture logic with a tested policy header, which reduces regression risk. The gesture-recognizer changes could still affect scrolling behavior.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0e64dfee85639f326d9f6d13d69e61a574ce6e50",
+          "short_sha": "0e64dfee"
+        },
+        {
+          "sha": "3df6e98d475fad092d4c57f45fab31663464e38d",
+          "title": "Fix the blank \"{}\" page after tapping Accept when Reddit rejects the API key (#1236)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloAccountCredentials.m",
+            "src/ApolloWebAuthViewController.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "auth",
+            "ui",
+            "networking",
+            "storage"
+          ],
+          "summary": "The OAuth sign-in web view now detects Reddit's HTTP 400 response from the oauth-grant endpoint (and Old Reddit's authorize 400/500 pages) and shows an explanatory alert pointing the user to Settings instead of a blank '{}' page. Per-account API keys are trimmed on save, comments are corrected, and 'Switch to Old Reddit' no longer rewrites the grant endpoint.",
+          "security_implications": "Touches the OAuth sign-in flow and response interception in the web auth controller, but only adds error detection and messaging; no new endpoints or credential handling beyond trimming stored keys.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Alert copy references account names and key state; whitespace trimming of stored keys is low risk, and the changed error handling in the web view delegate merits a quick glance.",
+          "risk_signals": [
+            "modifies OAuth sign-in web view response handling",
+            "changes grant endpoint rewriting behavior"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3df6e98d475fad092d4c57f45fab31663464e38d",
+          "short_sha": "3df6e98d"
+        },
+        {
+          "sha": "72b8963fd43c26e191ccbaee94f2cf27dc4a8c27",
+          "title": "fix(filters): collapse orphaned post separators (#1274)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "src/ApolloPostFilters.xm",
+            "tests/post_filter_separator_state_tests.m",
+            "tests/run_post_filter_separator_regression_check.sh",
+            "tests/run_post_filter_separator_state_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Fixes gaps left by filtered posts by tracking separator state and collapsing orphaned separators, with follow-ups for node lock ordering and a layout race. Adds unit and regression tests.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Changes locking and layout-race handling in hooked table nodes; deadlock or race risks are the concern, though the commit explicitly addresses lock ordering and adds tests.",
+          "risk_signals": [
+            "lock ordering changes",
+            "layout race fix in hooked code"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/72b8963fd43c26e191ccbaee94f2cf27dc4a8c27",
+          "short_sha": "72b8963f"
+        },
+        {
+          "sha": "2110e2daf90762109de7eac94dc80fcef69a52a6",
+          "title": "fix(ai): stop comment summary scroll churn (#1270)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "src/ApolloAISummary.xm",
+            "tests/run_ai_summary_scroll_churn_regression_check.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Reduces repeated work in the AI comment summary feature while scrolling and handles revisits of late-loaded summaries. Adds a regression check script.",
+          "security_implications": "(none)",
+          "privacy_implications": "No visible change to what data is sent to the AI summary provider; the change appears limited to UI update behavior.",
+          "safety_implications": "Modifies UI update and caching behavior during scroll; low risk of stale or missing summary state.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/2110e2daf90762109de7eac94dc80fcef69a52a6",
+          "short_sha": "2110e2da"
+        },
+        {
+          "sha": "53039c5bd0262ad39d561da7416e0894ea15538c",
+          "title": "fix(search): harden subreddit sources and profile list hooks (#1272)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "src/ApolloHiddenContentMenu.xm",
+            "src/Tweak.xm",
+            "tests/run_hidden_content_adapter_scope_tests.sh",
+            "tests/run_subreddit_source_tests.sh",
+            "tests/subreddit_source_tests.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "networking"
+          ],
+          "summary": "Hardens hooks for subreddit source handling and profile lists to fix an intermittent crash in the RandNSFW list, and clarifies behavior for invalid subreddit listings. Adds tests for subreddit source handling and adapter scope.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Improves crash resistance in hooked list code by adding guards and scoping; reduces crash risk.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/53039c5bd0262ad39d561da7416e0894ea15538c",
+          "short_sha": "53039c5b"
+        },
+        {
+          "sha": "732e60463428fcad6477679cf6cade1448be8f6d",
+          "title": "Unmute Videos in Feed: keep the sound on one video instead of swapping it every frame (#1250)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloVideoUnmute.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Changes the feed unmute logic so the video holding the sound keeps it while still playing on screen, and another video takes over only when the holder stops, is muted, enters PiP, or leaves the screen. The handoff is deferred until after the scroll pass to avoid work inside the visibility tick, reducing audio session churn and log spam.",
+          "security_implications": "(none)",
+          "privacy_implications": "Reduces log output per frame; no new data collection.",
+          "safety_implications": "Touches audio session and visibility-tick timing in hooked code; deferred handoff avoids mutation during enumeration, but state tracking adds edge cases (PiP, fullscreen).",
+          "risk_signals": [
+            "stateful holder tracking across scroll passes"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/732e60463428fcad6477679cf6cade1448be8f6d",
+          "short_sha": "732e6046"
+        },
+        {
+          "sha": "ed2d81e39e3efca5e3e98d57033d9ec8cb2b4b5a",
+          "title": "Fix feed crash when several RedGIFs posts load while the RedGIFs token is in flight (#1240) (#1251)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloCommon.h",
+            "src/ApolloRecentlyRead.xm",
+            "src/ApolloRedgifsQueuedFetchesLock.m",
+            "src/ApolloSwiftSingletonCapture.h",
+            "src/ApolloSwiftSingletonCapture.m",
+            "src/Tweak.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "threading",
+            "ipc",
+            "build"
+          ],
+          "summary": "Adds a recursive mutex that serialises access to RedGIFsClient's queuedFetches array to fix a concurrent-mutation double-free crash. It does this by using fishhook to rebind swift_beginAccess, swift_endAccess and dispatch_sync in Apollo's image once the client is allocated. swift_allocObject capture is moved to a shared module that Recently Read now also uses, so two rebindings of the same symbol don't conflict.",
+          "security_implications": "(none) - no network, auth, or secret handling changes, though it hooks runtime symbols globally in the process.",
+          "privacy_implications": "(none)",
+          "safety_implications": "Fixes a real memory-safety crash, but globally rebinding dispatch_sync and Swift exclusivity-access functions with a recursive lock carries deadlock and performance risk, and depends on fragile Swift runtime internals.",
+          "risk_signals": [
+            "fishhook rebinding of swift_beginAccess/swift_endAccess/dispatch_sync",
+            "global lock on dispatch_sync",
+            "swift_allocObject capture refactor shared across features",
+            "292 lines of new low-level hooking code"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed2d81e39e3efca5e3e98d57033d9ec8cb2b4b5a",
+          "short_sha": "ed2d81e3"
+        },
+        {
+          "sha": "4c33617859be30a9e12554da9ee28078cc84f46c",
+          "title": "Fix tapping a post sometimes opening a gallery post from further up the feed (#1248)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloFeedGalleryCarousel.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "The gallery carousel view now stops touch events from propagating up the responder chain, so the page-control dots handle their own gestures and the table view doesn't retain a stale pending row selection. This fixes taps opening the wrong thread.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Small, contained touch-handling change; low crash risk.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/4c33617859be30a9e12554da9ee28078cc84f46c",
+          "short_sha": "4c336178"
+        },
+        {
+          "sha": "fe3fd6068810e120098ac1da40b2e7e1a07f7e3a",
+          "title": "fix(inline-media): reserve image space from metadata (#1273)",
+          "author": "Thetromboneman1",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloInlineImageMetadata.h",
+            "src/ApolloInlineImageMetadata.m",
+            "src/ApolloInlineImages.xm",
+            "src/ApolloMedia.xm",
+            "tests/inline_image_metadata_tests.m",
+            "tests/run_inline_image_metadata_tests.sh"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "storage",
+            "deserialization"
+          ],
+          "summary": "Adds a module that parses Reddit media metadata (dimensions) and caches aspect ratios, so inline images reserve layout space before loading. Includes unit tests and a test runner script.",
+          "security_implications": "Parses untrusted Reddit JSON metadata, so dimension values should be validated to avoid divide-by-zero or absurd sizes; tests suggest this is covered.",
+          "privacy_implications": "(none) - uses data already fetched from Reddit; cache is in-memory ratios only as far as can be seen.",
+          "safety_implications": "Parsing untrusted metadata and cache access could crash on malformed input or race across threads if not synchronized.",
+          "risk_signals": [
+            "parsing external JSON metadata",
+            "new cache"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fe3fd6068810e120098ac1da40b2e7e1a07f7e3a",
+          "short_sha": "fe3fd606"
+        },
+        {
+          "sha": "7c7b6dbd88fd26023a201fafd7b102c3d0b69a9d",
+          "title": "Gallery View: keep starting videos when swiping on CarPlay (#1104) (#1257)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloGalleryImageViewer.m"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Replaces exact bounds equality checks between the collection view and self.view with the pager's own bounds for page geometry, fixing stalled paging when the host size is off the pixel grid (CarPlay mirroring).",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Layout logic change only; low risk of regression in rotation handling.",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/7c7b6dbd88fd26023a201fafd7b102c3d0b69a9d",
+          "short_sha": "7c7b6dbd"
+        },
+        {
+          "sha": "cbcc2f1aebaab0643654ec3333d48eff2eafe3b3",
+          "title": "Add Toon Bot icons to the Concepts pack (#1253)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "liquid-glass/generated/LiquidGlassIconPreviews.gen.h",
+            "liquid-glass/icons.json",
+            "liquid-glass/icons/toon-bot-2/*",
+            "liquid-glass/icons/toon-bot/*",
+            "liquid-glass/prebuilt/Assets.car"
+          ],
+          "kind": "asset",
+          "areas": [
+            "ui",
+            "build"
+          ],
+          "summary": "Adds two new app icon variants (Toon Bot and Toon Bot 2) with PNG/SVG assets, icon.json definitions, a generated preview header and a rebuilt prebuilt Assets.car.",
+          "security_implications": "(none) - though the prebuilt Assets.car is an opaque binary that can't be reviewed in the diff.",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [
+            "binary prebuilt Assets.car modified"
+          ],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/cbcc2f1aebaab0643654ec3333d48eff2eafe3b3",
+          "short_sha": "cbcc2f1a"
+        },
+        {
+          "sha": "9b320924ee2765d2fa0cf8df4bad120b54837842",
+          "title": "Fix: Make settings headers consistent and easier to read (#1241)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloFiltersBlocksInject.xm",
+            "src/ApolloThemeManagerIntegration.xm",
+            "src/ApolloThemeManagerViewController.m",
+            "src/settings/ApolloProfileLayoutViewController.m",
+            "src/settings/ApolloSettings.xm",
+            "src/settings/ApolloSettingsGeneralTable.xm",
+            "src/settings/ApolloSettingsTableViewController.h",
+            "src/settings/ApolloSettingsTableViewController.m",
+            "src/settings/ApolloSubredditLayoutViewController.m",
+            "src/settings/ApolloSubredditSectionsViewController.m",
+            "src/settings/CustomAPIViewController.m"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Makes section header styling consistent and more readable across the tweak's settings screens. Changes are view/table styling code in settings view controllers and hooks, with a small helper added to the shared settings table controller.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "(none)",
+          "risk_signals": [],
+          "severity": "none",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9b320924ee2765d2fa0cf8df4bad120b54837842",
+          "short_sha": "9b320924"
+        },
+        {
+          "sha": "b4454d470c1e30ab86257f9b8e709855597cf8e0",
+          "title": "Anchor fullscreen media menus to the long-press location (#1254)",
+          "author": "IllIIllIllIllII",
+          "files_touched": [
+            "src/ApolloNativeActionMenus.h",
+            "src/ApolloNativeActionMenus.xm",
+            "src/ApolloSaveAllMediaMenus.xm"
+          ],
+          "kind": "ui",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Positions the fullscreen media action menu/popover at the long-press point rather than a default anchor. Adds about 75 lines of location-tracking and anchoring logic to the native action menu code.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Touch-location tracking and popover anchoring involve UIKit hooks; a bad source rect or view reference could misplace the menu or crash, but this is a low-risk UI path.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b4454d470c1e30ab86257f9b8e709855597cf8e0",
+          "short_sha": "b4454d47"
+        },
+        {
+          "sha": "b8094607529e956a28cdc7bd7f1783022a4ebfb1",
+          "title": "Keep the post's video (and the scrubber) after visiting the OP's profile or swiping forward back into the post (#1269)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloVideoSwipeFix.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui",
+            "threading"
+          ],
+          "summary": "Tracks which AVPlayerLayer the comments header took and restores it when another screen has taken the shared layer, including handing it back on pop. Adds about 410 lines of hooks into Apollo's private player-layer sharing logic.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Manipulates shared AVPlayerLayer ownership through private-API hooks and remembered layer references, so lifetime, retain, or ownership mistakes could cause crashes or blank video.",
+          "risk_signals": [
+            "Swizzling and replicating Apollo's private take steps",
+            "stored layer references across view lifecycles"
+          ],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/b8094607529e956a28cdc7bd7f1783022a4ebfb1",
+          "short_sha": "b8094607"
+        },
+        {
+          "sha": "fb7ea8b72c0c7d894972a15deb44c7074f7749ad",
+          "title": "Fix Subreddits list Edit mode: moderator hide controls on the wrong rows and the list jumping up (#1262)",
+          "author": "icpryde",
+          "files_touched": [
+            "src/ApolloFollowingSection.h",
+            "src/ApolloFollowingSection.xm",
+            "src/ApolloHideModSubreddits.xm",
+            "src/ApolloSubredditIndexPolish.xm",
+            "src/ApolloSubredditListEditing.xm"
+          ],
+          "kind": "fix",
+          "areas": [
+            "ui"
+          ],
+          "summary": "Fixes Edit mode in the subreddits list by looking up section titles from the visible order, using on-screen header views for animations, and distinguishing swipe-to-delete editing from Edit mode. Touches table-view hooks across several files.",
+          "security_implications": "(none)",
+          "privacy_implications": "(none)",
+          "safety_implications": "Changes table-view hook logic and animations, so index or section mismatches could cause layout glitches or out-of-bounds crashes, but the risk is contained.",
+          "risk_signals": [],
+          "severity": "low",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/fb7ea8b72c0c7d894972a15deb44c7074f7749ad",
+          "short_sha": "fb7ea8b7"
+        },
+        {
+          "sha": "771bcdc0ec496d3b4e44891cf6afb8abc6ab99f1",
+          "title": "Say why a comment didn't post (post removed, thread locked, \u2026) instead of \"Reddit had a little hiccup\" (#1275)",
+          "author": "icpryde",
+          "files_touched": [
+            "Makefile",
+            "src/ApolloCommentSubmitFailure.xm"
+          ],
+          "kind": "feature",
+          "areas": [
+            "networking",
+            "auth",
+            "ui"
+          ],
+          "summary": "Records Reddit's response to each api/comment POST and, on failure, fetches the thread using the posting account (API-key and API-key-free paths) to determine why it failed (removed, locked, archived, banned). It then swaps the error alert's text with an explanation. This is a new 577-line file added to the Makefile.",
+          "security_implications": "Issues additional authenticated requests with the user's account credentials and parses Reddit responses in new code, so request construction, token handling, and response parsing deserve review.",
+          "privacy_implications": "Sends extra requests to Reddit about the thread the user tried to comment on, but only to Reddit and only after a failure; nothing indicates third-party endpoints.",
+          "safety_implications": "Hooks the comment submission callback and swaps alert content while the result is handed to Apollo, so races or a nil error path could break the failure UI.",
+          "risk_signals": [
+            "new authenticated follow-up network requests",
+            "hooks into the API response path",
+            "large new file"
+          ],
+          "severity": "medium",
+          "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/771bcdc0ec496d3b4e44891cf6afb8abc6ab99f1",
+          "short_sha": "771bcdc0"
+        }
+      ],
+      "aggregate": {
+        "total_commits": 50,
+        "by_kind": {
+          "config": 2,
+          "refactor": 2,
+          "fix": 38,
+          "ui": 3,
+          "feature": 4,
+          "asset": 1
+        },
+        "by_severity": {
+          "none": 12,
+          "low": 25,
+          "medium": 12,
+          "high": 1
+        },
+        "areas_touched": [
+          "auth",
+          "build",
+          "deps",
+          "deserialization",
+          "ipc",
+          "networking",
+          "storage",
+          "threading",
+          "ui"
+        ],
+        "high_or_medium_commits": [
+          {
+            "sha": "29ce2720099183722e505ced090183df02b84b63",
+            "title": "Keep avatar and subreddit lookups on the active account's own credential (#1227)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloBadgeBookScraper.m",
+              "src/ApolloImageUploadHost.xm",
+              "src/ApolloLinkPreviewFetcher.m",
+              "src/ApolloState.h",
+              "src/ApolloSubredditInfoCache.m",
+              "src/ApolloUserAvatars.xm",
+              "src/ApolloUserFlair.xm",
+              "src/ApolloUserProfileCache.m"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "networking",
+              "storage"
+            ],
+            "summary": "Introduces ApolloActiveAccountRedditBearerToken(), which returns the captured bearer token only when the active account can own it, so API-Key-Free accounts send bearer-less requests that are signed with the active web session. Also stops negative-caching 401/403 responses on about.json, instead holding lookups on the rejected credential for 60s, and re-applies profile header info when a later lookup succeeds.",
+            "security_implications": "Fixes credential mix-up where one account's OAuth bearer was used for another account's requests, and falls back to web-session signing; token handling logic changed so worth a human glance.",
+            "privacy_implications": "Prevents requests for one account from being attributed to another account (follow/subscribe state, rate limits), improving account isolation; no new data collected.",
+            "safety_implications": "Avoids caching auth failures as 'missing user' and adds a 60s hold keyed on the credential, reducing blank avatars and repeated failing requests.",
+            "risk_signals": [
+              "bearer token selection logic changed across multiple networking call sites",
+              "credential-keyed cache hold"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/29ce2720099183722e505ced090183df02b84b63",
+            "short_sha": "29ce2720"
+          },
+          {
+            "sha": "f05b95f581e0f45f36ea51d6dcd7b4863c3e3714",
+            "title": "Deleted comments: fix the crash when tapping \"Translated from \u2026\" on a recovered comment (#1222)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloCommon.m",
+              "src/ApolloDeletedCommentsUI.xm",
+              "src/ApolloTranslation.h",
+              "src/ApolloTranslation.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "ui",
+              "networking",
+              "ipc"
+            ],
+            "summary": "Recovered-comment link taps now open only http(s) URLs directly and forward other schemes (such as the apollo-translation://toggle sentinel) to the text node's delegate. ApolloPresentWebURLFromViewController now refuses to give non-http(s) URLs to the in-app browser, routing other schemes to the system and dropping scheme-less ones. Also stops a rewrite loop between translation and deleted-comment modules.",
+            "security_implications": "Adds scheme validation so only http(s) reach SFSafariViewController, but non-http(s) URLs are still passed to the system opener, which could launch other apps via arbitrary schemes from recovered comment content.",
+            "privacy_implications": "(none)",
+            "safety_implications": "Fixes an NSInvalidArgumentException crash and removes a ~80Hz node rewrite loop, improving stability and performance.",
+            "risk_signals": [
+              "untrusted comment-derived URLs routed to system openURL for non-http schemes"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f05b95f581e0f45f36ea51d6dcd7b4863c3e3714",
+            "short_sha": "f05b95f5"
+          },
+          {
+            "sha": "27f46a717e726ca77c07d45490f474a86c8fbbef",
+            "title": "Restore pre-3.8 backups instead of rejecting them as Invalid Backup (#1217)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/settings/ApolloBackupRestore.m",
+              "tests/backup_restore_keychain_tests.m",
+              "tests/run_backup_restore_keychain_tests.sh"
+            ],
+            "kind": "fix",
+            "areas": [
+              "storage",
+              "auth",
+              "deserialization"
+            ],
+            "summary": "Backup restore now drops keychain rows outside Apollo's owned namespaces (such as the heartbeat seed) instead of rejecting the entire archive. Still rejects non-dictionary entries, owned rows without data, and duplicate owned identities. Adds detailed rejection/success logging and a host-side test harness.",
+            "security_implications": "Loosens validation for pre-3.8 archives but only by ignoring, never writing, out-of-namespace keychain rows, which preserves the restriction on what gets written to the keychain; strict checks on owned rows remain.",
+            "privacy_implications": "New logs name the file, key, or check that refused an archive and report restore counts; unlikely to include secret values but worth confirming.",
+            "safety_implications": "Improves restore reliability and avoids failed restores; validation of corrupt input is retained.",
+            "risk_signals": [
+              "keychain restore validation changed",
+              "logging in keychain-handling path"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/27f46a717e726ca77c07d45490f474a86c8fbbef",
+            "short_sha": "27f46a71"
+          },
+          {
+            "sha": "0793656167a4eb8b4cc0be31ec5d0ea083ee81c4",
+            "title": "Fix API-Key-Free feeds getting stuck on a spinner: stop avatar lookups from using up the Reddit session limit (#1220)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloSubredditInfoCache.m",
+              "src/ApolloUserAvatars.xm",
+              "src/ApolloUserProfileCache.h",
+              "src/ApolloUserProfileCache.m",
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/ApolloWebJSONIdentity.xm",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "networking",
+              "auth",
+              "storage",
+              "threading",
+              "ui"
+            ],
+            "summary": "Reduces Reddit requests made on the web-session cookie by populating the avatar cache from Apollo's existing user_data_by_account_ids responses and batching keyless lookups. A 429 on a keyless session now pauses optional lookups until the rate-limit window resets, and a toast tells the user about the limit. The WebJSON session probe's 429 also starts the hold.",
+            "security_implications": "Touches session-cookie-authenticated requests to www.reddit.com and adds a batched endpoint use, all to the existing Reddit host; the response-serializer hook now reads response data into a cache, which needs sound parsing of untrusted JSON.",
+            "privacy_implications": "Fewer per-author profile requests are sent with the session cookie, which reduces exposure; the response data is cached in the avatar cache, and the log line names the request that hit the limit (check that it does not include usernames or tokens).",
+            "safety_implications": "Adds shared rate-limit state, batch-wait logic and hooks across threads in a fairly large change; a bug could cause stalled avatar loads or a wrongly paused lookup, and the toast is throttled to once every 30s.",
+            "risk_signals": [
+              "session cookie used for requests",
+              "new shared rate-limit state",
+              "response serializer hook feeds cache"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/0793656167a4eb8b4cc0be31ec5d0ea083ee81c4",
+            "short_sha": "07936561"
+          },
+          {
+            "sha": "68e8f6717f7204098ec1cf85ea14ba95dd225400",
+            "title": "Add Account: sign in with the default API key, not the active account's saved key (#1237)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloAccountCredentials.h",
+              "src/ApolloAccountCredentials.m",
+              "src/ApolloAccountSwitcherViewController.xm",
+              "src/ApolloUserAvatars.xm",
+              "src/Tweak.h",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "storage",
+              "networking"
+            ],
+            "summary": "Changes OAuth sign-in so a new Add Account flow uses the default API key from Settings instead of the active account's pinned key. The override is captured per new RDKOAuthCredential via a hook on authenticateWithClientIdentifier:redirectURI:, and the new username is then pinned to the key it actually used. Other credentials, including the active account's refreshes, resolve as before.",
+            "security_implications": "Touches OAuth client ID/redirect URI selection, the Basic auth header for the code exchange, and the per-account key pinning, so incorrect scoping could send the wrong client credentials or bind a refresh token to the wrong key.",
+            "privacy_implications": "Client identifiers are sent to Reddit as before, and only the account-to-key pin mapping changes.",
+            "safety_implications": "Per-credential state replaces a global flag, which is safer for concurrency, and failed sign-ins need no cleanup; the pin-mapping update could still leave a bad pin if it fails.",
+            "risk_signals": [
+              "OAuth clientIdentifier/redirectURI hooks",
+              "credential reinstall to rebake Basic auth header",
+              "account-to-API-key pin storage changes"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/68e8f6717f7204098ec1cf85ea14ba95dd225400",
+            "short_sha": "68e8f671"
+          },
+          {
+            "sha": "9c8d998b54899232780fa9ae526d2eae390226ea",
+            "title": "Port five performance/stability fixes from paradoxally's fork: idle text hooks, image cache budgets, non-blocking edit repair, launch trims, comments title and sort (#1169)",
+            "author": "icpryde",
+            "files_touched": [
+              "AGENTS.md",
+              "Makefile",
+              "src/ApolloBadgeBookCatalog.m",
+              "src/ApolloBadgeBookViewController.m",
+              "src/ApolloChatInlineImages.xm",
+              "src/ApolloChatUnreadPoller.m",
+              "src/ApolloCommon.h",
+              "src/ApolloCommon.m",
+              "src/ApolloDeletedCommentsData.m",
+              "src/ApolloDeletedCommentsUI.xm",
+              "src/ApolloFloatingTabs.xm",
+              "src/ApolloGalleryImageLoader.m",
+              "src/ApolloImageUploadHost.xm",
+              "src/ApolloImmersiveHeaderBackground.m",
+              "src/ApolloInlineImages.xm",
+              "src/ApolloInlineLinkPreviews.xm",
+              "src/ApolloLiquidGlassIconPicker.xm",
+              "src/ApolloMemoryDiagnostics.h",
+              "src/ApolloMemoryDiagnostics.m",
+              "src/ApolloMultiredditEdit.xm",
+              "src/ApolloPerPostCommentSort.xm",
+              "src/ApolloPhotoPostComposerScrollFix.xm",
+              "src/ApolloRecentlyRead.xm",
+              "src/ApolloSubredditCustomBannerCache.m",
+              "src/ApolloSubredditCustomIconCache.m",
+              "src/ApolloSubredditSidebar.xm",
+              "src/ApolloThemeRuntime.xm",
+              "src/ApolloTranslation.xm",
+              "src/ApolloURLOpenCommentSort.xm",
+              "src/ApolloUsageHeartbeat.m",
+              "src/ApolloUserFlair.xm",
+              "src/ApolloUserProfileCache.m",
+              "src/ApolloWebJSON.h",
+              "src/ApolloWebJSON.m",
+              "src/ApolloWebJSONIdentity.xm",
+              "src/ApolloWebJSONWriteRepair.h",
+              "src/ApolloWebJSONWriteRepair.m",
+              "src/Tweak.xm",
+              "src/UserDefaultConstants.h",
+              "src/settings/ApolloWallpaperViewerViewController.m",
+              "tests/run_web_json_write_repair_tests.sh",
+              "tests/web_json_write_repair_tests.m"
+            ],
+            "kind": "refactor",
+            "areas": [
+              "storage",
+              "networking",
+              "threading",
+              "deps",
+              "build"
+            ],
+            "summary": "Large bundle of ported performance and stability changes: idle-gating deleted-comments and sidebar hooks, registering all image NSCaches with a memory-warning purge and cutting budgets, and splitting the web JSON write/edit repair into a new ~950-line module with tests. It also includes launch trims, comment title and sort fixes, and changes to translation and the usage heartbeat.",
+            "security_implications": "The web JSON write-repair path (moved and extended) and the identity code handle authenticated web requests to Reddit, and the code is too large to fully verify from the summary.",
+            "privacy_implications": "ApolloUsageHeartbeat.m changed (+53/-9) and could alter what usage telemetry is sent or when, and the heartbeat is not explained in the visible commit message.",
+            "safety_implications": "Cache budgets, lock-free feature checks, threading changes and non-blocking edit repair touch data-persistence and concurrency in many files, so regressions are plausible; the new tests help.",
+            "risk_signals": [
+              "3,176-line multi-topic cherry-pick",
+              "ApolloUsageHeartbeat.m telemetry change",
+              "new ApolloWebJSONWriteRepair module",
+              "ApolloTranslation.xm +143 lines",
+              "lock-free check in hook path",
+              "truncated commit message"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/9c8d998b54899232780fa9ae526d2eae390226ea",
+            "short_sha": "9c8d998b"
+          },
+          {
+            "sha": "3387a24a18c83e9e4eb7696955a1eb4079955e74",
+            "title": "Play RedGIFs videos whose API record has no duration (#1258)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloRedgifsMissingDuration.h",
+              "src/ApolloRedgifsMissingDuration.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "networking",
+              "deserialization"
+            ],
+            "summary": "When a RedGIFs API response has a null duration, the tweak makes a ranged request for the video's mp4 header, parses the mvhd atom, and patches the duration into the JSON before Apollo decodes it. Adds a new source file and hooks in Tweak.xm.",
+            "security_implications": "Parses untrusted mp4 header bytes and rewrites JSON responses in-process, so bounds checking in the atom parser deserves a review.",
+            "privacy_implications": "Makes an additional ranged request to the RedGIFs video host, which reveals the same IP and User-Agent that already contact that host.",
+            "safety_implications": "Hand-written binary parsing and response rewriting carry a crash risk if the size checks are wrong, but failures should fall back to Apollo's normal error card.",
+            "risk_signals": [
+              "parses untrusted binary mp4 data",
+              "modifies network responses before the app parses them"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3387a24a18c83e9e4eb7696955a1eb4079955e74",
+            "short_sha": "3387a24a"
+          },
+          {
+            "sha": "f92f56ae41d59a4660ff52158fedee8bde359405",
+            "title": "Fix RedGIFs posts failing after the device's IP address changes (#1256)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloRedgifsTokenRefresh.h",
+              "src/ApolloRedgifsTokenRefresh.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "networking",
+              "auth"
+            ],
+            "summary": "Records the temporary RedGIFs tokens that the tweak hands to Apollo. On a 401 it mints a fresh token on the same session and retries the request once, then substitutes the fresh token into later requests that carry Apollo's stale copy. Requests carrying any other token are left alone.",
+            "security_implications": "Handles bearer tokens in memory and rewrites Authorization headers, but only for tokens the tweak itself issued, and retries are limited to one.",
+            "privacy_implications": "Sends extra requests to the RedGIFs auth endpoint; the tokens are temporary, anonymous, and not logged as far as the description says.",
+            "safety_implications": "Shared minting across concurrent requests needs correct synchronization, and the single retry limit prevents retry loops.",
+            "risk_signals": [
+              "Authorization header rewriting",
+              "token caching and substitution"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f92f56ae41d59a4660ff52158fedee8bde359405",
+            "short_sha": "f92f56ae"
+          },
+          {
+            "sha": "ed33135d73510762d519c5030f9ff283a1ba6dfb",
+            "title": "Search tab: search Reddit through Google, picked from the magnifier (#1260)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloGoogleSearch.h",
+              "src/ApolloGoogleSearch.m",
+              "src/ApolloGoogleSearchTab.h",
+              "src/ApolloGoogleSearchTab.m",
+              "src/ApolloGoogleSearchViewController.h",
+              "src/ApolloGoogleSearchViewController.m",
+              "src/ApolloSearchTabFixes.xm",
+              "src/ApolloSimDebugTap.xm",
+              "src/UserDefaultConstants.h"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "ui",
+              "storage",
+              "ipc"
+            ],
+            "summary": "Adds a Google search mode to the Search tab, roughly 3.7k lines. Result pages are loaded in hidden web views and scraped with a JavaScript extractor. Result redirect links are resolved only when the user acts on a result, using the search's own Google cookies. Read More fetches the post from Reddit on the account's usual auth path. The chosen mode is remembered in user defaults.",
+            "security_implications": "Runs JavaScript scraping in hidden web views against google.com, fetches redirect links with session cookies, and uses authenticated Reddit reads, which enlarges the attack and failure surface.",
+            "privacy_implications": "Search queries, typing suggestions, and cookies now go to Google, and the user's Reddit auth path is used for Read More, so third-party data sharing is new and the choice is persisted with no setting to disable it.",
+            "safety_implications": "Scraping depends on Google's page structure and can break silently; it may hit bot checks or consent pages, though redirects are deferred to limit automated behaviour.",
+            "risk_signals": [
+              "hidden web view scraping",
+              "sends user queries to Google",
+              "cookie reuse for redirect requests",
+              "evading bot detection by deferring link resolution",
+              "large new code volume",
+              "debug tap file touched"
+            ],
+            "severity": "high",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed33135d73510762d519c5030f9ff283a1ba6dfb",
+            "short_sha": "ed33135d"
+          },
+          {
+            "sha": "f10ae9646358d02dc3ee4e733246c8cf3b2ef022",
+            "title": "Interactive posts: show Reddit's permission prompt, and keep Apollo in sync when a post subscribes you (#1264)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloAccountSubscriptions.h",
+              "src/ApolloAccountSubscriptions.m",
+              "src/ApolloDevvitPosts.xm",
+              "src/ApolloSubredditHeaders.xm"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth",
+              "storage",
+              "ui",
+              "build"
+            ],
+            "summary": "Lets Reddit's Devvit app consent sheet show through the embedded web widget crop and enlarges the widget while it is open. After a tap in an interactive post, the app queries Reddit as the active account to check whether the subscription state changed, then updates Apollo's local subscription list. The subreddit Join pill now tracks subscription changes and updates Apollo's list. A new ApolloAccountSubscriptions module is added.",
+            "security_implications": "Exposes Reddit's third-party app authorization prompt in the embedded web view, and makes authenticated Reddit API calls using the active account's credentials. Those calls go to Reddit, which is expected, but the change deserves review of which endpoint and token are used.",
+            "privacy_implications": "Sends an additional authenticated request to Reddit after widget taps to check subscription state, and persists the resulting subscription changes in the local account list.",
+            "safety_implications": "Adds state synchronization between the web widget, the Join pill, and the subscriptions list, with a risk of stale or incorrect subscription state or races. It also relies on page DOM structure to unhide the sheet, which could break if Reddit changes it.",
+            "risk_signals": [
+              "authenticated requests as active account triggered by web content interaction",
+              "unhides third-party consent UI in embedded web view",
+              "new subscription-state persistence module"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/f10ae9646358d02dc3ee4e733246c8cf3b2ef022",
+            "short_sha": "f10ae964"
+          },
+          {
+            "sha": "3df6e98d475fad092d4c57f45fab31663464e38d",
+            "title": "Fix the blank \"{}\" page after tapping Accept when Reddit rejects the API key (#1236)",
+            "author": "icpryde",
+            "files_touched": [
+              "src/ApolloAccountCredentials.m",
+              "src/ApolloWebAuthViewController.m"
+            ],
+            "kind": "fix",
+            "areas": [
+              "auth",
+              "ui",
+              "networking",
+              "storage"
+            ],
+            "summary": "The OAuth sign-in web view now detects Reddit's HTTP 400 response from the oauth-grant endpoint (and Old Reddit's authorize 400/500 pages) and shows an explanatory alert pointing the user to Settings instead of a blank '{}' page. Per-account API keys are trimmed on save, comments are corrected, and 'Switch to Old Reddit' no longer rewrites the grant endpoint.",
+            "security_implications": "Touches the OAuth sign-in flow and response interception in the web auth controller, but only adds error detection and messaging; no new endpoints or credential handling beyond trimming stored keys.",
+            "privacy_implications": "(none)",
+            "safety_implications": "Alert copy references account names and key state; whitespace trimming of stored keys is low risk, and the changed error handling in the web view delegate merits a quick glance.",
+            "risk_signals": [
+              "modifies OAuth sign-in web view response handling",
+              "changes grant endpoint rewriting behavior"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/3df6e98d475fad092d4c57f45fab31663464e38d",
+            "short_sha": "3df6e98d"
+          },
+          {
+            "sha": "ed2d81e39e3efca5e3e98d57033d9ec8cb2b4b5a",
+            "title": "Fix feed crash when several RedGIFs posts load while the RedGIFs token is in flight (#1240) (#1251)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloCommon.h",
+              "src/ApolloRecentlyRead.xm",
+              "src/ApolloRedgifsQueuedFetchesLock.m",
+              "src/ApolloSwiftSingletonCapture.h",
+              "src/ApolloSwiftSingletonCapture.m",
+              "src/Tweak.xm"
+            ],
+            "kind": "fix",
+            "areas": [
+              "threading",
+              "ipc",
+              "build"
+            ],
+            "summary": "Adds a recursive mutex that serialises access to RedGIFsClient's queuedFetches array to fix a concurrent-mutation double-free crash. It does this by using fishhook to rebind swift_beginAccess, swift_endAccess and dispatch_sync in Apollo's image once the client is allocated. swift_allocObject capture is moved to a shared module that Recently Read now also uses, so two rebindings of the same symbol don't conflict.",
+            "security_implications": "(none) - no network, auth, or secret handling changes, though it hooks runtime symbols globally in the process.",
+            "privacy_implications": "(none)",
+            "safety_implications": "Fixes a real memory-safety crash, but globally rebinding dispatch_sync and Swift exclusivity-access functions with a recursive lock carries deadlock and performance risk, and depends on fragile Swift runtime internals.",
+            "risk_signals": [
+              "fishhook rebinding of swift_beginAccess/swift_endAccess/dispatch_sync",
+              "global lock on dispatch_sync",
+              "swift_allocObject capture refactor shared across features",
+              "292 lines of new low-level hooking code"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/ed2d81e39e3efca5e3e98d57033d9ec8cb2b4b5a",
+            "short_sha": "ed2d81e3"
+          },
+          {
+            "sha": "771bcdc0ec496d3b4e44891cf6afb8abc6ab99f1",
+            "title": "Say why a comment didn't post (post removed, thread locked, \u2026) instead of \"Reddit had a little hiccup\" (#1275)",
+            "author": "icpryde",
+            "files_touched": [
+              "Makefile",
+              "src/ApolloCommentSubmitFailure.xm"
+            ],
+            "kind": "feature",
+            "areas": [
+              "networking",
+              "auth",
+              "ui"
+            ],
+            "summary": "Records Reddit's response to each api/comment POST and, on failure, fetches the thread using the posting account (API-key and API-key-free paths) to determine why it failed (removed, locked, archived, banned). It then swaps the error alert's text with an explanation. This is a new 577-line file added to the Makefile.",
+            "security_implications": "Issues additional authenticated requests with the user's account credentials and parses Reddit responses in new code, so request construction, token handling, and response parsing deserve review.",
+            "privacy_implications": "Sends extra requests to Reddit about the thread the user tried to comment on, but only to Reddit and only after a failure; nothing indicates third-party endpoints.",
+            "safety_implications": "Hooks the comment submission callback and swaps alert content while the result is handed to Apollo, so races or a nil error path could break the failure UI.",
+            "risk_signals": [
+              "new authenticated follow-up network requests",
+              "hooks into the API response path",
+              "large new file"
+            ],
+            "severity": "medium",
+            "url": "https://github.com/Apollo-Reborn/Apollo-Reborn/commit/771bcdc0ec496d3b4e44891cf6afb8abc6ab99f1",
+            "short_sha": "771bcdc0"
+          }
+        ]
+      },
+      "hard_flag": true,
+      "summary": "50 commits reviewed. severity: 1H 12M 25L 12none. areas: auth, build, deps, deserialization, ipc, networking"
+    },
+    {
+      "module": "url_inventory",
+      "ok": true,
+      "new_path": "/tmp/tmpgku3u86b/new/Apollo",
+      "baseline_path": null,
+      "allowlist_path": "examples/apollo/allowlist.json",
+      "total_hosts": 71,
+      "added": [
+        "api.gfycat.com",
+        "api.mixpanel.com",
+        "api.redgifs.com",
+        "api.streamable.com",
+        "apolloapp.io",
+        "apollogur.download",
+        "apollonotifications.com",
+        "apollopushserver.xyz",
+        "apolloreq.com",
+        "apps.apple.com",
+        "aspca.org",
+        "bcrfcure.org",
+        "beta.apollonotifications.com",
+        "buy.itunes.apple.com",
+        "cancer.org",
+        "care.org",
+        "cff.org",
+        "chromium.googlesource.com",
+        "cocoapods.org",
+        "cottonbureau.com",
+        "developer.twitter.com",
+        "doctorswithoutborders.org",
+        "eff.org",
+        "giphy.com",
+        "gist.github.com",
+        "github.com",
+        "humanesociety.org",
+        "i.imgflip.com",
+        "i.imgur.com",
+        "i.vimeocdn.com",
+        "imgur-apiv3.p.rapidapi.com",
+        "imgur.com",
+        "itunes.apple.com",
+        "iwkfoundation.org",
+        "jimmyfund.org",
+        "m.reddit.com",
+        "mastodon.social",
+        "mod.reddit.com",
+        "notify.bugsnag.com",
+        "null.org",
+        "oauth.reddit.com",
+        "old.reddit.com",
+        "pcf.org",
+        "plannedparenthood.org",
+        "player.vimeo.com",
+        "redcross.org",
+        "redcrossblood.org",
+        "reddit.com",
+        "sandbox.itunes.apple.com",
+        "sessions.bugsnag.com",
+        "shinerama.ca",
+        "spcans.ca",
+        "ssl.gstatic.com",
+        "ssl.reddit.com",
+        "statsigapi.net",
+        "stjude.org",
+        "terryfox.org",
+        "translate.google.com",
+        "twitter.com",
+        "unicef.org",
+        "v.redd.it",
+        "vimeo.com",
+        "water.org",
+        "weather-data.apple.com",
+        "wikimedia.org",
+        "www.apple.com",
+        "www.googleapis.com",
+        "www.reddit.com",
+        "www.reddithelp.com",
+        "www.youtube.com",
+        "xkcd.com"
+      ],
+      "removed": [],
+      "added_unallowlisted": [
+        "www.apple.com"
+      ],
+      "hard_flag": false,
+      "summary": "71 total hosts. 71 added (1 not on allowlist), 0 removed."
+    }
+  ],
+  "tag": "v1.15.11_3.8.5",
+  "baseline": "v1.15.11_3.8.0"
+}
