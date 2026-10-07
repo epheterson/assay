@@ -1,5 +1,7 @@
 # assay
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/epheterson/assay/badge)](https://scorecard.dev/viewer/?uri=github.com/epheterson/assay)
+
 > An "assay" tests precious metal for purity. **`assay`** tests software releases for trust.
 
 Watch a GitHub repo's releases. On each new release, run a battery of checks (URL inventory, committer diff, more), have an LLM judge whether the diff is consistent with the stated intent, and emit a structured verdict to **email + GitHub Issues**.

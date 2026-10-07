@@ -24,17 +24,19 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  issues: write
+  contents: read
 
 jobs:
   assay:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the new verdict and ledger
+      issues: write # the verdict report and the state issues
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Cache previous-release binary
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: /tmp/assay-baseline
           key: assay-baseline-Apollo-Reborn-v1
@@ -44,7 +46,7 @@ jobs:
       # `claude setup-token`. Without it every verdict is "review" (unjudged),
       # never "clean".
       - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code@2
+        run: npm install -g @anthropic-ai/claude-code@stable
 
       - name: Run assay pipeline
         id: assay
@@ -92,7 +94,7 @@ jobs:
           EMAIL_TAG: ${{ steps.assay.outputs.tag }}
           EMAIL_REASONING: ${{ steps.assay.outputs.reasoning }}
           EMAIL_ISSUE_URL: ${{ steps.assay.outputs.issue_url }}
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde # v3.12.0
         with:
           server_address: smtp.gmail.com
           server_port: 465
