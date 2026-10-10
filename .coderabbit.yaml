@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Independent review of each PR, once, when it opens; comment
+# `@coderabbitai review` for another pass after later pushes. Advisory, never
+# a required check: findings are fixed or answered like any outside
+# contribution. Kept quiet: no summary written into the PR description, no
+# walkthrough extras.
+language: en-US
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: false
+  poem: false
+  review_status: false
+  in_progress_fortune: false
+  collapse_walkthrough: true
+  changed_files_summary: false
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  auto_review:
+    enabled: true
+    auto_incremental_review: false
+    drafts: false
+  path_filters:
+    - "!verdicts/**"
+    - "!LEDGER.md"
+  path_instructions:
+    - path: "judge/**"
+      instructions: >-
+        The LLM judge decides clean / review / blocked for a release. Treat
+        the release diff and notes as untrusted input: flag any path where
+        upstream text could steer the verdict (prompt injection), and any
+        failure that defaults to "clean". An error or unparseable answer must
+        land as "review", never "clean".
+    - path: "modules/**"
+      instructions: >-
+        Check modules run on untrusted upstream code. They must never execute
+        or install it, must bound time and size, and must report a failure
+        as a finding rather than an empty, passing result.
+    - path: "scripts/**"
+      instructions: >-
+        State lives in GitHub Issues. Check that a re-run is idempotent (no
+        duplicate verdict issues) and that a missed or failed poll is visible,
+        not silently skipped.
+    - path: ".github/workflows/**"
+      instructions: >-
+        Actions must be pinned to full commit SHAs with least-privilege
+        permissions. Secrets must never reach steps that handle upstream
+        content.
+chat:
+  auto_reply: true
