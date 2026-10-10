@@ -2,12 +2,13 @@
 
 Every verdict, every release, every target. Newest first. Auto-generated on each verdict.
 
-**Totals:** 16 verdicts · ✅ 3 clean · ⚠️ 13 review · 🚨 0 blocked
+**Totals:** 17 verdicts · ✅ 3 clean · ⚠️ 14 review · 🚨 0 blocked
 
 ## Apollo/Reborn
 
 | | Tag | Score | Headline | Judge | Baseline |
 |---|---|---|---|---|---|
+| ⚠️ `review` | [`v1.15.11_3.9.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.9.0) | 6 | Apollo Reborn 3.9.0: new in-app updater, Kagi/Nitter integrations, Siri/Spotligh | `claude:sonnet` | `v1.15.11_3.8.5` |
 | ⚠️ `review` | [`v1.15.11_3.8.5`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.8.5) | 7 | Apollo-Reborn v3.8.5 adds Google Search (Google-scraping web views) plus many au | `claude:sonnet` | `v1.15.11_3.8.0` |
 | ⚠️ `review` | [`v1.15.11_3.8.0`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.8.0) | 7 | Large feature release (Save All Media, Automatic Backups, Account Switcher redes | `claude:sonnet` | `v1.15.11_3.7.1` |
 | ⚠️ `review` | [`v1.15.11_3.7.1`](https://github.com/Apollo-Reborn/Apollo-Reborn/releases/tag/v1.15.11_3.7.1) | 7 | Routine bugfix/feature release from known contributors; a few medium-severity co | `claude:sonnet` | `v1.15.11_3.7.0` |
